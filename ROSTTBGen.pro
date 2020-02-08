@@ -20,16 +20,19 @@ SOURCES += \
     main.cxx \
     rosservice.cxx \
     rostimetable.cxx \
-    rosttbgen.cxx
+    rosttbgen.cxx \
+    station_add.cxx
 
 HEADERS += \
     app_window.hxx \
     rosservice.hxx \
     rostimetable.hxx \
-    rosttbgen.hxx
+    rosttbgen.hxx \
+    station_add.hxx
 
 FORMS += \
-    rosttbappwindow.ui
+    rosttbappwindow.ui \
+    station_add.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -11,9 +11,17 @@ ROSService* ROSTimetable::operator[](const int& i)
     const int index = (i < 0) ? _services.size()+i : i;
     for(auto srv : _services)
     {
-        if(counter == index) return srv.second;
+        if(counter == index) return srv;
         ++counter;
     }
 
     return nullptr;
+}
+
+void ROSTimetable::orderServices()
+{
+    for(auto srv : _services)
+    {
+        srv->orderService();
+    }
 }

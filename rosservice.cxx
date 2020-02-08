@@ -3,6 +3,7 @@
 QString ROSService::_join(QString join_symbol, QString a, QString b, QString c, QString d, QString e, QString f, QString g, QString h)
 {
     if(a == "") return b;
+    if(b == "") return "";
     QString _temp = a+join_symbol+b;
 
     if(c != "NULL") _temp += join_symbol+c;
@@ -15,9 +16,9 @@ QString ROSService::_join(QString join_symbol, QString a, QString b, QString c, 
     return _temp;
 }
 
-QString ROSService::_start_new(QString in_string)
+QString ROSService::_start_new()
 {
-    QString out_string = _join(",", in_string, _service_id,_description, QString(_start_speed), QString(_max_speed),
+    QString out_string = _join(";", _service_id,_description, QString(_start_speed), QString(_max_speed),
                         QString(_mass), QString(_max_brake), QString(_power));
 
     switch (_service_type)
@@ -45,17 +46,16 @@ QString ROSService::_start_new(QString in_string)
     return out_string;
 }
 
-QString ROSService::_add_stops(QString in_string)
+QString ROSService::_add_stops()
 {
-    QString out_string = in_string;
 
-    if(_stations.size() < 2) return out_string;
+    if(_stations.size() < 2) return "";
 
-    out_string = _join(",", out_string, _join(";", _times[0][0].toString("HH:mm"), _stations[0]));
+    QString out_string = _join(";", _times[0][0].toString("HH:mm"), _stations[0]);
 
-    for(unsigned int i{1}; i < _stations.size()-2; ++i)
+    for(int i{1}; i < _stations.size()-2; ++i)
     {
-        out_string = _join(",", out_string, _join(";", _times[i][0].toString("HH:mm"),_times[i][1].toString("HH:mm"), _stations[i]));
+        out_string = _join(",", out_string, _join(";", (_times[i][1] != QTime()) ? _join(";", _times[i][0].toString("HH:mm"), _times[i][1].toString("HH:mm")) : _times[i][0].toString("HH:mm"), _stations[i]));
     }
 
     if(_finish_as == FinishState::FinishExit)
@@ -77,26 +77,26 @@ QString ROSService::summarise()
 {
     const QString _start = (_stations.size() < 1) ? "" : _stations[0],
                   _finish = (_stations.size() < 2) ? "" : _stations[_stations.size()-1];
-    return _join("\t", _enter_map_time.toString("HH:mm"), _service_id, _start, _finish);
+    return _join("\t", _enter_map_time.toString("HH:mm"), _service_id, _description, _start, _finish);
 }
 
-QString ROSService::_finalize(QString in_string)
+QString ROSService::_finalize()
 {
-    QString out_string;
+    QString out_string = "";
 
     switch(_finish_as)
     {
         case ROSService::FinishState::FinishExit:
-            out_string = _join(",", in_string, _join(";", _times[_times.size()-1][0].toString(), "Fer", _exit_id));
+            out_string = _join(";", _times[_times.size()-1][0].toString(), "Fer", _exit_id);
             break;
         case ROSService::FinishState::FinishFormNew:
-            out_string = _join(",", in_string, _join(";", _times[_times.size()-1][0].toString(), "Fns", _daughter_id));
+            out_string = _join(";", _times[_times.size()-1][0].toString(), "Fns", _daughter_id);
             break;
         case ROSService::FinishState::FinishJoinOther:
-            out_string = _join(",", in_string, _join(";", _times[_times.size()-1][0].toString(), "Fjo", _daughter_id));
+            out_string = _join(";", _times[_times.size()-1][0].toString(), "Fjo", _daughter_id);
             break;
         default:
-            out_string = _join(",", in_string, "Frh");
+            out_string = "Frh";
     }
 
     return out_string;
@@ -111,9 +111,9 @@ bool ROSService::checkService()
 
 QString ROSService::as_string()
 {
-    QString _out = _start_new("");
-    _out = _join(",", _out, _add_stops(_out));
-    _out = _join(",", _out, _finalize(_out));
+    QString _out = _start_new();
+    _out = _join(",", _out, _add_stops());
+    _out = _join(",", _out, _finalize());
 
     return _out;
 }
@@ -143,4 +143,45 @@ void ROSService::setShuttleRefPosition(QString coordinates[2])
     _shuttle_pos_ref_ids[0] = coordinates[0];
     _shuttle_pos_ref_ids[1] = coordinates[1];
 
+}
+
+void ROSService::orderService()
+{
+    QList<bool> _pass_temp = {};
+    QList<QString> _stat_temp = {};
+    QMap<int, QList<QTime>> _times_temp = {{}};
+
+    QList<int> _ordered_index = {};
+
+    for(int i{0}; i < _times_temp.size(); ++i)
+    {
+        if(i == 0)
+        {
+            _ordered_index.push_back(i);
+        }
+
+        else
+        {
+            for(auto j : _ordered_index)
+            {
+                if(_times[i][0] < _times[j][0])
+                {
+                    _ordered_index.insert(j, i);
+                    break;
+                }
+            }
+        }
+
+    }
+
+    for(int i{0}; i < _passing_stops.size(); ++i)
+    {
+        _pass_temp[i] = _passing_stops[_ordered_index[i]];
+        _stat_temp[i] = _stations[_ordered_index[i]];
+        _times_temp[i] = _times[_ordered_index[i]];
+    }
+
+    _passing_stops = _pass_temp;
+    _stations = _stat_temp;
+    _times = _times_temp;
 }

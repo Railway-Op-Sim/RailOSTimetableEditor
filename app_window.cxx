@@ -6,6 +6,7 @@ ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
     , ui(new Ui::ROSTTBAppWindow)
 {
     ui->setupUi(this);
+    connect(_station_add, SIGNAL(accepted()), this, SLOT(on_stationAdd_accepted()));
     ui->ROSStatus->setStyleSheet("QLabel { color : red; }");
     ui->SelectedRoute->setStyleSheet("QLabel { color : red; }");
     _timetable_table->setGeometry(440,50,900,541);
@@ -33,6 +34,12 @@ void ROSTTBAppWindow::_record_current_info()
               _max_brake   = ui->spinBoxForce->value(),
               _max_speed   = ui->spinBoxMaxSpeed->value();
     const bool info_missing = _srv_id == "" || _desc == "";
+    if(_srv_id.size() != 4)
+    {
+        _srv_id = _srv_id.left(4);
+        QMessageBox::warning(this, "Service ID Length", "Service ID must be 4 characters in length, ID will be spliced to '" + _srv_id+ "'.");
+
+    }
     if(info_missing)
     {
         QMessageBox::critical(this, "Missing Information", "Service Identifier or Description Missing");
@@ -59,6 +66,7 @@ void ROSTTBAppWindow::_record_current_info()
         return;
     }
     _current_timetable->addService(_start_time, _srv_id);
+    _current_timetable->operator[](-1)->setDescription(_desc);
     _current_timetable->operator[](-1)->setMass(_mass);
     _current_timetable->operator[](-1)->setMaxBrake(_max_brake);
     _current_timetable->operator[](-1)->setStartSpeed(_start_speed);
@@ -70,17 +78,37 @@ void ROSTTBAppWindow::_record_current_info()
 
 void ROSTTBAppWindow::_update_output()
 {
-    QString out = "";
+    _timetable_table->setRowCount(0);
+    _service_table->setRowCount(0);
+
+    _current_timetable->orderServices();
+
     for(int i{0}; i < _current_timetable->size(); ++i)
     {
-        out += _current_timetable->operator[](i)->summarise();
-        if(i < _current_timetable->size()-2) out += "\n";
+        QString out = _current_timetable->operator[](i)->summarise();
+        QTableWidgetItem* _new_service_item = new QTableWidgetItem(out, 0);
+        _new_service_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+        if(_timetable_table->columnCount() == 0) _timetable_table->insertColumn(_timetable_table->columnCount());
+        _timetable_table->insertRow(_timetable_table->rowCount());
+        _timetable_table->setItem(_timetable_table->rowCount()-1, 0, _new_service_item);
     }
-    QTableWidgetItem* _new_service_item = new QTableWidgetItem(out, 0);
-    _new_service_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-    if(_timetable_table->columnCount() == 0) _timetable_table->insertColumn(_timetable_table->columnCount());
-    _timetable_table->insertRow(_timetable_table->rowCount());
-    _timetable_table->setItem(_timetable_table->rowCount()-1, 0, _new_service_item);
+
+    QList<QString> _current_element_stations = _current_timetable->operator[](_current_service_selection)->getStations();
+    QMap<int, QList<QTime>> _current_element_times = _current_timetable->operator[](_current_service_selection)->getTimes();
+
+    qDebug() << "Processing Stations..." << "\n";
+    for(int i{0}; i < _current_element_stations.size(); ++i)
+    {
+        QTime _arrival_time = _current_element_times[i][0],
+              _depart_time  = _current_element_times[i][1];
+        QString _station_item =  _arrival_time.toString("HH:mm")+"\t"+_depart_time.toString("HH:mm")+"\t"+_current_element_stations[i];
+        qDebug() << "Appending Station: " << _station_item << "\n";
+        QTableWidgetItem* _new_time_item = new QTableWidgetItem(_station_item, 0);
+        _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+        if(_service_table->columnCount() == 0) _service_table->insertColumn(_service_table->columnCount());
+        _service_table->insertRow(_service_table->rowCount());
+        _service_table->setItem(_service_table->rowCount()-1, 0, _new_time_item);
+    }
 }
 
 void ROSTTBAppWindow::on_actionOpen_triggered()
@@ -165,6 +193,7 @@ void ROSTTBAppWindow::on_pushButtonInsert_clicked()
 {
     _record_current_info();
     _current_service_selection = _current_timetable->size()-1;
+    _station_add->setCurrentService(_current_timetable->operator[](_current_service_selection));
 }
 
 void ROSTTBAppWindow::delete_entries()
@@ -190,10 +219,27 @@ void ROSTTBAppWindow::on_pushButtonRoute_clicked()
     _parts.push_back("Railways");
     QString _railways_dir = _parts.join(_split_str);
     qDebug() << "Railways Directory: " << _railways_dir << "\n";
-    QString _parsed = _parser->parse_rly(_railways_dir);
+    QString _parsed = _parser->parse_rly(this, _railways_dir);
     _current_route = (_parsed != "NULL") ? _parsed : _current_route;
     _parts = _current_route.split(_split_str);
     ui->SelectedRoute->setText(_parts[_parts.size()-1]);
     ui->SelectedRoute->setStyleSheet("QLabel { color : green; }");
 
+}
+
+void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
+{
+    if(_current_timetable->size() == 0)
+    {
+        QMessageBox::critical(this, "No Service Defined", "You must add a service before selecting calling points.");
+        return;
+    }
+    _station_add->setStations(_parser->getStations());
+    _station_add->show();
+
+}
+
+void ROSTTBAppWindow::on_stationAdd_accepted()
+{
+    _update_output();
 }

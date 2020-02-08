@@ -1,17 +1,17 @@
 #ifndef ROSTIMETABLE_HXX
 #define ROSTIMETABLE_HXX
 
-#include <map>
-#include <vector>
+#include <QMap>
 #include <QDateTime>
+#include <QSet>
 
 #include "rosservice.hxx"
 
 class ROSTimetable
 {
     private:
-        std::map<QString, ROSService*> _services = {};
-        std::vector<QString> _stored_locations = {};
+        QMap<QString, ROSService*> _services = {};
+        QList<QString> _stored_locations = {};
         QString _file_name = "";
     public:
         ROSTimetable(QString file_name="NewTimetable_"+QDateTime::currentDateTime().toString("HH_mm_dd-MM-yy")+".ttb") : _file_name(file_name) {}
@@ -19,6 +19,7 @@ class ROSTimetable
         {
             _services[id] = new ROSService(start_time, id);
         }
+        void orderServices();
         QString getFileName() const {return _file_name;}
         void setFileName(QString file_name) {_file_name = file_name;}
         ROSService* operator[](const QString&);
