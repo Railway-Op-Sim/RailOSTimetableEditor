@@ -46,25 +46,38 @@ private slots:
 
     void on_stationAdd_accepted();
 
+    void on_radioButtonStandard_toggled(bool checked);
+
+    void on_radioButtonShuttleFeeder_toggled(bool checked);
+
+    void on_radioButtonShuttleStop_toggled(bool checked);
+
+    void on_radioButtonFeeder_toggled(bool checked);
+
+    void on_radioButtonFromOther_toggled(bool checked);
+
+    void on_tableWidgetTimetable_cellClicked(int row, int column);
+
 private:
-    QTableWidget* _service_table = new QTableWidget(this);
-    QTableWidget* _timetable_table = new QTableWidget(this);
     Station_add* _station_add = new Station_add(nullptr, this);
-    QItemSelectionModel* _tt_model_select = new QItemSelectionModel(_timetable_table->model());
     QDir* _ros_timetables = nullptr;
     Ui::ROSTTBAppWindow *ui;
+    QItemSelectionModel* _tt_model_select;
     QFileDialog* _current_file = new QFileDialog(this);
     QString _open_file_str = "";
     QString _current_route = "";
-    ROSTTBGen* _parser = new ROSTTBGen;
+    ROSTTBGen* _parser = new ROSTTBGen(this);
     ROSTimetable* _current_timetable = new ROSTimetable;
-    int _current_service_selection = -1;
+    QList<int> _ttb_column_widths = {50, 50, 300, 200, 75, 200, 50};
+    ROSService* _current_service_selection = nullptr;
     void _save_as();
     void reset();
     bool checkROS();
     void _record_current_info();
     void _update_output();
     void delete_entries();
+    void _set_initial_open_file();
+    void _enable_integer_info(bool enable);
 
 };
 #endif // ROSTTBAPPWINDOW_HXX

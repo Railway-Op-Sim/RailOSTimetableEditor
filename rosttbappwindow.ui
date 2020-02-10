@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>610</y>
+      <y>590</y>
       <width>1601</width>
-      <height>281</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="title">
@@ -54,7 +54,7 @@
       <rect>
        <x>360</x>
        <y>30</y>
-       <width>171</width>
+       <width>131</width>
        <height>31</height>
       </rect>
      </property>
@@ -75,7 +75,7 @@
     <widget class="QSpinBox" name="spinBoxStartSpeed">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>150</x>
        <y>70</y>
        <width>60</width>
        <height>30</height>
@@ -85,7 +85,7 @@
     <widget class="QSpinBox" name="spinBoxMaxSpeed">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>150</x>
        <y>100</y>
        <width>60</width>
        <height>30</height>
@@ -95,7 +95,7 @@
     <widget class="QSpinBox" name="spinBoxMass">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>150</x>
        <y>130</y>
        <width>60</width>
        <height>30</height>
@@ -105,7 +105,7 @@
     <widget class="QSpinBox" name="spinBoxForce">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>150</x>
        <y>160</y>
        <width>60</width>
        <height>30</height>
@@ -148,7 +148,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Mass (tonnes)</string>
+      <string>Mass (te)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_6">
@@ -156,18 +156,18 @@
       <rect>
        <x>20</x>
        <y>170</y>
-       <width>101</width>
+       <width>131</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Max Brake Force</string>
+      <string>Max Brake Force (te)</string>
      </property>
     </widget>
     <widget class="QSpinBox" name="spinBoxPower">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>150</x>
        <y>190</y>
        <width>60</width>
        <height>30</height>
@@ -190,7 +190,7 @@
     <widget class="QLabel" name="label_9">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>220</x>
        <y>80</y>
        <width>81</width>
        <height>16</height>
@@ -203,9 +203,9 @@
     <widget class="QTextEdit" name="descEdit">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>300</x>
        <y>70</y>
-       <width>241</width>
+       <width>191</width>
        <height>31</height>
       </rect>
      </property>
@@ -213,7 +213,7 @@
     <widget class="QRadioButton" name="radioButtonStandard">
      <property name="geometry">
       <rect>
-       <x>570</x>
+       <x>530</x>
        <y>30</y>
        <width>100</width>
        <height>20</height>
@@ -236,7 +236,7 @@
       <string>Shuttle from Feeder Service</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_3">
+    <widget class="QTextEdit" name="textEditFeederRef">
      <property name="geometry">
       <rect>
        <x>820</x>
@@ -249,7 +249,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_4">
+    <widget class="QTextEdit" name="textEditShuttleRef">
      <property name="geometry">
       <rect>
        <x>990</x>
@@ -278,33 +278,7 @@
       <string>Feeder for Shuttle Service</string>
      </property>
     </widget>
-    <widget class="Line" name="line">
-     <property name="geometry">
-      <rect>
-       <x>670</x>
-       <y>30</y>
-       <width>16</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-    <widget class="Line" name="line_2">
-     <property name="geometry">
-      <rect>
-       <x>970</x>
-       <y>30</y>
-       <width>16</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_8">
+    <widget class="QLabel" name="labelFeederRef">
      <property name="geometry">
       <rect>
        <x>700</x>
@@ -317,7 +291,7 @@
       <string>Feeder Reference</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_10">
+    <widget class="QLabel" name="labelShuttleRef">
      <property name="geometry">
       <rect>
        <x>990</x>
@@ -330,22 +304,22 @@
       <string>Shuttle Reference</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="spinBox_6">
+    <widget class="QSpinBox" name="spinBoxRepeats">
      <property name="geometry">
       <rect>
        <x>840</x>
-       <y>170</y>
+       <y>120</y>
        <width>42</width>
        <height>22</height>
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_11">
+    <widget class="QLabel" name="labelRepeats">
      <property name="geometry">
       <rect>
        <x>690</x>
-       <y>180</y>
-       <width>111</width>
+       <y>120</y>
+       <width>60</width>
        <height>16</height>
       </rect>
      </property>
@@ -353,11 +327,11 @@
       <string>Repeats</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_12">
+    <widget class="QLabel" name="labelTerminusWaitTime">
      <property name="geometry">
       <rect>
        <x>690</x>
-       <y>200</y>
+       <y>150</y>
        <width>141</width>
        <height>16</height>
       </rect>
@@ -366,11 +340,11 @@
       <string>Terminus Wait Time (s)</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="spinBox_7">
+    <widget class="QSpinBox" name="spinBoxTerminusWaitTime">
      <property name="geometry">
       <rect>
        <x>840</x>
-       <y>200</y>
+       <y>150</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -379,40 +353,14 @@
     <widget class="QRadioButton" name="radioButtonShuttleStop">
      <property name="geometry">
       <rect>
-       <x>690</x>
-       <y>100</y>
+       <x>530</x>
+       <y>70</y>
        <width>201</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>Shuttle from Stop</string>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="textEdit_5">
-     <property name="geometry">
-      <rect>
-       <x>820</x>
-       <y>130</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_13">
-     <property name="geometry">
-      <rect>
-       <x>700</x>
-       <y>140</y>
-       <width>111</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Location Name</string>
      </property>
     </widget>
     <widget class="Line" name="line_3">
@@ -441,7 +389,7 @@
       <string>Service from Other Service</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_14">
+    <widget class="QLabel" name="labelParentRef">
      <property name="geometry">
       <rect>
        <x>990</x>
@@ -454,7 +402,7 @@
       <string>Parent Service Reference</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_6">
+    <widget class="QTextEdit" name="textEditParentRef">
      <property name="geometry">
       <rect>
        <x>990</x>
@@ -467,7 +415,7 @@
       <string/>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="checkBoxParentSplit">
      <property name="geometry">
       <rect>
        <x>990</x>
@@ -483,7 +431,7 @@
     <widget class="Line" name="line_4">
      <property name="geometry">
       <rect>
-       <x>540</x>
+       <x>500</x>
        <y>30</y>
        <width>16</width>
        <height>241</height>
@@ -496,7 +444,7 @@
     <widget class="Line" name="line_5">
      <property name="geometry">
       <rect>
-       <x>550</x>
+       <x>510</x>
        <y>30</y>
        <width>16</width>
        <height>241</height>
@@ -522,8 +470,8 @@
     <widget class="QLabel" name="label_15">
      <property name="geometry">
       <rect>
-       <x>140</x>
-       <y>240</y>
+       <x>130</x>
+       <y>260</y>
        <width>241</width>
        <height>31</height>
       </rect>
@@ -542,9 +490,9 @@
     <widget class="QLabel" name="label_16">
      <property name="geometry">
       <rect>
-       <x>770</x>
-       <y>240</y>
-       <width>241</width>
+       <x>750</x>
+       <y>260</y>
+       <width>161</width>
        <height>31</height>
       </rect>
      </property>
@@ -563,7 +511,7 @@
      <property name="geometry">
       <rect>
        <x>1270</x>
-       <y>240</y>
+       <y>250</y>
        <width>261</width>
        <height>31</height>
       </rect>
@@ -603,6 +551,81 @@
      </property>
      <property name="text">
       <string>Delete</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEditEnterID1">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>140</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEditEnterID2">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>210</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>120</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Track ID Rear</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>180</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Track ID Front</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBoxRefIncrement">
+     <property name="geometry">
+      <rect>
+       <x>840</x>
+       <y>180</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>180</y>
+       <width>140</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reference Increment</string>
      </property>
     </widget>
    </widget>
@@ -707,6 +730,26 @@
      <string>Add Calling Point</string>
     </property>
    </widget>
+   <widget class="QTableWidget" name="tableWidgetService">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>60</y>
+      <width>381</width>
+      <height>531</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidgetTimetable">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>60</y>
+      <width>941</width>
+      <height>531</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -728,7 +771,15 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout_ROSTTBGen"/>
+    <addaction name="actionDocumentation"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNew">
@@ -754,6 +805,16 @@
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
+   </property>
+  </action>
+  <action name="actionAbout_ROSTTBGen">
+   <property name="text">
+    <string>About ROSTTBGen</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
    </property>
   </action>
  </widget>

@@ -8,7 +8,7 @@ ROSService* ROSTimetable::operator[](const QString& id)
 ROSService* ROSTimetable::operator[](const int& i)
 {
     int counter = 0;
-    const int index = (i < 0) ? _services.size()+i : i;
+    const int index = (i == -1) ? _services.size()-1 : i;
     for(auto srv : _services)
     {
         if(counter == index) return srv;
@@ -20,8 +20,8 @@ ROSService* ROSTimetable::operator[](const int& i)
 
 void ROSTimetable::orderServices()
 {
-    for(auto srv : _services)
+    for(int i{0}; i < _services.size(); ++i)
     {
-        srv->orderService();
+        this->operator[](i)->orderService();
     }
 }

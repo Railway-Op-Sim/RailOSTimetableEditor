@@ -42,6 +42,9 @@ private slots:
 
     void on_checkBoxCDT_stateChanged();
 
+signals:
+    void on_stationAdd_accepted();
+
 private:
     Ui::Station_add *ui;
     QList<QString> _station_list = {};

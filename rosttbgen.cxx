@@ -1,30 +1,60 @@
 #include "rosttbgen.hxx"
 
-ROSTTBGen::ROSTTBGen()
-{
-}
-
-void ROSTTBGen::parse_file(const QFileDialog* file)
+QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 {
     _cached_text = "";
-    QFile open_file(file->getOpenFileName());
+    QString in_file = file->getOpenFileName(_parent, "Open Timetable",directory->absolutePath(), "ROS Timetable Files (*.ttb)");
+    QFile open_file(in_file);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
-        return;
+    {
+        QMessageBox::critical(_parent, "File Open Failure", "Failed to open file '"+in_file+"'");
+        return QString();
+    }
 
     QTextStream in(&open_file);
     while (!in.atEnd()) {
         QString line = in.readLine();
-        _cached_text += line;
+        QRegExp rex("(\\x0)");
+        bool _record_ttb = false;
+        QStringList _parts = line.split(rex);
+
+        for(auto part : _parts)
+        {
+            if(part.contains(";"))
+            {
+                _record_ttb = _check_isID(part.split(";")[0]);
+                if(_record_ttb) _input_data += part.split(",");
+            }
+            else
+            {
+                for(int i{0}; i < part.size(); ++i)
+                {
+                    if(_check_isTime(part.mid(i, i+5)))
+                    {
+                        _input_data.append(part.mid(i, i+5));
+                        break;
+                    }
+                }
+                if(part.size() > 0) _comments.append(part);
+            }
+        }
     }
 
-    qDebug() << _cached_text << "\n";
+    open_file.close();
 
+    _process_data();
+
+    QString _file_name = open_file.fileName();
+
+    _current_timetable->setFileName(_file_name);
+
+    return _file_name;
 }
 
-QString ROSTTBGen::parse_rly(QWidget* parent, const QString railways_dir)
+QString ROSTTBGen::parse_rly(const QString railways_dir)
 {
     QFileDialog* _route_diag = new QFileDialog;
-    QString _current_route = _route_diag->getOpenFileName(parent, "Open Route", railways_dir,
+    QString _current_route = _route_diag->getOpenFileName(_parent, "Open Route", railways_dir,
                                    "ROS Railway Files (*.rly)");
     QStringList _stations = {};
     QFile open_file(_current_route);
@@ -50,5 +80,343 @@ QString ROSTTBGen::parse_rly(QWidget* parent, const QString railways_dir)
     }
     _stations_list = QSet<QString>(_stations.begin(), _stations.end());
 
+    open_file.close();
+
     return _current_route;
+}
+
+bool ROSTTBGen::_check_isTime(QString string)
+{
+    if(string.size() != 5) return false;
+    return string[0].isNumber() && string[1].isNumber() && string[2] == ":" && string[3].isNumber() && string[4].isNumber();
+}
+
+bool ROSTTBGen::_check_isID(QString string)
+{
+    if(string.size() != 4 || _check_isTime("0"+string)) return false;
+
+    return true;
+}
+
+bool ROSTTBGen::_check_Integer(QString string)
+{
+    for(auto n : string)
+    {
+        if(!n.isNumber()) return false;
+    }
+
+    return true;
+}
+
+bool ROSTTBGen::_checkPas(QStringList str_list)
+{
+    if(str_list.contains("pas")) return true;
+
+    return false;
+}
+
+bool ROSTTBGen::_checkCDT(QStringList str_list)
+{
+    if(str_list.contains("cdt")) return true;
+
+    return false;
+}
+
+bool ROSTTBGen::_checkIfStart(QStringList str_list)
+{
+    QStringList _types = _start_types.values();
+    for(auto type : _types)
+    {
+        if(str_list.contains(type)) return true;
+    }
+
+    return false;
+}
+
+ROSService::ServiceType ROSTTBGen::_parseType(QStringList str_list)
+{
+    QStringList _str_types = _start_types.values();
+    QList<ROSService::ServiceType> _types = _start_types.keys();
+    for(int i{0}; i < _start_types.size(); ++i)
+    {
+        if(str_list.contains(_str_types[i])) return _types[i];
+    }
+
+    return ROSService::ServiceType::Service;
+}
+
+ROSService::FinishState ROSTTBGen::_parseExit(QStringList str_list)
+{
+    QStringList _str_types = _exit_types.values();
+    QList<ROSService::FinishState> _types = _exit_types.keys();
+    for(int i{0}; i < _exit_types.size(); ++i)
+    {
+        if(str_list.contains(_str_types[i]))
+        {
+            qDebug() << "Got type " << int(_types[i]) << " for " << str_list;
+            return _types[i];
+        }
+    }
+
+    return ROSService::FinishState::FinishExit;
+}
+
+bool ROSTTBGen::_checkIfEnd(QStringList str_list)
+{
+    QStringList _types = _exit_types.values();
+    for(auto type : _types)
+    {
+        if(str_list.contains(type)) return true;
+    }
+
+    return false;
+}
+
+bool ROSTTBGen::_checkStationCall(QStringList str_list)
+{
+    return _check_isTime(str_list[0]) && !_checkCDT(str_list) && !_checkPas(str_list) && !_checkIfStart(str_list) && !_checkIfEnd(str_list);
+}
+
+bool ROSTTBGen::_checkIsCoordinate(QString string)
+{
+    int n_chars = 0, n_nums = 0;
+
+    for(int i{0}; i < string.size(); ++i)
+    {
+        if(string[i].isLetter()) n_chars++;
+        else n_nums++;
+    }
+
+    return string.contains("-") && string[string.indexOf("-")-1].isNumber() && n_chars < 2 && n_nums > 1;
+}
+
+bool ROSTTBGen::_isRepeat(QStringList str_list)
+{
+    if(str_list.size() != 4) return false;
+
+    return str_list[0] == "R" && _check_Integer(str_list[1]) && _check_Integer(str_list[2]) && _check_Integer(str_list[3]);
+}
+
+bool ROSTTBGen::_isCallingPoint(QStringList str_list)
+{
+    if(str_list.size() != 3) return false;
+    return _check_isTime(str_list[0]) && _check_isTime(str_list[1]) && str_list[2][0].isLetter();
+}
+
+bool ROSTTBGen::_isStartStopPoint(QStringList str_list)
+{
+    if(str_list.size() != 2) return false;
+    return !_check_isID(str_list[0]) && _check_isTime(str_list[0]) && str_list[1][0].isLetter() && !_checkCDT(str_list) && !_checkPas(str_list);
+}
+
+bool ROSTTBGen::_isServiceDefinition(QStringList str_list)
+{
+    if(str_list.size() != 7) return false;
+    return _check_isID(str_list[0]) && _check_Integer(str_list[2]) && _check_Integer(str_list[3]) && _check_Integer(str_list[4]) && _check_Integer(str_list[5]) && _check_Integer(str_list[6]);
+}
+
+bool ROSTTBGen::_isContinuedServiceDefinition(QStringList str_list)
+{
+    if(str_list.size() != 2) return false;
+
+    return _check_isID(str_list[0]);
+}
+
+void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
+{
+    QString _id = "NULL", _description = "NULL";
+    QTime _start_time = QTime();
+    if(_isServiceDefinition(service[0].split(";")))
+    {
+        QStringList _components = service[0].split(";");
+        _id = _components[0];
+        _description = _components[1];
+    }
+    else if(_isContinuedServiceDefinition(service[0].split(";")))
+    {
+        QStringList _components = service[0].split(";");
+        _id = _components[0];
+        _description = _components[1];
+    }
+
+    if(_checkIfStart(service[1].split(";")))
+    {
+        QStringList _components = service[1].split(";");
+        _start_time = QTime::fromString(_components[0], "HH:mm");
+    }
+
+    else
+    {
+        QMessageBox::critical(_parent, "Import Failure", "Failed to import service '"+_id+"'");
+        return;
+    }
+
+    ROSService* _service = new ROSService(int_id, _start_time, _id, _description);
+
+    if(_isServiceDefinition(service[0].split(";")))
+    {
+        QStringList _components = service[0].split(";");
+        _service->setStartSpeed(_components[2].toInt());
+        _service->setMaxSpeed(_components[3].toInt());
+        _service->setMass(_components[4].toInt());
+        _service->setMaxBrake(_components[5].toInt());
+        _service->setPower(_components[6].toInt());
+    }
+
+    if(_checkIfStart(service[1].split(";")))
+    {
+        QStringList _components = service[1].split(";");
+
+        ROSService::ServiceType _type = _parseType(_components[1].split(";"));
+        _service->setType(_type);
+        QStringList _element_ids;
+        switch(_type)
+        {
+            case ROSService::ServiceType::Service:
+                _element_ids = _components[2].split(" ");
+                _service->setEntryPoint(_element_ids);
+                break;
+            case ROSService::ServiceType::ShuttleFromStop:
+                _element_ids = _components[2].split(" ");
+                _service->setEntryPoint(_element_ids);
+                _service->setParent(_components[3]);
+                break;
+            case ROSService::ServiceType::ShuttleFromFeeder:
+                _service->setParent(_components[2]);
+                _service->setDaughter(_components[3]);
+                break;
+            case ROSService::ServiceType::ServiceFromService:
+                _service->setParent(_components[2]);
+                break;
+            case ROSService::ServiceType::SingleShuttleService:
+                _service->setDaughter(_components[2]);
+                break;
+            case ROSService::ServiceType::ServiceFromSplit:
+                _service->setParent(_components[2]);
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    int _final_index = 1;
+    QStringList _components;
+
+    if(_isRepeat(service[service.size()-1].split(";")))
+    {
+        _components = service[service.size()-1].split(";");
+        _service->setNRepeats(_components[3].toInt());
+        _service->setIDIncrement(_components[2].toInt());
+        _final_index = 2;
+
+        //TODO Need to calculate terminus wait time based on start and finish times
+    }
+
+    _components = service[service.size()-_final_index].split(";");
+    ROSService::FinishState _fin_state = _parseExit(_components);
+    switch(_fin_state)
+    {
+        case ROSService::FinishState::FinishExit:
+            _service->setExitPoint(_components[2]);
+            break;
+        case ROSService::FinishState::FinishFormNew:
+            _service->setDaughter(_components[2]);
+            break;
+        case ROSService::FinishState::FinishJoinOther:
+            _service->setDaughter(_components[2]);
+            break;
+        case ROSService::FinishState::FinishRemainHere:
+            break;
+        case ROSService::FinishState::FinishShuttleFormNew:
+            _service->setParent(_components[2]);
+            _service->setDaughter(_components[3]);
+            break;
+        case ROSService::FinishState::FinishShuttleRemainHere:
+            _service->setParent(_components[2]);
+            break;
+        case ROSService::FinishState::FinishSingleShuttleFeeder:
+            _service->setParent(_components[2]);
+            break;
+        default:
+            break;
+    }
+
+    for(int i{2}; i < service.size()-_final_index; ++i)
+    {
+        bool _pass_point = false;
+
+        if(_isCallingPoint(service[i].split(";")))
+        {
+            QStringList _components = service[i].split(";");
+            _service->addStation({QTime::fromString(_components[0], "HH:mm"),
+                                 QTime::fromString(_components[1], "HH:mm")},
+                                 _components[2]);
+        }
+
+        else if(_isStartStopPoint(service[i].split(";")))
+        {
+            QStringList _components = service[i].split(";");
+            _service->addStation({QTime::fromString(_components[0], "HH:mm"),
+                                 QTime()},
+                                 _components[1]);
+        }
+
+        else if(_checkPas(service[i].split(";")))
+        {
+            QStringList _components = service[i].split(";");
+            _service->addStation({QTime::fromString(_components[0]), QTime()},
+                                 _components[2]);
+            _pass_point = true;
+
+        }
+
+        _service->setStopAsPassPoint(_service->getStations().size()-1, _pass_point);
+        bool _cdt = (i < service.size()-2 && _checkCDT(service[i+1].split(";")));
+        _service->setDirectionChangeAtStop(_service->getStations().size()-1, _cdt);
+
+    }
+
+    _current_timetable->addService(_service);
+
+    qDebug() << "START: " << service;
+    qDebug() << "FINISH: " << _current_timetable->getServices()[_id]->summarise();
+}
+
+void ROSTTBGen::_process_data()
+{
+    if(_input_data.size() < 1)
+    {
+        QMessageBox::critical(_parent, "Parsing Failed", "No data found in input file");
+        return;
+    }
+
+    QList<QStringList> _services;
+
+    QStringList _temp = {};
+
+    for(int i{0}; i < _input_data.size(); ++i)
+    {
+        if(i == 0) continue;
+        if((_isServiceDefinition(_input_data[i].split(";")) || _isContinuedServiceDefinition(_input_data[i].split(";"))) && i != 1)
+        {
+            _services.push_back(_temp);
+            _temp = QStringList();
+        }
+        _temp.push_back(_input_data[i]);
+    }
+
+
+    for(int i{0}; i < _services.size(); ++i)
+    {
+        _process_service_candidate(i, _services[i]);
+    }
+
+    if(_current_timetable->size() != _services.size())
+    {
+        QMessageBox::critical(_parent, "Failed Service Importing", "Number of services created does not match number in input file");
+        return;
+    }
+
+
 }

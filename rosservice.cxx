@@ -33,14 +33,14 @@ QString ROSService::_start_new()
             out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Sns-fsh", _parent_service));
             break;
         case ROSService::ServiceType::ShuttleFromStop:
-            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Snt-sh", _shuttle_pos_ref_ids[0]));
-            out_string = _join(" ", out_string, _join(";", _shuttle_pos_ref_ids[1], _parent_service));
+            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Snt-sh", _enter_ids[0]));
+            out_string = _join(" ", out_string, _join(";", _enter_ids[1], _parent_service));
             break;
         case ROSService::ServiceType::ShuttleFromFeeder:
             out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Sns-sh", _parent_service));
             break;
         default:
-            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Sns-fsh", _parent_service));
+            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Snt", _enter_ids[0], _enter_ids[1]));
     }
 
     return out_string;
@@ -73,11 +73,9 @@ QString ROSService::_add_stops()
     return out_string;
 }
 
-QString ROSService::summarise()
+QStringList ROSService::summarise()
 {
-    const QString _start = (_stations.size() < 1) ? "" : _stations[0],
-                  _finish = (_stations.size() < 2) ? "" : _stations[_stations.size()-1];
-    return _join("\t", _enter_map_time.toString("HH:mm"), _service_id, _description, _start, _finish);
+    return QStringList({_enter_map_time.toString("HH:mm"), _service_id, _description})+getStations();
 }
 
 QString ROSService::_finalize()
@@ -140,48 +138,12 @@ void ROSService::setFinishState(ROSService::FinishState fin_state, QString exit_
 void ROSService::setShuttleRefPosition(QString coordinates[2])
 {
     _service_type = ServiceType::ShuttleFromStop;
-    _shuttle_pos_ref_ids[0] = coordinates[0];
-    _shuttle_pos_ref_ids[1] = coordinates[1];
+    _enter_ids[0] = coordinates[0];
+    _enter_ids[1] = coordinates[1];
 
 }
 
 void ROSService::orderService()
 {
-    QList<bool> _pass_temp = {};
-    QList<QString> _stat_temp = {};
-    QMap<int, QList<QTime>> _times_temp = {{}};
-
-    QList<int> _ordered_index = {};
-
-    for(int i{0}; i < _times_temp.size(); ++i)
-    {
-        if(i == 0)
-        {
-            _ordered_index.push_back(i);
-        }
-
-        else
-        {
-            for(auto j : _ordered_index)
-            {
-                if(_times[i][0] < _times[j][0])
-                {
-                    _ordered_index.insert(j, i);
-                    break;
-                }
-            }
-        }
-
-    }
-
-    for(int i{0}; i < _passing_stops.size(); ++i)
-    {
-        _pass_temp[i] = _passing_stops[_ordered_index[i]];
-        _stat_temp[i] = _stations[_ordered_index[i]];
-        _times_temp[i] = _times[_ordered_index[i]];
-    }
-
-    _passing_stops = _pass_temp;
-    _stations = _stat_temp;
-    _times = _times_temp;
+ //TODO
 }

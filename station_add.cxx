@@ -51,6 +51,8 @@ void Station_add::on_buttonBoxAddStation_accepted()
     _current_srv->setStopAsPassPoint(_current_srv->getStations().size()-1, ui->checkBoxPASS->isChecked());
 
     reset_state();
+
+    emit on_stationAdd_accepted();
 }
 
 void Station_add::on_buttonBoxAddStation_rejected()
