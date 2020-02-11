@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QSet>
+#include <QRegularExpression>
 
 #include <map>
 #include <vector>
@@ -24,6 +25,7 @@ class ROSTTBGen
         QStringList _input_data = {};
         QStringList _comments = {};
         QWidget* _parent;
+        QString _special_char;
         void _process_data();
         bool _check_isTime(QString string);
         bool _check_isID(QString string);
@@ -43,6 +45,12 @@ class ROSTTBGen
         void _process_service_candidate(int int_id, QStringList service);
         ROSService::ServiceType _parseType(QStringList str_list);
         ROSService::FinishState _parseExit(QStringList str_list);
+        QString _make_service_definition(ROSService* service);
+        QString _make_type_line(ROSService* service);
+        QStringList _add_stations(ROSService* service);
+        QString _make_service_termination(ROSService* service);
+        QString _make_repeat_line(ROSService* service);
+        int _calculate_repeat_time_interval(ROSService* service);
         QMap<ROSService::FinishState, QString> _exit_types = {{ROSService::FinishState::FinishExit, "Fer"},
                                                               {ROSService::FinishState::FinishFormNew, "Fns"},
                                                               {ROSService::FinishState::FinishJoinOther, "Fjo"},
@@ -54,16 +62,18 @@ class ROSTTBGen
                                                                {ROSService::ServiceType::ShuttleFromStop, "Snt-sh"},
                                                                {ROSService::ServiceType::ShuttleFromFeeder, "Sns-sh"},
                                                                {ROSService::ServiceType::ServiceFromSplit, "Sfs"},
-                                                               {ROSService::ServiceType::SingleShuttleService, "Sns-fsh"},
+                                                               {ROSService::ServiceType::ShuttleFinishService, "Sns-fsh"},
                                                                {ROSService::ServiceType::ServiceFromService, "Sns"}};
     public:
         ROSTTBGen(QWidget* parent) : _parent(parent) {}
         QSet<QString> getStations(){return _stations_list;}
+        QString getSpecialChar() const {return _special_char;}
         QString parse_file(const QFileDialog* dialog, const QDir* directory);
         QString parse_rly(const QString railways_dir);
         ROSTimetable* getParsedTimetable() { return _current_timetable; }
         QString getFinishID(ROSService::FinishState state) {return _exit_types[state];}
         QString getStartID(ROSService::ServiceType state) {return _start_types[state];}
+        QStringList createTimetableStrings(ROSTimetable* timetable);
 };
 
 #endif // ROSTTBGEN_HXX

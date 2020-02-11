@@ -1,6 +1,6 @@
 #include "rosservice.hxx"
 
-QString ROSService::_join(QString join_symbol, QString a, QString b, QString c, QString d, QString e, QString f, QString g, QString h)
+QString join(QString join_symbol, QString a, QString b, QString c, QString d, QString e, QString f, QString g, QString h)
 {
     if(a == "") return b;
     if(b == "") return "";
@@ -16,31 +16,50 @@ QString ROSService::_join(QString join_symbol, QString a, QString b, QString c, 
     return _temp;
 }
 
+QString join(QString join_symbol, QStringList list)
+{
+    QString _temp = list[0];
+
+    for(int i{1}; i < list.size(); ++i) _temp += join_symbol+list[i];
+
+    return _temp;
+}
+
+
+QString join(QChar::SpecialCharacter join_symbol, QStringList list)
+{
+    QString _temp = list[0];
+
+    for(int i{1}; i < list.size(); ++i) _temp += join_symbol+list[i];
+
+    return _temp;
+}
+
 QString ROSService::_start_new()
 {
-    QString out_string = _join(";", _service_id,_description, QString(_start_speed), QString(_max_speed),
+    QString out_string = join(";", _service_id,_description, QString(_start_speed), QString(_max_speed),
                         QString(_mass), QString(_max_brake), QString(_power));
 
     switch (_service_type)
     {
         case ROSService::ServiceType::ServiceFromSplit:
-            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Sfs", _parent_service));
+            out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Sfs", _parent_service));
             break;
         case ROSService::ServiceType::ServiceFromService:
-            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Sns", _parent_service));
+            out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Sns", _parent_service));
             break;
-        case ROSService::ServiceType::SingleShuttleService:
-            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Sns-fsh", _parent_service));
+        case ROSService::ServiceType::ShuttleFinishService:
+            out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Sns-fsh", _parent_service));
             break;
         case ROSService::ServiceType::ShuttleFromStop:
-            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Snt-sh", _enter_ids[0]));
-            out_string = _join(" ", out_string, _join(";", _enter_ids[1], _parent_service));
+            out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Snt-sh", _enter_ids[0]));
+            out_string = join(" ", out_string, join(";", _enter_ids[1], _parent_service));
             break;
         case ROSService::ServiceType::ShuttleFromFeeder:
-            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Sns-sh", _parent_service));
+            out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Sns-sh", _parent_service));
             break;
         default:
-            out_string = _join(",", out_string, _join(";", _enter_map_time.toString("HH:mm"), "Snt", _enter_ids[0], _enter_ids[1]));
+            out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Snt", _enter_ids[0], _enter_ids[1]));
     }
 
     return out_string;
@@ -51,23 +70,23 @@ QString ROSService::_add_stops()
 
     if(_stations.size() < 2) return "";
 
-    QString out_string = _join(";", _times[0][0].toString("HH:mm"), _stations[0]);
+    QString out_string = join(";", _times[0][0].toString("HH:mm"), _stations[0]);
 
     for(int i{1}; i < _stations.size()-2; ++i)
     {
-        out_string = _join(",", out_string, _join(";", (_times[i][1] != QTime()) ? _join(";", _times[i][0].toString("HH:mm"), _times[i][1].toString("HH:mm")) : _times[i][0].toString("HH:mm"), _stations[i]));
+        out_string = join(",", out_string, join(";", (_times[i][1] != QTime()) ? join(";", _times[i][0].toString("HH:mm"), _times[i][1].toString("HH:mm")) : _times[i][0].toString("HH:mm"), _stations[i]));
     }
 
     if(_finish_as == FinishState::FinishExit)
     {
         const int final = _stations.size()-2;
-        out_string = _join(",", out_string, _join(";", _times[final][0].toString("HH:mm"),_times[final][1].toString("HH:mm"), _stations[final]));
+        out_string = join(",", out_string, join(";", _times[final][0].toString("HH:mm"),_times[final][1].toString("HH:mm"), _stations[final]));
     }
 
     else
     {
         const int final = _stations.size()-2;
-        out_string = _join(",", out_string, _join(";", _times[final][0].toString("HH:mm"), _stations[final]));
+        out_string = join(",", out_string, join(";", _times[final][0].toString("HH:mm"), _stations[final]));
     }
 
     return out_string;
@@ -85,13 +104,13 @@ QString ROSService::_finalize()
     switch(_finish_as)
     {
         case ROSService::FinishState::FinishExit:
-            out_string = _join(";", _times[_times.size()-1][0].toString(), "Fer", _exit_id);
+            out_string = join(";", _times[_times.size()-1][0].toString(), "Fer", _exit_id);
             break;
         case ROSService::FinishState::FinishFormNew:
-            out_string = _join(";", _times[_times.size()-1][0].toString(), "Fns", _daughter_id);
+            out_string = join(";", _times[_times.size()-1][0].toString(), "Fns", _daughter_id);
             break;
         case ROSService::FinishState::FinishJoinOther:
-            out_string = _join(";", _times[_times.size()-1][0].toString(), "Fjo", _daughter_id);
+            out_string = join(";", _times[_times.size()-1][0].toString(), "Fjo", _daughter_id);
             break;
         default:
             out_string = "Frh";
@@ -110,8 +129,8 @@ bool ROSService::checkService()
 QString ROSService::as_string()
 {
     QString _out = _start_new();
-    _out = _join(",", _out, _add_stops());
-    _out = _join(",", _out, _finalize());
+    _out = join(",", _out, _add_stops());
+    _out = join(",", _out, _finalize());
 
     return _out;
 }

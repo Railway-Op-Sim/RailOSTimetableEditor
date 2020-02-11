@@ -58,6 +58,8 @@ private slots:
 
     void on_tableWidgetTimetable_cellClicked(int row, int column);
 
+    void on_actionSave_triggered();
+
 private:
     Station_add* _station_add = new Station_add(nullptr, this);
     QDir* _ros_timetables = nullptr;
@@ -70,7 +72,7 @@ private:
     ROSTimetable* _current_timetable = new ROSTimetable;
     QList<int> _ttb_column_widths = {50, 50, 300, 200, 75, 200, 50};
     ROSService* _current_service_selection = nullptr;
-    void _save_as();
+    void save_file();
     void reset();
     bool checkROS();
     void _record_current_info();

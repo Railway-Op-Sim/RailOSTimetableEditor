@@ -6,6 +6,10 @@
 #include <QMap>
 #include <QDebug>
 
+extern QString join(QString join_symbol, QString a, QString b, QString c="NULL", QString d="NULL", QString e="NULL", QString f="NULL", QString g="NULL", QString h="NULL");
+extern QString join(QString join_symbol, QStringList list);
+extern QString join(QChar::SpecialCharacter join_symbol, QStringList list);
+
 class ROSService
 {
 private:
@@ -27,20 +31,19 @@ private:
     int _max_brake = -1;
     int _start_speed = -1;
     int _n_repeats = 0;
-    int _nsecs_wait_turnaround = 0;
+    int _repeat_interval = 0;
     int _id_increment = 1;
     QString _description = "";
     QString _start_new();
     QString _add_stops();
     QString _finalize();
-    QString _join(QString join_symbol, QString a, QString b, QString c="NULL", QString d="NULL", QString e="NULL", QString f="NULL", QString g="NULL", QString h="NULL");
 public:
     enum class ServiceType
     {
         Service,
         ServiceFromSplit,
         ServiceFromService,
-        SingleShuttleService,
+        ShuttleFinishService,
         ShuttleFromStop,
         ShuttleFromFeeder,
     };
@@ -62,7 +65,7 @@ public:
     void setNRepeats(const int& n) { _n_repeats = n;}
     int getIntegerID() const { return _integer_id;}
     void setIDIncrement(const int& n) {_id_increment = n;}
-    void setTurnaroundTime(const int& n_secs) {_nsecs_wait_turnaround = n_secs;}
+    void setRepeatInterval(const int& n_mins) {_repeat_interval = n_mins;}
     void setMaxSpeed(const int& speed){_max_speed = speed;}
     void setMaxBrake(const int& force){_max_brake = force;}
     void setStartSpeed(const int& speed){_start_speed = speed;}
@@ -77,7 +80,19 @@ public:
     int getMaxBrake() const {return _max_brake;}
     int getStartSpeed() const {return _start_speed;}
     int getMass() const {return _mass;}
-    int getPower() {return _power;}
+    int getPower() const {return _power;}
+    QStringList getStartPoint() const {return _enter_ids;}
+    QTime getStartTime() const {return _enter_map_time;}
+    QTime getExitTime() const {return _exit_map_time;}
+    QString getDescription() const {return _description;}
+    QString getDaughter() const {return _daughter_id;}
+    QString getParent() const {return _parent_service;}
+    QString getExitID() const {return _exit_id;}
+    int getNRepeats() const {return _n_repeats;}
+    QList<bool> getPassList() const {return _passing_stops;}
+    QList<bool> getDirectionChanges() const {return _direction_changes;}
+    int getRepeatInterval() const {return _repeat_interval;}
+    int getIDIncrement() const {return _id_increment;}
     bool checkService();
     void setType(ROSService::ServiceType type) {_service_type = type;}
     void setFinishState(ROSService::FinishState fin_state, QString exit_info="");
@@ -114,6 +129,10 @@ public:
 private:
     ServiceType _service_type = ServiceType::Service;
     FinishState _finish_as = FinishState::FinishRemainHere;
+
+public:
+      ROSService::ServiceType getType() const {return _service_type;}
+      ROSService::FinishState getFinState() const {return _finish_as;}
 };
 
 #endif // ROSSERVICE_HXX

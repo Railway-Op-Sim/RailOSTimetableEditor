@@ -33,8 +33,6 @@ ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
     if(!cache_dir.exists()) cache_dir.mkpath(".");
     QFile _cache_file(cache_dir.absolutePath()+"/"+"ros_location_cache.dat");
 
-    qDebug() << _cache_file.fileName() << "\n";
-
     if(_cache_file.exists())
     {
         if(!_cache_file.open(QIODevice::ReadOnly)) {
@@ -109,29 +107,28 @@ void ROSTTBAppWindow::_record_current_info()
 
     _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, {}, {}, _start_speed, _max_speed, _mass, _max_brake, _max_power);
 
-    if(ui->radioButtonFeeder->isChecked()) _current_timetable->operator[](-1)->setType(ROSService::ServiceType::SingleShuttleService);
+    if(ui->radioButtonFeeder->isChecked()) _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ShuttleFinishService);
     else if(ui->radioButtonShuttleStop->isChecked())
     {
         _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ShuttleFromStop);
-        int n_repeats = ui->spinBoxRepeats->value(), nsecs_wait = ui->spinBoxTerminusWaitTime->value(), id_inc = ui->spinBoxRefIncrement->value();
+        int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
         _current_timetable->operator[](-1)->setNRepeats(n_repeats);
-        _current_timetable->operator[](-1)->setTurnaroundTime(nsecs_wait);
+        _current_timetable->operator[](-1)->setRepeatInterval(nmins_interval);
         _current_timetable->operator[](-1)->setIDIncrement(id_inc);
     }
     else if(ui->radioButtonShuttleFeeder->isChecked())
     {
         _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ShuttleFromFeeder);
 
-        int n_repeats = ui->spinBoxRepeats->value(), nsecs_wait = ui->spinBoxTerminusWaitTime->value(), id_inc = ui->spinBoxRefIncrement->value();
+        int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
         _current_timetable->operator[](-1)->setNRepeats(n_repeats);
-        _current_timetable->operator[](-1)->setTurnaroundTime(nsecs_wait);
+        _current_timetable->operator[](-1)->setRepeatInterval(nmins_interval);
         _current_timetable->operator[](-1)->setIDIncrement(id_inc);
     }
     else if(ui->radioButtonFromOther->isChecked() && ui->checkBoxParentSplit->isChecked()) _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ServiceFromSplit);
     else if(ui->radioButtonFromOther->isChecked()) _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ServiceFromService);
     else _current_timetable->operator[](-1)->setType(ROSService::ServiceType::Service);
 
-    qDebug() << "Added Service: " << _current_timetable->operator[](-1)->as_string() << "\n";
     _update_output();
 }
 
@@ -199,14 +196,10 @@ void ROSTTBAppWindow::on_actionNew_triggered()
     reset();
 }
 
-void ROSTTBAppWindow::_save_as()
-{
-    _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), "Timetable (*.ttb)" );
-}
-
 void ROSTTBAppWindow::on_actionSave_As_triggered()
 {
-    _save_as();
+    _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), "Timetable (*.ttb)" );
+    save_file();
 }
 
 void ROSTTBAppWindow::open_file()
@@ -257,7 +250,6 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
     ui->ROSStatus->setText(_file_name);
     ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
     _set_initial_open_file();
-    qDebug() << "ROS Timetables Location Set to " << _ros_timetables->absolutePath() << "\n";
     QFile _cache_file("cache/ros_location_cache.dat");
     if ( _cache_file.open(QIODevice::ReadWrite) )
     {
@@ -316,7 +308,6 @@ void ROSTTBAppWindow::on_pushButtonRoute_clicked()
     _parts.pop_back();
     _parts.push_back("Railways");
     QString _railways_dir = _parts.join(_split_str);
-    qDebug() << "Railways Directory: " << _railways_dir << "\n";
     QString _parsed = _parser->parse_rly(_railways_dir);
     _current_route = (_parsed != "NULL") ? _parsed : _current_route;
     _parts = _current_route.split(_split_str);
@@ -353,7 +344,7 @@ void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
         ui->textEditParentRef->setEnabled(false);
         ui->textEditShuttleRef->setEnabled(false);
         ui->spinBoxRepeats->setEnabled(false);
-        ui->spinBoxTerminusWaitTime->setEnabled(false);
+        ui->spinBoxRepeatInterval->setEnabled(false);
         ui->checkBoxParentSplit->setEnabled(false);
         ui->spinBoxRefIncrement->setEnabled(false);
     }
@@ -370,7 +361,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
         ui->textEditParentRef->setEnabled(false);
         ui->textEditShuttleRef->setEnabled(false);
         ui->spinBoxRepeats->setEnabled(true);
-        ui->spinBoxTerminusWaitTime->setEnabled(true);
+        ui->spinBoxRepeatInterval->setEnabled(true);
         ui->checkBoxParentSplit->setEnabled(false);
         ui->spinBoxRefIncrement->setEnabled(true);
 
@@ -388,7 +379,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
         ui->textEditParentRef->setEnabled(false);
         ui->textEditShuttleRef->setEnabled(false);
         ui->spinBoxRepeats->setEnabled(true);
-        ui->spinBoxTerminusWaitTime->setEnabled(true);
+        ui->spinBoxRepeatInterval->setEnabled(true);
         ui->checkBoxParentSplit->setEnabled(false);
         ui->spinBoxRefIncrement->setEnabled(true);
     }
@@ -405,7 +396,7 @@ void ROSTTBAppWindow::on_radioButtonFeeder_toggled(bool checked)
         ui->textEditParentRef->setEnabled(false);
         ui->textEditShuttleRef->setEnabled(true);
         ui->spinBoxRepeats->setEnabled(false);
-        ui->spinBoxTerminusWaitTime->setEnabled(false);
+        ui->spinBoxRepeatInterval->setEnabled(false);
         ui->checkBoxParentSplit->setEnabled(false);
         ui->spinBoxRefIncrement->setEnabled(false);
     }
@@ -422,7 +413,7 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
         ui->textEditParentRef->setEnabled(true);
         ui->textEditShuttleRef->setEnabled(false);
         ui->spinBoxRepeats->setEnabled(false);
-        ui->spinBoxTerminusWaitTime->setEnabled(false);
+        ui->spinBoxRepeatInterval->setEnabled(false);
         ui->checkBoxParentSplit->setEnabled(true);
         ui->spinBoxRefIncrement->setEnabled(false);
     }
@@ -434,4 +425,22 @@ void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
     _current_service_selection = _current_timetable->operator[](ui->tableWidgetTimetable->takeItem(row, 1)->text());
     _update_output();
     ui->tableWidgetTimetable->selectRow(row);
+}
+
+void ROSTTBAppWindow::save_file()
+{
+    QStringList _ttb = _parser->createTimetableStrings(_current_timetable);
+    QString _output = join(QChar::Null, _ttb);
+
+    QFile _file(_open_file_str);
+    if ( _file.open(QIODevice::ReadWrite) )
+    {
+        QTextStream out(&_file);
+        out << _output;
+    }
+}
+
+void ROSTTBAppWindow::on_actionSave_triggered()
+{
+    save_file();
 }

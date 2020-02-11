@@ -14,25 +14,35 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
     QTextStream in(&open_file);
     while (!in.atEnd()) {
         QString line = in.readLine();
-        QRegExp rex("(\\x0)");
         bool _record_ttb = false;
-        QStringList _parts = line.split(rex);
+
+        QStringList _parts = line.split(QChar::Null);
+
+        bool _start_time_found = false;
 
         for(auto part : _parts)
         {
             if(part.contains(";"))
             {
                 _record_ttb = _check_isID(part.split(";")[0]);
-                if(_record_ttb) _input_data += part.split(",");
+
+                if(_record_ttb)
+                {
+                    _input_data += part.split(",");
+                }
             }
             else
             {
-                for(int i{0}; i < part.size(); ++i)
+                if(!_start_time_found)
                 {
-                    if(_check_isTime(part.mid(i, i+5)))
+                    for(int i{0}; i < part.size(); ++i)
                     {
-                        _input_data.append(part.mid(i, i+5));
-                        break;
+                        if(_check_isTime(part.mid(i, i+5)))
+                        {
+                            _input_data.append(part.mid(i, i+5));
+                            _start_time_found = true;
+                            break;
+                        }
                     }
                 }
                 if(part.size() > 0) _comments.append(part);
@@ -69,7 +79,6 @@ QString ROSTTBGen::parse_rly(const QString railways_dir)
         QString line = in.readLine();
         if(previous[0].isLetter() && line[0] == "*")
         {
-            qDebug() << "Found Station: " << previous << "\n";
             _stations.push_back(previous);
         }
         if(counter > 0)
@@ -153,7 +162,6 @@ ROSService::FinishState ROSTTBGen::_parseExit(QStringList str_list)
     {
         if(str_list.contains(_str_types[i]))
         {
-            qDebug() << "Got type " << int(_types[i]) << " for " << str_list;
             return _types[i];
         }
     }
@@ -247,7 +255,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
     else
     {
-        QMessageBox::critical(_parent, "Import Failure", "Failed to import service '"+_id+"'");
+        QMessageBox::critical(_parent, "Import Failure", "Failed to import service "+QString::number(int_id)+" '"+_id+"'");
         return;
     }
 
@@ -288,8 +296,8 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             case ROSService::ServiceType::ServiceFromService:
                 _service->setParent(_components[2]);
                 break;
-            case ROSService::ServiceType::SingleShuttleService:
-                _service->setDaughter(_components[2]);
+            case ROSService::ServiceType::ShuttleFinishService:
+                _service->setParent(_components[2]);
                 break;
             case ROSService::ServiceType::ServiceFromSplit:
                 _service->setParent(_components[2]);
@@ -307,6 +315,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     {
         _components = service[service.size()-1].split(";");
         _service->setNRepeats(_components[3].toInt());
+        _service->setRepeatInterval(_components[1].toInt());
         _service->setIDIncrement(_components[2].toInt());
         _final_index = 2;
 
@@ -315,6 +324,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
     _components = service[service.size()-_final_index].split(";");
     ROSService::FinishState _fin_state = _parseExit(_components);
+    _service->setFinishState(_fin_state);
     switch(_fin_state)
     {
         case ROSService::FinishState::FinishExit:
@@ -340,6 +350,12 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             break;
         default:
             break;
+    }
+
+    if(_fin_state != ROSService::FinishState::FinishRemainHere)
+    {
+        QTime _time = QTime::fromString(_components[0], "HH:mm");
+        _service->setExitTime(_time);
     }
 
     for(int i{2}; i < service.size()-_final_index; ++i)
@@ -378,9 +394,6 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     }
 
     _current_timetable->addService(_service);
-
-    qDebug() << "START: " << service;
-    qDebug() << "FINISH: " << _current_timetable->getServices()[_id]->summarise();
 }
 
 void ROSTTBGen::_process_data()
@@ -395,9 +408,11 @@ void ROSTTBGen::_process_data()
 
     QStringList _temp = {};
 
-    for(int i{0}; i < _input_data.size(); ++i)
+    QTime _time_temp = QTime::fromString(_input_data[0], "HH:mm");
+    _current_timetable->setStartTime(_time_temp);
+
+    for(int i{1}; i < _input_data.size(); ++i)
     {
-        if(i == 0) continue;
         if((_isServiceDefinition(_input_data[i].split(";")) || _isContinuedServiceDefinition(_input_data[i].split(";"))) && i != 1)
         {
             _services.push_back(_temp);
@@ -406,6 +421,7 @@ void ROSTTBGen::_process_data()
         _temp.push_back(_input_data[i]);
     }
 
+    _services.push_back(_temp);
 
     for(int i{0}; i < _services.size(); ++i)
     {
@@ -417,6 +433,150 @@ void ROSTTBGen::_process_data()
         QMessageBox::critical(_parent, "Failed Service Importing", "Number of services created does not match number in input file");
         return;
     }
-
-
 }
+
+QString ROSTTBGen::_make_service_definition(ROSService* service)
+{
+    const QString _id = service->getID(), _desc = service->getDescription(),
+                  _start_speed = QString::number(service->getStartSpeed()),
+                  _max_speed = QString::number(service->getMaxSpeed()),
+                  _mass = QString::number(service->getMass()),
+                  _brake = QString::number(service->getMaxBrake()),
+                  _power = QString::number(service->getPower());
+
+    QString _output;
+
+    if(service->getType() == ROSService::ServiceType::Service || service->getType() == ROSService::ServiceType::ShuttleFromStop)
+    {
+        _output = join(";", _id, _desc, _start_speed, _max_speed, _mass, _brake, _power);
+    }
+
+    else
+    {
+        _output = join(";", _id, _desc);
+    }
+
+    return _output;
+}
+
+QString ROSTTBGen::_make_type_line(ROSService* service)
+{
+    const QString _start_time = service->getStartTime().toString("HH:mm"),
+                  _start_type = _start_types[service->getType()];
+
+    switch(service->getType())
+    {
+        case ROSService::ServiceType::Service:
+            return join(";", _start_time, _start_type, service->getStartPoint()[0]+" "+service->getStartPoint()[1]);
+        case ROSService::ServiceType::ShuttleFromStop:
+            return join(";", _start_time, _start_type, service->getStartPoint()[0], service->getStartPoint()[1], service->getDaughter());
+        case ROSService::ServiceType::ServiceFromSplit:
+            return join(";",_start_time, _start_type, service->getParent());
+        case ROSService::ServiceType::ShuttleFromFeeder:
+            return join(";", _start_time, _start_type, service->getDaughter(), service->getParent());
+        case ROSService::ServiceType::ServiceFromService:
+            return join(";", _start_time, _start_type, service->getParent());
+        case ROSService::ServiceType::ShuttleFinishService:
+            return join(";", _start_time, _start_type, service->getParent());
+        default:
+                return "NULL";
+    }
+}
+
+QStringList ROSTTBGen::_add_stations(ROSService* service)
+{
+    QStringList _temp = {};
+
+
+    for(int i{0}; i < service->getStations().size(); ++i)
+    {
+        const QTime _arrive = service->getTimes()[i][0],
+              _depart = service->getTimes()[i][1];
+        const QString _name = service->getStations()[i];
+        const bool _is_pas = service->getPassList()[i],
+             _is_cdt = service->getDirectionChanges()[i];
+
+        if(_is_pas)
+        {
+            _temp.append(join(";", _arrive.toString("HH:mm"), "pas", _name));
+        }
+        else
+        {
+            _temp.append(join(";", (_depart != QTime()) ? _arrive.toString("HH:mm")+";"+_depart.toString("HH:mm") : _arrive.toString("HH:mm"), _name));
+        }
+
+        if(_is_cdt)
+        {
+            _temp.append(join(";", (_depart != QTime()) ? _depart.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
+        }
+    }
+
+    return _temp;
+}
+
+QString ROSTTBGen::_make_service_termination(ROSService* service)
+{
+    if(service->getFinState() == ROSService::FinishState::FinishRemainHere) return "Frh";
+    QTime _exit_time = service->getExitTime();
+
+    QString _exit_type = _exit_types[service->getFinState()];
+
+    QString _new_serv, _prev_serv, _exit_id;
+
+    switch(service->getFinState())
+    {
+        case ROSService::FinishState::FinishExit:
+            _exit_id = service->getExitID();
+            return join(";", _exit_time.toString("HH:mm"), _exit_type, _exit_id);
+        case ROSService::FinishState::FinishFormNew:
+             _new_serv = service->getDaughter();
+            return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
+        case ROSService::FinishState::FinishJoinOther:
+            _new_serv = service->getDaughter();
+            return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
+        case ROSService::FinishState::FinishShuttleFormNew:
+            _prev_serv = service->getParent();
+            _new_serv = service->getDaughter();
+            return join(";", _exit_time.toString("HH:mm"), _prev_serv, _new_serv);
+        case ROSService::FinishState::FinishShuttleRemainHere:
+            _prev_serv = service->getParent();
+            return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
+        case ROSService::FinishState::FinishSingleShuttleFeeder:
+            _prev_serv = service->getParent();
+            return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
+        default:
+            return "NULL";
+     }
+}
+
+int ROSTTBGen::_calculate_repeat_time_interval(ROSService* service)
+{
+    return service->getStartTime().msecsTo(service->getExitTime())/60*1000.;
+}
+
+QString ROSTTBGen::_make_repeat_line(ROSService *service)
+{
+    return join(";", "R", QString::number(service->getRepeatInterval()), QString::number(service->getIDIncrement()), QString::number(service->getNRepeats()));
+}
+
+QStringList ROSTTBGen::createTimetableStrings(ROSTimetable* timetable)
+{
+    QStringList _elements = {timetable->getStartTime().toString("HH:mm")};
+
+    for(auto service : timetable->getServices())
+    {
+        QString _service = join(",", _make_service_definition(service), _make_type_line(service));
+        _service = join(",", _service, join(",", _add_stations(service)));
+        _service = join(",", _service, _make_service_termination(service));
+
+        if(service->getNRepeats() > 0)
+        {
+            _service = join(",", _service, _make_repeat_line(service));
+        }
+
+        _elements.push_back(_service);
+    }
+
+    return _elements;
+}
+

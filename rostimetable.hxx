@@ -34,6 +34,7 @@ class ROSTimetable
         ROSService* operator[](const int&);
         ROSService* begin() {return this->operator[](0);}
         ROSService* end() {return this->operator[](_services.size()-1);}
+        QTime getStartTime() const {return _start_time;}
         int size() const {return _services.size();}
         void setStartTime(QTime& time) {_start_time = time;}
 };

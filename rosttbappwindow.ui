@@ -337,10 +337,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>Terminus Wait Time (s)</string>
+      <string>Time Interval (mins)</string>
      </property>
     </widget>
-    <widget class="QSpinBox" name="spinBoxTerminusWaitTime">
+    <widget class="QSpinBox" name="spinBoxRepeatInterval">
      <property name="geometry">
       <rect>
        <x>840</x>
