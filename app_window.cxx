@@ -7,7 +7,6 @@ ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
 {
     ui->setupUi(this);
     _tt_model_select = new QItemSelectionModel(ui->tableWidgetTimetable->model());
-    connect(_station_add, SIGNAL(on_stationAdd_accepted()), this, SLOT(on_stationAdd_accepted()));
     ui->ROSStatus->setStyleSheet("QLabel { color : red; }");
     ui->SelectedRoute->setStyleSheet("QLabel { color : red; }");
     QHeaderView* _header_ttb = ui->tableWidgetTimetable->horizontalHeader();
@@ -16,19 +15,25 @@ ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
     _header_srv->setStretchLastSection(true);
     ui->tableWidgetTimetable->setColumnCount(3);
     ui->tableWidgetService->setColumnCount(3);
-    for(int i{0}; i < 3; ++i)
-    {
-        ui->tableWidgetTimetable->setColumnWidth(i, _ttb_column_widths[i]);
-        ui->tableWidgetService->setColumnWidth(i, _ttb_column_widths[i]);
-    }
+    ui->pushButtonTTBTime->setVisible(false);
+    ui->pushButtonTTBTimeEdit->setVisible(true);
+    ui->timeEditTTBStart->setVisible(false);
+    ui->labelStartTime->setText(_current_timetable->getStartTime().toString("HH:mm"));
+    for(int i{0}; i < 3; ++i) ui->tableWidgetTimetable->setColumnWidth(i, _ttb_column_widths[i]);
+    for(int i{0}; i < 3; ++i) ui->tableWidgetService->setColumnWidth(i, _srv_column_widths[i]);
     ui->tableWidgetTimetable->verticalHeader()->setVisible(false);
     ui->tableWidgetTimetable->horizontalHeader()->setVisible(false);
     ui->tableWidgetTimetable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidgetTimetable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableWidgetTimetable->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidgetService->verticalHeader()->setVisible(false);
     ui->tableWidgetService->horizontalHeader()->setVisible(false);
     ui->tableWidgetService->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidgetService->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableWidgetService->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    _station_add->setServiceTable(ui->tableWidgetService);
+
     QDir cache_dir("cache");
     if(!cache_dir.exists()) cache_dir.mkpath(".");
     QFile _cache_file(cache_dir.absolutePath()+"/"+"ros_location_cache.dat");
@@ -53,6 +58,7 @@ ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
 
     ui->radioButtonStandard->setEnabled(true);
     ui->radioButtonStandard->toggle();
+    _set_tab(true);
 
 }
 
@@ -61,17 +67,92 @@ ROSTTBAppWindow::~ROSTTBAppWindow()
     delete ui;
 }
 
+bool ROSTTBAppWindow::checkLocID(QString id)
+{
+    const QStringList _parts = id.split("-");
+    if(_parts.size() != 2) return false;
+
+    for(auto part : _parts)
+    {
+        for(int i{1}; i < part.size(); ++i)
+        {
+            if(part[i].isLetter()) return false;
+        }
+    }
+
+    return true;
+}
+
+bool ROSTTBAppWindow::checkIDsAreNeighbours(QStringList ids)
+{
+    QString _coordinate_0_0 = ids[0].split("-")[0],
+            _coordinate_0_1 = ids[0].split("-")[1],
+            _coordinate_1_0 = ids[1].split("-")[0],
+            _coordinate_1_1 = ids[1].split("-")[1];
+
+    int _temp = 0, _temp2 = 0;
+
+    if(_coordinate_0_0[0].isLetter() != _coordinate_1_0[0].isLetter()) return false;
+    if(_coordinate_0_0[0].isLetter() && _coordinate_0_0[0] != _coordinate_1_0[0]) return false;
+    if(_coordinate_0_1[0].isLetter() != _coordinate_1_1[0].isLetter()) return false;
+    if(_coordinate_0_1[0].isLetter() && _coordinate_0_1[0] != _coordinate_1_1[0]) return false;
+
+    if(_coordinate_0_0[0].isLetter())
+    {
+
+            _temp = _coordinate_0_0.right(_coordinate_0_0.size()-2).toInt();
+            _temp2 = _coordinate_1_0.right(_coordinate_1_0.size()-2).toInt();
+
+    }
+    else
+    {
+        _temp = _coordinate_0_0.toInt();
+        _temp2 = _coordinate_1_0.toInt();
+     }
+
+    qDebug() << _temp << "VS" << _temp2;
+
+    if(abs(_temp2-_temp) != 0 && abs(_temp2-_temp) != 1)
+    {
+        return false;
+    }
+
+    if(_coordinate_0_1[0].isLetter())
+    {
+            _temp = _coordinate_0_1.right(_coordinate_0_0.size()-2).toInt();
+            _temp2 = _coordinate_1_1.right(_coordinate_1_0.size()-2).toInt();
+    }
+    else
+    {
+        _temp = _coordinate_0_1.toInt();
+        _temp2 = _coordinate_1_1.toInt();
+     }
+
+    if(abs(_temp2-_temp) != 0 && abs(_temp2-_temp) != 1)
+    {
+        return false;
+    }
+
+       return true;
+}
+
 void ROSTTBAppWindow::_record_current_info()
 {
     if(!checkROS()) return;
     QString _srv_id = ui->servicerefEdit->toPlainText();
     QString _desc = ui->descEdit->toPlainText();
     QTime _start_time = ui->starttimeEdit->time();
+    if(_current_timetable->getStartTime().msecsTo(_start_time) < 0)
+    {
+        QMessageBox::critical(this, "Invalid Service", "Service start time must not precede timetable start time.");
+        return;
+    }
     const int _max_power   = ui->spinBoxPower->value(),
               _start_speed = ui->spinBoxStartSpeed->value(),
               _mass        = ui->spinBoxMass->value(),
               _max_brake   = ui->spinBoxForce->value(),
               _max_speed   = ui->spinBoxMaxSpeed->value();
+    const QStringList _start_ids = {ui->textEditEnterID1->toPlainText(), ui->textEditEnterID2->toPlainText()};
     const bool info_missing = _srv_id == "" || _desc == "";
     if(_srv_id.size() != 4)
     {
@@ -84,60 +165,116 @@ void ROSTTBAppWindow::_record_current_info()
         QMessageBox::critical(this, "Missing Information", "Service Identifier or Description Missing");
         return;
     }
-    if(_max_speed == 0 && ui->radioButtonStandard->isChecked())
+
+    if(ui->radioButtonStandard->isChecked() || ui->radioButtonShuttleStop->isChecked())
     {
-        QMessageBox::critical(this, "Invalid Maximum Speed", "Maximum service speed cannot be 0 kph for Standard Service");
-        return;
-    }
-    if(_max_power == 0  && !ui->radioButtonStandard->isChecked())
-    {
-        QMessageBox::critical(this, "Invalid Maximum Power", "Maximum service power cannot be 0 kW for Standard Service");
-        return;
-    }
-    if(_mass == 0  && !ui->radioButtonStandard->isChecked())
-    {
-        QMessageBox::critical(this, "Invalid Mass", "Mass value cannot be 0 te for Standard Service");
-        return;
-    }
-    if(_max_brake == 0  && !ui->radioButtonStandard->isChecked())
-    {
-        QMessageBox::critical(this, "Invalid Maximum Braking Force", "Maximum brake force cannot be 0 te Standard Service");
-        return;
+        if(_max_speed == 0)
+        {
+            QMessageBox::critical(this, "Invalid Maximum Speed", "Maximum service speed cannot be 0 kph for Standard Service or Shuttle from Stop.");
+            return;
+        }
+        if(_max_power == 0)
+        {
+            QMessageBox::critical(this, "Invalid Maximum Power", "Maximum service power cannot be 0 kW for Standard Service or Shuttle from Stop.");
+            return;
+        }
+        if(_mass == 0)
+        {
+            QMessageBox::critical(this, "Invalid Mass", "Mass value cannot be 0 te for Standard Service or Shuttle from Stop.");
+            return;
+        }
+        if(_max_brake == 0)
+        {
+            QMessageBox::critical(this, "Invalid Maximum Braking Force", "Maximum brake force cannot be 0 te for Standard Service or Shuttle from Stop.");
+            return;
+        }
+        if(_start_ids[0] == "" || _start_ids[1] == "")
+        {
+            QMessageBox::critical(this, "Invalid Start Position", "IDs for start location rear and front track elements must be provided for a Standard Service or Shuttle from Stop.");
+            return;
+        }
+
+        for(auto id : _start_ids)
+        {
+            if(!checkLocID(id))
+            {
+                QMessageBox::critical(this, "Invalid Start Position", "Location IDs must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number.");
+                return;
+            }
+        }
+
+        if(!checkIDsAreNeighbours(_start_ids))
+        {
+            QMessageBox::critical(this, "Invalid Start Position", "Location IDs must be neighbouring map elements.");
+            return;
+        }
     }
 
-    _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, {}, {}, _start_speed, _max_speed, _mass, _max_brake, _max_power);
+    if(!_current_timetable->getServices().contains(_srv_id))
+    {
+        _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, _start_speed, _max_speed, _mass, _max_brake, _max_power);
+        _current_service_selection = _current_timetable->operator[](-1);
+    }
 
-    if(ui->radioButtonFeeder->isChecked()) _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ShuttleFinishService);
+    else
+    {
+        _current_service_selection->setEntryTime(_start_time);
+        _current_service_selection->setDescription(_desc);
+        _current_service_selection->setStartSpeed(_start_speed);
+        _current_service_selection->setMaxSpeed(_max_speed);
+        _current_service_selection->setMaxBrake(_max_brake);
+        _current_service_selection->setPower(_max_power);
+    }
+
+    if(ui->radioButtonFeeder->isChecked()) _current_service_selection->setType(ROSService::ServiceType::ShuttleFinishService);
     else if(ui->radioButtonShuttleStop->isChecked())
     {
-        _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ShuttleFromStop);
+        _current_service_selection->setType(ROSService::ServiceType::ShuttleFromStop);
+        _current_service_selection->setEntryPoint(_start_ids);
         int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
-        _current_timetable->operator[](-1)->setNRepeats(n_repeats);
-        _current_timetable->operator[](-1)->setRepeatInterval(nmins_interval);
-        _current_timetable->operator[](-1)->setIDIncrement(id_inc);
+        _current_service_selection->setNRepeats(n_repeats);
+        _current_service_selection->setRepeatInterval(nmins_interval);
+        _current_service_selection->setIDIncrement(id_inc);
     }
     else if(ui->radioButtonShuttleFeeder->isChecked())
     {
-        _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ShuttleFromFeeder);
+        _current_service_selection->setType(ROSService::ServiceType::ShuttleFromFeeder);
 
         int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
-        _current_timetable->operator[](-1)->setNRepeats(n_repeats);
-        _current_timetable->operator[](-1)->setRepeatInterval(nmins_interval);
-        _current_timetable->operator[](-1)->setIDIncrement(id_inc);
+        _current_service_selection->setNRepeats(n_repeats);
+        _current_service_selection->setRepeatInterval(nmins_interval);
+        _current_service_selection->setIDIncrement(id_inc);
     }
-    else if(ui->radioButtonFromOther->isChecked() && ui->checkBoxParentSplit->isChecked()) _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ServiceFromSplit);
-    else if(ui->radioButtonFromOther->isChecked()) _current_timetable->operator[](-1)->setType(ROSService::ServiceType::ServiceFromService);
-    else _current_timetable->operator[](-1)->setType(ROSService::ServiceType::Service);
+    else if(ui->radioButtonFromOther->isChecked() && ui->checkBoxParentSplit->isChecked()) _current_service_selection->setType(ROSService::ServiceType::ServiceFromSplit);
+    else if(ui->radioButtonFromOther->isChecked()) _current_service_selection->setType(ROSService::ServiceType::ServiceFromService);
+    else
+    {
+        _current_service_selection->setType(ROSService::ServiceType::Service);
+        _current_service_selection->setEntryPoint(_start_ids);
+    }
 
     _update_output();
 }
 
-void ROSTTBAppWindow::_update_output()
+void ROSTTBAppWindow::_set_tab(bool tab_mode_on)
+{
+    ui->textEditEnterID1->setTabChangesFocus(tab_mode_on);
+    ui->textEditEnterID2->setTabChangesFocus(tab_mode_on);
+    ui->textEditFeederRef->setTabChangesFocus(tab_mode_on);
+    ui->textEditParentRef->setTabChangesFocus(tab_mode_on);
+    ui->textEditShuttleRef->setTabChangesFocus(tab_mode_on);
+    ui->servicerefEdit->setTabChangesFocus(tab_mode_on);
+    ui->descEdit->setTabChangesFocus(tab_mode_on);
+}
+
+void ROSTTBAppWindow::_update_output(ROSService* current_serv)
 {
     // IMPORTANT: If Timetable is Empty there is nothing to show!
     if(_current_timetable->size() < 1) return;
+    if(current_serv) _current_service_selection = current_serv;
     ui->tableWidgetTimetable->setRowCount(0);
     ui->tableWidgetService->setRowCount(0);
+    ui->labelStartTime->setText(_current_timetable->getStartTime().toString("HH:mm"));
 
     if(_current_timetable->size() > 0) _current_timetable->orderServices();
 
@@ -154,7 +291,7 @@ void ROSTTBAppWindow::_update_output()
     }
 
 
-    QList<QString> _current_element_stations = _current_service_selection->getStations();
+    QStringList _current_element_stations = _current_service_selection->getStations();
     QList<QList<QTime>> _current_element_times = _current_service_selection->getTimes();
 
     for(int i{0}; i < _current_element_stations.size(); ++i)
@@ -173,6 +310,8 @@ void ROSTTBAppWindow::_update_output()
 
     ui->tableWidgetService->sortItems(0);
     ui->tableWidgetTimetable->sortItems(0);
+
+    _station_add->setServiceTable(ui->tableWidgetService);
 
 }
 
@@ -210,7 +349,8 @@ void ROSTTBAppWindow::open_file()
         return;
     }
     reset();
-    _open_file_str = _parser->parse_file(_current_file, _ros_timetables);
+    QString _parsed = _parser->parse_file(_current_file, _ros_timetables);
+    _open_file_str = (_parsed != "NULL")? _parsed : _open_file_str;
     _current_timetable = _parser->getParsedTimetable();
     _current_service_selection = _current_timetable->operator[](-1);
     _update_output();
@@ -262,10 +402,8 @@ void ROSTTBAppWindow::reset()
 {
     delete _current_file;
     _current_file = new QFileDialog(this);
-    delete _parser;
-    _parser = new ROSTTBGen(this);
     _current_timetable = new ROSTimetable;
-    Station_add* _station_add = new Station_add(nullptr, this);
+    _station_add = new Station_add(nullptr, this);
 }
 
 bool ROSTTBAppWindow::checkROS()
@@ -282,7 +420,6 @@ bool ROSTTBAppWindow::checkROS()
 void ROSTTBAppWindow::on_pushButtonInsert_clicked()
 {
     _record_current_info();
-    _current_service_selection = _current_timetable->operator[](-1);
     _station_add->setCurrentService(_current_service_selection);
 }
 
@@ -293,6 +430,9 @@ void ROSTTBAppWindow::delete_entries()
     {
         ui->tableWidgetTimetable->removeRow(i.row());
     }
+    _current_timetable->removeService(_current_service_selection->getID());
+    _current_service_selection = _current_timetable->operator[](-1);
+    _update_output();
 }
 
 void ROSTTBAppWindow::on_pushButtonDelete_clicked()
@@ -323,13 +463,10 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
         QMessageBox::critical(this, "No Service Defined", "You must add a service before selecting calling points.");
         return;
     }
+    _station_add->setCurrentService(_current_service_selection);
     _station_add->setStations(_parser->getStations());
     _station_add->show();
 
-}
-
-void ROSTTBAppWindow::on_stationAdd_accepted()
-{
     _update_output();
 }
 
@@ -338,15 +475,20 @@ void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
     _enable_integer_info(true);
     if(checked)
     {
+        ui->spinBoxMass->setEnabled(true);
+        ui->spinBoxForce->setEnabled(true);
+        ui->spinBoxPower->setEnabled(true);
+        ui->spinBoxMaxSpeed->setEnabled(true);
+        ui->spinBoxStartSpeed->setEnabled(true);
+        ui->spinBoxRefIncrement->setEnabled(true);
+        ui->spinBoxRepeatInterval->setEnabled(true);
+        ui->spinBoxRepeats->setEnabled(true);
         ui->textEditEnterID1->setEnabled(true);
         ui->textEditEnterID2->setEnabled(true);
         ui->textEditFeederRef->setEnabled(false);
         ui->textEditParentRef->setEnabled(false);
         ui->textEditShuttleRef->setEnabled(false);
-        ui->spinBoxRepeats->setEnabled(false);
-        ui->spinBoxRepeatInterval->setEnabled(false);
         ui->checkBoxParentSplit->setEnabled(false);
-        ui->spinBoxRefIncrement->setEnabled(false);
     }
 }
 
@@ -355,16 +497,20 @@ void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->spinBoxMass->setEnabled(false);
+        ui->spinBoxForce->setEnabled(false);
+        ui->spinBoxPower->setEnabled(false);
+        ui->spinBoxMaxSpeed->setEnabled(false);
+        ui->spinBoxStartSpeed->setEnabled(false);
+        ui->spinBoxRefIncrement->setEnabled(true);
+        ui->spinBoxRepeatInterval->setEnabled(true);
+        ui->spinBoxRepeats->setEnabled(true);
         ui->textEditEnterID1->setEnabled(false);
         ui->textEditEnterID2->setEnabled(false);
         ui->textEditFeederRef->setEnabled(true);
         ui->textEditParentRef->setEnabled(false);
         ui->textEditShuttleRef->setEnabled(false);
-        ui->spinBoxRepeats->setEnabled(true);
-        ui->spinBoxRepeatInterval->setEnabled(true);
         ui->checkBoxParentSplit->setEnabled(false);
-        ui->spinBoxRefIncrement->setEnabled(true);
-
     }
 }
 
@@ -373,15 +519,20 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->spinBoxMass->setEnabled(true);
+        ui->spinBoxForce->setEnabled(true);
+        ui->spinBoxPower->setEnabled(true);
+        ui->spinBoxMaxSpeed->setEnabled(true);
+        ui->spinBoxStartSpeed->setEnabled(true);
+        ui->spinBoxRefIncrement->setEnabled(true);
+        ui->spinBoxRepeatInterval->setEnabled(true);
+        ui->spinBoxRepeats->setEnabled(true);
         ui->textEditEnterID1->setEnabled(true);
         ui->textEditEnterID2->setEnabled(true);
         ui->textEditFeederRef->setEnabled(false);
         ui->textEditParentRef->setEnabled(false);
         ui->textEditShuttleRef->setEnabled(false);
-        ui->spinBoxRepeats->setEnabled(true);
-        ui->spinBoxRepeatInterval->setEnabled(true);
         ui->checkBoxParentSplit->setEnabled(false);
-        ui->spinBoxRefIncrement->setEnabled(true);
     }
 }
 
@@ -390,15 +541,21 @@ void ROSTTBAppWindow::on_radioButtonFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->spinBoxMass->setEnabled(false);
+        ui->spinBoxForce->setEnabled(false);
+        ui->spinBoxPower->setEnabled(false);
+        ui->spinBoxMaxSpeed->setEnabled(false);
+        ui->spinBoxStartSpeed->setEnabled(false);
+
+        ui->spinBoxRefIncrement->setEnabled(false);
+        ui->spinBoxRepeatInterval->setEnabled(false);
+        ui->spinBoxRepeats->setEnabled(false);
         ui->textEditEnterID1->setEnabled(false);
         ui->textEditEnterID2->setEnabled(false);
         ui->textEditFeederRef->setEnabled(false);
         ui->textEditParentRef->setEnabled(false);
         ui->textEditShuttleRef->setEnabled(true);
-        ui->spinBoxRepeats->setEnabled(false);
-        ui->spinBoxRepeatInterval->setEnabled(false);
         ui->checkBoxParentSplit->setEnabled(false);
-        ui->spinBoxRefIncrement->setEnabled(false);
     }
 }
 
@@ -407,16 +564,90 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->spinBoxMass->setEnabled(false);
+        ui->spinBoxForce->setEnabled(false);
+        ui->spinBoxPower->setEnabled(false);
+        ui->spinBoxMaxSpeed->setEnabled(false);
+        ui->spinBoxStartSpeed->setEnabled(false);
+        ui->spinBoxRefIncrement->setEnabled(true);
+        ui->spinBoxRepeatInterval->setEnabled(true);
+        ui->spinBoxRepeats->setEnabled(true);
         ui->textEditEnterID1->setEnabled(false);
         ui->textEditEnterID2->setEnabled(false);
         ui->textEditFeederRef->setEnabled(false);
         ui->textEditParentRef->setEnabled(true);
         ui->textEditShuttleRef->setEnabled(false);
-        ui->spinBoxRepeats->setEnabled(false);
-        ui->spinBoxRepeatInterval->setEnabled(false);
         ui->checkBoxParentSplit->setEnabled(true);
-        ui->spinBoxRefIncrement->setEnabled(false);
     }
+}
+
+void ROSTTBAppWindow::_set_form_info()
+{
+
+    const QString _serv_id = _current_service_selection->getID(),
+          _description = _current_service_selection->getDescription(),
+          _feeder_ref  = _current_service_selection->getParent(),
+          _daughter_ref = _current_service_selection->getDaughter();
+
+    const ROSService::ServiceType _type = _current_service_selection->getType();
+
+
+    const int _max_power   = _current_service_selection->getPower(),
+              _start_speed = _current_service_selection->getStartSpeed(),
+              _mass        = _current_service_selection->getMass(),
+              _max_brake   = _current_service_selection->getMaxBrake(),
+              _max_speed   = _current_service_selection->getMaxSpeed(),
+              _n_repeats   = _current_service_selection->getNRepeats(),
+              _interval    = _current_service_selection->getIDIncrement(),
+              _t_interv    = _current_service_selection->getRepeatInterval();
+    const bool _is_from_split = _type == ROSService::ServiceType::ServiceFromSplit;
+    const QStringList _start_ids = _current_service_selection->getStartPoint();
+    const QTime _start_time = _current_service_selection->getStartTime();
+
+    ui->spinBoxMass->setValue(_mass);
+    ui->spinBoxForce->setValue(_max_brake);
+    ui->spinBoxPower->setValue(_max_power);
+    ui->spinBoxMaxSpeed->setValue(_max_speed);
+    ui->spinBoxStartSpeed->setValue(_start_speed);
+
+    ui->textEditEnterID1->setText(_start_ids[0]);
+    ui->textEditEnterID2->setText(_start_ids[1]);
+    ui->checkBoxParentSplit->setChecked(_is_from_split);
+    ui->spinBoxRepeats->setValue(_n_repeats);
+    ui->spinBoxRefIncrement->setValue(_interval);
+    ui->spinBoxRepeatInterval->setValue(_t_interv);
+
+    ui->descEdit->setText(_description);
+    ui->textEditFeederRef->setText(_feeder_ref);
+    ui->textEditParentRef->setText(_feeder_ref);
+    ui->textEditShuttleRef->setText(_daughter_ref);
+    ui->servicerefEdit->setText(_serv_id);
+    ui->starttimeEdit->setTime(_start_time);
+
+    switch(_type)
+    {
+        case ROSService::ServiceType::Service:
+            ui->radioButtonStandard->setChecked(true);
+            break;
+        case ROSService::ServiceType::ShuttleFromStop:
+            ui->radioButtonShuttleStop->setChecked(false);
+            break;
+        case ROSService::ServiceType::ServiceFromSplit:
+            ui->radioButtonFromOther->setChecked(true);
+            break;
+        case ROSService::ServiceType::ServiceFromService:
+            ui->radioButtonFromOther->setChecked(true);
+            break;
+        case ROSService::ServiceType::ShuttleFinishService:
+            ui->radioButtonFeeder->setChecked(true);
+            break;
+        case ROSService::ServiceType::ShuttleFromFeeder:
+            ui->radioButtonShuttleFeeder->setChecked(true);
+            break;
+        default:
+            break;
+    }
+
 }
 
 void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
@@ -425,12 +656,15 @@ void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
     _current_service_selection = _current_timetable->operator[](ui->tableWidgetTimetable->takeItem(row, 1)->text());
     _update_output();
     ui->tableWidgetTimetable->selectRow(row);
+    _set_form_info();
 }
 
 void ROSTTBAppWindow::save_file()
 {
     QStringList _ttb = _parser->createTimetableStrings(_current_timetable);
     QString _output = join(QChar::Null, _ttb);
+
+    qDebug() << _open_file_str;
 
     QFile _file(_open_file_str);
     if ( _file.open(QIODevice::ReadWrite) )
@@ -443,4 +677,63 @@ void ROSTTBAppWindow::save_file()
 void ROSTTBAppWindow::on_actionSave_triggered()
 {
     save_file();
+}
+
+void ROSTTBAppWindow::on_pushButtonTTBTime_clicked()
+{
+    QTime _temp_time = ui->timeEditTTBStart->time();
+    for(auto service : _current_timetable->getServices())
+    {
+        if(service->getStartTime().msecsTo(_temp_time) < 0)
+        {
+            QMessageBox::critical(this, "Invalid Start Time", "Start time for timetable cannot be after first service time.");
+            return;
+        }
+    }
+    _current_timetable->setStartTime(_temp_time);
+    ui->pushButtonTTBTime->setVisible(false);
+    ui->pushButtonTTBTimeEdit->setVisible(true);
+    ui->timeEditTTBStart->setVisible(false);
+    ui->labelStartTime->setText(_temp_time.toString("HH:mm"));
+    ui->labelStartTime->setVisible(true);
+}
+
+void ROSTTBAppWindow::on_pushButtonTTBTimeEdit_clicked()
+{
+    ui->pushButtonTTBTime->setVisible(true);
+    ui->pushButtonTTBTimeEdit->setVisible(false);
+    ui->timeEditTTBStart->setVisible(true);
+    ui->labelStartTime->setVisible(false);
+}
+
+void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int column)
+{
+    if(_parser->getStations().size() == 0)
+    {
+      QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable.");
+      ui->pushButtonRoute->click();
+      _update_output();
+      return;
+    }
+
+    _station_add->setCurrentService(_current_service_selection);
+    _station_add->setStations(_parser->getStations());
+    const QString _station_name = ui->tableWidgetService->takeItem(row, 2)->text();
+
+    if(!_parser->getStations().contains(_station_name))
+    {
+        QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable (station not found in current route).");
+        ui->pushButtonRoute->click();
+        _update_output();
+        return;
+    }
+
+    const QList<bool> _cdtPass = _current_service_selection->getCDTPass(_station_name);
+    const QString _arrive = ui->tableWidgetService->takeItem(row, 0)->text(),
+                _depart = ui->tableWidgetService->takeItem(row, 1)->text();
+
+    _station_add->fwdCurrentSelection(_station_name, {QTime::fromString(_arrive, "HH:mm"), QTime::fromString(_depart, "HH:mm")}, _cdtPass[0], _cdtPass[1]);
+
+    _station_add->show();
+    _update_output();
 }

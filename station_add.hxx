@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QSet>
 #include <QTime>
+#include <QTableWidget>
 
 #include "rosservice.hxx"
 
@@ -28,12 +29,19 @@ public:
     ~Station_add();
     void setStations(QSet<QString> stations);
     bool setInfo();
-    void setCurrentService(ROSService* service) {_current_srv = service;}
+    QTime _srv_start = QTime();
+    void setCurrentService(ROSService* service)
+    {
+        _current_srv = service;
+        _srv_start = service->getStartTime();
+    }
     QList<QTime> getTimes() const {return _times;}
     QString getStation() const {return _current_station;}
     void setType(StopType type) {_stop_class = type;}
     StopType getType() const {return _stop_class;}
     void reset_state();
+    void setServiceTable(QTableWidget* serv_table){_service_table = serv_table;}
+    void fwdCurrentSelection(const QString& station, const QList<QTime>& times, bool isCDT, bool isPass);
 
 private slots:
     void on_buttonBoxAddStation_accepted();
@@ -49,6 +57,7 @@ private:
     Ui::Station_add *ui;
     QList<QString> _station_list = {};
     ROSService* _current_srv;
+    QTableWidget* _service_table;
     QString _current_station = "";
     QList<QTime> _times = {QTime(), QTime()};
     StopType _stop_class = StopType::CallingPoint;

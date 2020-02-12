@@ -11,20 +11,25 @@
 class ROSTimetable
 {
     private:
-        QTime _start_time = QTime();
+        QTime _start_time = QTime::fromString("00:00", "HH:mm");
         QMap<QString, ROSService*> _services;
         QList<QString> _stored_locations = {};
         QString _file_name = "";
     public:
         ROSTimetable(QString file_name="NewTimetable_"+QDateTime::currentDateTime().toString("HH_mm_dd-MM-yy")+".ttb") : _file_name(file_name) {}
-        void addService(int int_id, QTime start_time, QString id, QString description, QList<QString> stations = {}, QList<QList<QTime>> times = {},
+        void addService(int int_id, QTime start_time, QString id, QString description,
                         int start_speed=-1, int max_speed=-1, int mass=-1, int max_brake_force=-1, int power=-1)
         {
-            _services[id] = new ROSService(int_id, start_time, id, description, stations, times, start_speed, max_speed, mass, max_brake_force, power);
+            _services[id] = new ROSService(int_id, start_time, id, description, start_speed, max_speed, mass, max_brake_force, power);
         }
         void addService(ROSService* service)
         {
             _services[service->getID()] = service;
+        }
+        void removeService(const QString& service_ref)
+        {
+            _services.erase(_services.find(service_ref));
+            orderServices();
         }
         QMap<QString, ROSService*> getServices() const {return _services;}
         void orderServices();

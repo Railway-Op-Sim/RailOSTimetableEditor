@@ -22,9 +22,9 @@ private:
     QString _service_id = "";
     QList<bool> _passing_stops = {};
     QList<bool> _direction_changes = {};
-    QList<QString> _stations = {};
+    QStringList _stations = QStringList();
     QString _parent_service = "";
-    QList<QList<QTime>> _times = {};
+    QList<QList<QTime>> _times = QList<QList<QTime>>();
     int _power = -1;
     int _mass= -1;
     int _max_speed = -1;
@@ -58,10 +58,8 @@ public:
         FinishShuttleFormNew,
         FinishSingleShuttleFeeder,
     };
-    ROSService(int int_id, QTime start_time, QString id, QString description, QList<QString> stations = {}, QList<QList<QTime>> times = {},
-               int start_speed=-1, int max_speed=-1, int mass=-1, int max_brake_force=-1, int power=-1) :
-        _integer_id(int_id), _enter_map_time(start_time), _service_id(id), _stations(stations), _power(power), _mass(mass),
-        _max_speed(max_speed), _max_brake(max_brake_force), _start_speed(start_speed), _description(description), _times(times)  {}
+    ROSService(int int_id, QTime start_time, QString id, QString description, int start_speed=-1, int max_speed=-1, int mass=-1, int max_brake_force=-1, int power=-1) :
+        _integer_id(int_id), _enter_map_time(start_time), _service_id(id), _power(power), _mass(mass), _max_speed(max_speed), _max_brake(max_brake_force), _start_speed(start_speed), _description(description)  {}
     void setNRepeats(const int& n) { _n_repeats = n;}
     int getIntegerID() const { return _integer_id;}
     void setIDIncrement(const int& n) {_id_increment = n;}
@@ -71,10 +69,23 @@ public:
     void setStartSpeed(const int& speed){_start_speed = speed;}
     void setMass(const int& mass){_mass = mass;}
     void setPower(const int& power) {_power = power;}
-    void setExitPoint(QString& id) {_exit_id = id;}
-    void setEntryPoint(QStringList& ids) {_enter_ids = ids;}
-    void setExitTime(QTime& time) {_exit_map_time = time;}
+    void setExitPoint(const QString& id) {_exit_id = id;}
+    void setEntryPoint(const QStringList& ids) {_enter_ids = ids;}
+    void setExitTime(const QTime& time) {_exit_map_time = time;}
     void setDescription(const QString& desc) {_description = desc;}
+    void setEntryTime(const QTime& time) {_enter_map_time = time;}
+    QList<bool> getCDTPass(const QString& station_name)
+    {
+        for(int i{0}; i < _stations.size(); ++i)
+        {
+            if(_stations[i] == station_name)
+            {
+                return {_direction_changes[i], _passing_stops[i]};
+            }
+        }
+
+        return {false, false};
+    }
     void orderService();
     int getMaxSpeed() const {return _max_speed;}
     int getMaxBrake() const {return _max_brake;}
@@ -111,20 +122,28 @@ public:
         _passing_stops.push_back(false);
         _direction_changes.push_back(false);
     }
+    void updateStation(QString station, QList<QTime> time, bool CDT=false, bool Pass=false)
+    {
+        const int index = _stations.indexOf(station);
+        _times[index] = time;
+        _direction_changes[index] = CDT;
+        _passing_stops[index] = Pass;
+
+    }
     void setStopAsPassPoint(int index, bool state) {_passing_stops[index] = state;}
     void setDirectionChangeAtStop(int index, bool state) {_direction_changes[index] = state;}
     void setShuttleRefPosition(QString coordinates[2]);
     QString as_string();
     QStringList summarise();
-    const QList<QString> getStations() const
+    QStringList getStations() const
     {
         return _stations;
     }
-    const QList<QList<QTime>> getTimes() const
+    QList<QList<QTime>> getTimes() const
     {
         return _times;
     }
-    const QString getID() const {return _service_id; }
+    QString getID() const {return _service_id; }
 
 private:
     ServiceType _service_type = ServiceType::Service;

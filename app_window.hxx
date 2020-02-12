@@ -25,6 +25,10 @@ public:
     ROSTTBAppWindow(QWidget *parent = nullptr);
     ~ROSTTBAppWindow();
     void open_file();
+    bool checkLocID(QString id);
+    bool checkIDsAreNeighbours(QStringList ids);
+    void _update_output(ROSService* current_serv = nullptr);
+
     ROSTTBGen* getParser(){return _parser;}
 
 private slots:
@@ -44,8 +48,6 @@ private slots:
 
     void on_pushButtonAddLocation_clicked();
 
-    void on_stationAdd_accepted();
-
     void on_radioButtonStandard_toggled(bool checked);
 
     void on_radioButtonShuttleFeeder_toggled(bool checked);
@@ -60,6 +62,13 @@ private slots:
 
     void on_actionSave_triggered();
 
+    void on_pushButtonTTBTime_clicked();
+
+    void on_pushButtonTTBTimeEdit_clicked();
+
+
+    void on_tableWidgetService_cellDoubleClicked(int row, int column);
+
 private:
     Station_add* _station_add = new Station_add(nullptr, this);
     QDir* _ros_timetables = nullptr;
@@ -71,15 +80,17 @@ private:
     ROSTTBGen* _parser = new ROSTTBGen(this);
     ROSTimetable* _current_timetable = new ROSTimetable;
     QList<int> _ttb_column_widths = {50, 50, 300, 200, 75, 200, 50};
+    QList<int> _srv_column_widths = {50, 50, 200};
     ROSService* _current_service_selection = nullptr;
     void save_file();
     void reset();
     bool checkROS();
     void _record_current_info();
-    void _update_output();
     void delete_entries();
     void _set_initial_open_file();
     void _enable_integer_info(bool enable);
+    void _set_tab(bool tab_mode_on);
+    void _set_form_info();
 
 };
 #endif // ROSTTBAPPWINDOW_HXX

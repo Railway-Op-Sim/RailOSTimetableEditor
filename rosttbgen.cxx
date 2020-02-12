@@ -7,6 +7,7 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
     QFile open_file(in_file);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
     {
+        if(in_file.isEmpty() || in_file.isNull()) return "NULL";
         QMessageBox::critical(_parent, "File Open Failure", "Failed to open file '"+in_file+"'");
         return QString();
     }
@@ -79,7 +80,7 @@ QString ROSTTBGen::parse_rly(const QString railways_dir)
         QString line = in.readLine();
         if(previous[0].isLetter() && line[0] == "*")
         {
-            _stations.push_back(previous);
+            _stations.push_back(previous.split(QChar::Null)[0]);
         }
         if(counter > 0)
         {

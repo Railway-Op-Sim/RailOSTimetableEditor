@@ -81,6 +81,9 @@
        <height>30</height>
       </rect>
      </property>
+     <property name="maximum">
+      <number>999</number>
+     </property>
     </widget>
     <widget class="QSpinBox" name="spinBoxMaxSpeed">
      <property name="geometry">
@@ -90,6 +93,9 @@
        <width>60</width>
        <height>30</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="spinBoxMass">
@@ -101,6 +107,9 @@
        <height>30</height>
       </rect>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
     <widget class="QSpinBox" name="spinBoxForce">
      <property name="geometry">
@@ -110,6 +119,9 @@
        <width>60</width>
        <height>30</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_3">
@@ -172,6 +184,9 @@
        <width>60</width>
        <height>30</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_7">
@@ -748,6 +763,68 @@
       <width>941</width>
       <height>531</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QTimeEdit" name="timeEditTTBStart">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>17</y>
+      <width>118</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_12">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>20</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start Time:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonTTBTime">
+    <property name="geometry">
+     <rect>
+      <x>800</x>
+      <y>13</y>
+      <width>113</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Confirm</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelStartTime">
+    <property name="geometry">
+     <rect>
+      <x>674</x>
+      <y>19</y>
+      <width>59</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>00:00</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonTTBTimeEdit">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>13</y>
+      <width>71</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Edit</string>
     </property>
    </widget>
   </widget>
