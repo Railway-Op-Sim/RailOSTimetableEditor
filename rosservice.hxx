@@ -22,6 +22,7 @@ private:
     QString _service_id = "";
     QList<bool> _passing_stops = {};
     QList<bool> _direction_changes = {};
+    QMap<QString, QStringList> _split_data = QMap<QString, QStringList>();
     QStringList _stations = QStringList();
     QString _parent_service = "";
     QList<QList<QTime>> _times = QList<QList<QTime>>();
@@ -68,7 +69,13 @@ public:
     void setMaxBrake(const int& force){_max_brake = force;}
     void setStartSpeed(const int& speed){_start_speed = speed;}
     void setMass(const int& mass){_mass = mass;}
+    void setID(const QString& id) {_service_id = id;}
     void setPower(const int& power) {_power = power;}
+    void setSplitData(QString& fr_rear, QString& service_id, QString& station)
+    {
+        _split_data = {{fr_rear, {service_id, station}}};
+    }
+    QMap<QString, QStringList> getSplitData() const {return _split_data;}
     void setExitPoint(const QString& id) {_exit_id = id;}
     void setEntryPoint(const QStringList& ids) {_enter_ids = ids;}
     void setExitTime(const QTime& time) {_exit_map_time = time;}

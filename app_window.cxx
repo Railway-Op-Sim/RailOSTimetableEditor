@@ -31,6 +31,8 @@ ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
     ui->tableWidgetService->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidgetService->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableWidgetService->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->radioButtonFromOther->setEnabled(false);
+    ui->radioButtonShuttleFeeder->setEnabled(false);
 
     _station_add->setServiceTable(ui->tableWidgetService);
 
@@ -138,10 +140,12 @@ bool ROSTTBAppWindow::checkIDsAreNeighbours(QStringList ids)
 
 void ROSTTBAppWindow::_record_current_info()
 {
+    ui->labelParentOfJoin->setText("");
     if(!checkROS()) return;
     QString _srv_id = ui->servicerefEdit->toPlainText();
-    QString _desc = ui->descEdit->toPlainText();
-    QTime _start_time = ui->starttimeEdit->time();
+    const QString _desc = ui->descEdit->toPlainText();
+    const QTime _start_time = ui->starttimeEdit->time();
+    const QString _shuttle_partner = ui->textEditShuttlePart2->toPlainText();
     if(_current_timetable->getStartTime().msecsTo(_start_time) < 0)
     {
         QMessageBox::critical(this, "Invalid Service", "Service start time must not precede timetable start time.");
@@ -226,9 +230,37 @@ void ROSTTBAppWindow::_record_current_info()
         _current_service_selection->setPower(_max_power);
     }
 
-    if(ui->radioButtonFeeder->isChecked()) _current_service_selection->setType(ROSService::ServiceType::ShuttleFinishService);
+    if(ui->radioButtonShuttleFinish->isChecked())
+    {
+        const ROSService* _parent = _current_timetable->getServices()[ui->comboBoxFeeder->currentText()];
+        QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][1];
+        _parent_last_time = (_parent_last_time != QTime()) ? _parent_last_time : _parent->getTimes()[_parent->getTimes().size()-1][0];
+
+        const QString _service_id = _current_timetable->getServices()[_current_service_selection->getParent()]->getDaughter();
+        if(_service_id == "")
+        {
+            QMessageBox::critical(this, "No Parent Daughter Found", "Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service.");
+            return;
+        }
+        if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
+        {
+            QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent end time.");
+            return;
+        }
+
+        _current_service_selection->setType(ROSService::ServiceType::ShuttleFinishService);
+        _current_service_selection->setParent(ui->comboBoxFeeder->currentText());
+        _current_service_selection->setID(_service_id);
+        ui->servicerefEdit->setText(_service_id);
+    }
     else if(ui->radioButtonShuttleStop->isChecked())
     {
+        if(_shuttle_partner == "")
+        {
+            QMessageBox::critical(this, "No Partner", "You must specify an accompanying return service ID.");
+            return;
+        }
+        _current_service_selection->setDaughter(_shuttle_partner);
         _current_service_selection->setType(ROSService::ServiceType::ShuttleFromStop);
         _current_service_selection->setEntryPoint(_start_ids);
         int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
@@ -238,20 +270,126 @@ void ROSTTBAppWindow::_record_current_info()
     }
     else if(ui->radioButtonShuttleFeeder->isChecked())
     {
+        if(_shuttle_partner == "")
+        {
+            QMessageBox::critical(this, "No Partner", "You must specify an accompanying return service ID.");
+            return;
+        }
+        _current_service_selection->setDaughter(_shuttle_partner);
         _current_service_selection->setType(ROSService::ServiceType::ShuttleFromFeeder);
 
         int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
         _current_service_selection->setNRepeats(n_repeats);
         _current_service_selection->setRepeatInterval(nmins_interval);
         _current_service_selection->setIDIncrement(id_inc);
+        _current_service_selection->setParent(ui->comboBoxFeeder->currentText());
     }
-    else if(ui->radioButtonFromOther->isChecked() && ui->checkBoxParentSplit->isChecked()) _current_service_selection->setType(ROSService::ServiceType::ServiceFromSplit);
-    else if(ui->radioButtonFromOther->isChecked()) _current_service_selection->setType(ROSService::ServiceType::ServiceFromService);
+    else if(ui->radioButtonFromOther->isChecked())
+    {
+        const ROSService* _parent = _current_timetable->getServices()[ui->comboBoxParent->currentText()];
+        QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][1];
+        _parent_last_time = (_parent_last_time != QTime()) ? _parent_last_time : _parent->getTimes()[_parent->getTimes().size()-1][0];
+
+        if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
+        {
+            QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent end time.");
+            return;
+        }
+        const QString _service_id = _current_timetable->getServices()[_current_service_selection->getParent()]->getDaughter();
+        if(_service_id == "")
+        {
+            QMessageBox::critical(this, "No Parent Daughter Found", "Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service.");
+            return;
+        }
+
+        if(_current_timetable->getServices()[ui->comboBoxParent->currentText()]->getSplitData() != QMap<QString, QStringList>())
+        {
+            _current_service_selection->setType(ROSService::ServiceType::ServiceFromSplit);
+        }
+
+        else
+        {
+            _current_service_selection->setType(ROSService::ServiceType::ServiceFromService);
+        }
+
+
+        _current_service_selection->setID(_service_id);
+        _current_service_selection->setParent(ui->comboBoxParent->currentText());
+        ui->servicerefEdit->setText(_service_id);
+
+    }
     else
     {
         _current_service_selection->setType(ROSService::ServiceType::Service);
         _current_service_selection->setEntryPoint(_start_ids);
     }
+
+    if(ui->radioButtonFer->isChecked())
+    {
+        const QString _exit_id = ui->serviceExitEdit->toPlainText();
+        if(_exit_id == "")
+        {
+            QMessageBox::critical(this, "No Exit Location", "You must provide an exit location ID.");
+            return;
+        }
+
+        if(!checkLocID(_exit_id))
+        {
+            QMessageBox::critical(this, "Invalid Start Position", "Location ID must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number.");
+            return;
+        }
+
+        _current_service_selection->setExitPoint(_exit_id);
+        _current_service_selection->setFinishState(ROSService::FinishState::FinishExit);
+    }
+
+    else if(ui->radioButtonFjo->isChecked())
+    {
+        QString _found_candidate = "NULL";
+        for(auto service : _current_timetable->getServices())
+        {
+            if(service->getSplitData().keys().contains(_current_service_selection->getID()))
+            {
+                _found_candidate = service->getID();
+                break;
+            }
+        }
+
+        if(_found_candidate == "NULL")
+        {
+            QMessageBox::critical(this, "No Parent Found", "Could not find split reference in existing service matching current service. You must define a forward or rear split "\
+                                  "in an existing service first.");
+            return;
+        }
+
+        ui->labelParentOfJoin->setText(_found_candidate);
+        _current_service_selection->setParent(_found_candidate);
+    }
+
+    else if(ui->radioButtonFns->isChecked() || ui->radioButtonFshf->isChecked() || ui->radioButtonFrsfns->isChecked())
+    {
+        QString _srv_id = ui->serviceFinishServiceEdit->toPlainText();
+
+        if(_srv_id == "")
+        {
+            QMessageBox::critical(this, "Missing Daughter Service", "You must provide an identifier for the newly formed service.");
+        }
+        if(_srv_id.size() != 4)
+        {
+            _srv_id = _srv_id.left(4);
+            QMessageBox::warning(this, "Service ID Length", "Service ID must be 4 characters in length, ID will be spliced to '" + _srv_id+ "'.");
+
+        }
+
+        _current_service_selection->setDaughter(_srv_id);
+
+        if(ui->radioButtonFns->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishFormNew);
+        else if(ui->radioButtonFshf->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleFormNew);
+        else _current_service_selection->setFinishState(ROSService::FinishState::FinishSingleShuttleFeeder);
+    }
+
+    else if(ui->radioButtonFrh->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishRemainHere);
+    else _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleRemainHere);
 
     _update_output();
 }
@@ -260,9 +398,7 @@ void ROSTTBAppWindow::_set_tab(bool tab_mode_on)
 {
     ui->textEditEnterID1->setTabChangesFocus(tab_mode_on);
     ui->textEditEnterID2->setTabChangesFocus(tab_mode_on);
-    ui->textEditFeederRef->setTabChangesFocus(tab_mode_on);
-    ui->textEditParentRef->setTabChangesFocus(tab_mode_on);
-    ui->textEditShuttleRef->setTabChangesFocus(tab_mode_on);
+    ui->textEditParentShuttleRef->setTabChangesFocus(tab_mode_on);
     ui->servicerefEdit->setTabChangesFocus(tab_mode_on);
     ui->descEdit->setTabChangesFocus(tab_mode_on);
 }
@@ -312,12 +448,12 @@ void ROSTTBAppWindow::_update_output(ROSService* current_serv)
     ui->tableWidgetTimetable->sortItems(0);
 
     _station_add->setServiceTable(ui->tableWidgetService);
+    _populate_feederboxes();
 
 }
 
 void ROSTTBAppWindow::_enable_integer_info(bool enable)
 {
-    ui->descEdit->setEnabled(enable);
     ui->spinBoxMass->setEnabled(enable);
     ui->spinBoxForce->setEnabled(enable);
     ui->spinBoxMaxSpeed->setEnabled(enable);
@@ -352,6 +488,11 @@ void ROSTTBAppWindow::open_file()
     QString _parsed = _parser->parse_file(_current_file, _ros_timetables);
     _open_file_str = (_parsed != "NULL")? _parsed : _open_file_str;
     _current_timetable = _parser->getParsedTimetable();
+    if(_current_timetable->getServices().size() > 0)
+    {
+        ui->radioButtonFromOther->setEnabled(true);
+        ui->radioButtonShuttleFeeder->setEnabled(true);
+    }
     _current_service_selection = _current_timetable->operator[](-1);
     _update_output();
 }
@@ -421,6 +562,8 @@ void ROSTTBAppWindow::on_pushButtonInsert_clicked()
 {
     _record_current_info();
     _station_add->setCurrentService(_current_service_selection);
+    ui->radioButtonFromOther->setEnabled(true);
+    ui->radioButtonShuttleFeeder->setEnabled(true);
 }
 
 void ROSTTBAppWindow::delete_entries()
@@ -438,6 +581,24 @@ void ROSTTBAppWindow::delete_entries()
 void ROSTTBAppWindow::on_pushButtonDelete_clicked()
 {
     delete_entries();
+}
+
+void ROSTTBAppWindow::_populate_feederboxes()
+{
+    const QMap<QString, ROSService*> _services = _current_timetable->getServices();
+    if(_services.size() < 1) return;
+
+    QStringList _service_ids = {};
+
+    for(auto key : _services.keys()) _service_ids.push_back(QString(key));
+
+    ui->comboBoxFeeder->clear();
+    ui->comboBoxParent->clear();
+
+    std::sort(_service_ids.begin(), _service_ids.end());
+
+    ui->comboBoxFeeder->addItems(_service_ids);
+    ui->comboBoxParent->addItems(_service_ids);
 }
 
 void ROSTTBAppWindow::on_pushButtonRoute_clicked()
@@ -475,6 +636,7 @@ void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
     _enable_integer_info(true);
     if(checked)
     {
+        ui->textEditShuttlePart2->setEnabled(false);
         ui->spinBoxMass->setEnabled(true);
         ui->spinBoxForce->setEnabled(true);
         ui->spinBoxPower->setEnabled(true);
@@ -485,10 +647,9 @@ void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
         ui->spinBoxRepeats->setEnabled(true);
         ui->textEditEnterID1->setEnabled(true);
         ui->textEditEnterID2->setEnabled(true);
-        ui->textEditFeederRef->setEnabled(false);
-        ui->textEditParentRef->setEnabled(false);
-        ui->textEditShuttleRef->setEnabled(false);
-        ui->checkBoxParentSplit->setEnabled(false);
+        ui->comboBoxFeeder->setEnabled(false);
+        ui->comboBoxParent->setEnabled(false);
+        ui->textEditParentShuttleRef->setEnabled(false);
     }
 }
 
@@ -497,6 +658,8 @@ void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->textEditShuttlePart2->setEnabled(true);
+        ui->servicerefEdit->setEnabled(false);
         ui->spinBoxMass->setEnabled(false);
         ui->spinBoxForce->setEnabled(false);
         ui->spinBoxPower->setEnabled(false);
@@ -507,10 +670,9 @@ void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
         ui->spinBoxRepeats->setEnabled(true);
         ui->textEditEnterID1->setEnabled(false);
         ui->textEditEnterID2->setEnabled(false);
-        ui->textEditFeederRef->setEnabled(true);
-        ui->textEditParentRef->setEnabled(false);
-        ui->textEditShuttleRef->setEnabled(false);
-        ui->checkBoxParentSplit->setEnabled(false);
+        ui->comboBoxFeeder->setEnabled(true);
+        ui->comboBoxParent->setEnabled(false);
+        ui->textEditParentShuttleRef->setEnabled(false);
     }
 }
 
@@ -519,6 +681,8 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->textEditShuttlePart2->setEnabled(true);
+        ui->servicerefEdit->setEnabled(true);
         ui->spinBoxMass->setEnabled(true);
         ui->spinBoxForce->setEnabled(true);
         ui->spinBoxPower->setEnabled(true);
@@ -529,10 +693,9 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
         ui->spinBoxRepeats->setEnabled(true);
         ui->textEditEnterID1->setEnabled(true);
         ui->textEditEnterID2->setEnabled(true);
-        ui->textEditFeederRef->setEnabled(false);
-        ui->textEditParentRef->setEnabled(false);
-        ui->textEditShuttleRef->setEnabled(false);
-        ui->checkBoxParentSplit->setEnabled(false);
+        ui->comboBoxFeeder->setEnabled(false);
+        ui->comboBoxParent->setEnabled(false);
+        ui->textEditParentShuttleRef->setEnabled(false);
     }
 }
 
@@ -541,6 +704,8 @@ void ROSTTBAppWindow::on_radioButtonFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->textEditShuttlePart2->setEnabled(false);
+        ui->servicerefEdit->setEnabled(true);
         ui->spinBoxMass->setEnabled(false);
         ui->spinBoxForce->setEnabled(false);
         ui->spinBoxPower->setEnabled(false);
@@ -552,10 +717,9 @@ void ROSTTBAppWindow::on_radioButtonFeeder_toggled(bool checked)
         ui->spinBoxRepeats->setEnabled(false);
         ui->textEditEnterID1->setEnabled(false);
         ui->textEditEnterID2->setEnabled(false);
-        ui->textEditFeederRef->setEnabled(false);
-        ui->textEditParentRef->setEnabled(false);
-        ui->textEditShuttleRef->setEnabled(true);
-        ui->checkBoxParentSplit->setEnabled(false);
+        ui->comboBoxFeeder->setEnabled(false);
+        ui->comboBoxParent->setEnabled(false);
+        ui->textEditParentShuttleRef->setEnabled(true);
     }
 }
 
@@ -564,6 +728,8 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->textEditShuttlePart2->setEnabled(false);
+        ui->servicerefEdit->setEnabled(false);
         ui->spinBoxMass->setEnabled(false);
         ui->spinBoxForce->setEnabled(false);
         ui->spinBoxPower->setEnabled(false);
@@ -574,10 +740,9 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
         ui->spinBoxRepeats->setEnabled(true);
         ui->textEditEnterID1->setEnabled(false);
         ui->textEditEnterID2->setEnabled(false);
-        ui->textEditFeederRef->setEnabled(false);
-        ui->textEditParentRef->setEnabled(true);
-        ui->textEditShuttleRef->setEnabled(false);
-        ui->checkBoxParentSplit->setEnabled(true);
+        ui->comboBoxFeeder->setEnabled(false);
+        ui->comboBoxParent->setEnabled(true);
+        ui->textEditParentShuttleRef->setEnabled(false);
     }
 }
 
@@ -587,9 +752,11 @@ void ROSTTBAppWindow::_set_form_info()
     const QString _serv_id = _current_service_selection->getID(),
           _description = _current_service_selection->getDescription(),
           _feeder_ref  = _current_service_selection->getParent(),
-          _daughter_ref = _current_service_selection->getDaughter();
+          _daughter_ref = _current_service_selection->getDaughter(),
+          _exit_loc = _current_service_selection->getExitID();
 
     const ROSService::ServiceType _type = _current_service_selection->getType();
+    const ROSService::FinishState _exit_as = _current_service_selection->getFinState();
 
 
     const int _max_power   = _current_service_selection->getPower(),
@@ -600,7 +767,6 @@ void ROSTTBAppWindow::_set_form_info()
               _n_repeats   = _current_service_selection->getNRepeats(),
               _interval    = _current_service_selection->getIDIncrement(),
               _t_interv    = _current_service_selection->getRepeatInterval();
-    const bool _is_from_split = _type == ROSService::ServiceType::ServiceFromSplit;
     const QStringList _start_ids = _current_service_selection->getStartPoint();
     const QTime _start_time = _current_service_selection->getStartTime();
 
@@ -612,17 +778,18 @@ void ROSTTBAppWindow::_set_form_info()
 
     ui->textEditEnterID1->setText(_start_ids[0]);
     ui->textEditEnterID2->setText(_start_ids[1]);
-    ui->checkBoxParentSplit->setChecked(_is_from_split);
     ui->spinBoxRepeats->setValue(_n_repeats);
     ui->spinBoxRefIncrement->setValue(_interval);
     ui->spinBoxRepeatInterval->setValue(_t_interv);
 
     ui->descEdit->setText(_description);
-    ui->textEditFeederRef->setText(_feeder_ref);
-    ui->textEditParentRef->setText(_feeder_ref);
-    ui->textEditShuttleRef->setText(_daughter_ref);
+    ui->comboBoxFeeder->setCurrentText(_feeder_ref);
+    ui->comboBoxParent->setCurrentText(_feeder_ref);
+    ui->textEditParentShuttleRef->setText(_feeder_ref);
     ui->servicerefEdit->setText(_serv_id);
     ui->starttimeEdit->setTime(_start_time);
+
+
 
     switch(_type)
     {
@@ -630,6 +797,7 @@ void ROSTTBAppWindow::_set_form_info()
             ui->radioButtonStandard->setChecked(true);
             break;
         case ROSService::ServiceType::ShuttleFromStop:
+            ui->textEditShuttlePart2->setText(_daughter_ref);
             ui->radioButtonShuttleStop->setChecked(false);
             break;
         case ROSService::ServiceType::ServiceFromSplit:
@@ -639,10 +807,42 @@ void ROSTTBAppWindow::_set_form_info()
             ui->radioButtonFromOther->setChecked(true);
             break;
         case ROSService::ServiceType::ShuttleFinishService:
-            ui->radioButtonFeeder->setChecked(true);
+            ui->radioButtonShuttleFinish->setChecked(true);
             break;
         case ROSService::ServiceType::ShuttleFromFeeder:
+            ui->textEditShuttlePart2->setText(_daughter_ref);
             ui->radioButtonShuttleFeeder->setChecked(true);
+            break;
+        default:
+            break;
+    }
+
+    switch(_exit_as)
+    {
+        case ROSService::FinishState::FinishRemainHere:
+            ui->radioButtonFrh->setChecked(true);
+            break;
+        case ROSService::FinishState::FinishExit:
+            ui->serviceExitEdit->setText(_exit_loc);
+            ui->radioButtonFer->setChecked(true);
+            break;
+        case ROSService::FinishState::FinishFormNew:
+            ui->serviceFinishServiceEdit->setText(_daughter_ref);
+            ui->radioButtonFns->setChecked(true);
+            break;
+        case ROSService::FinishState::FinishJoinOther:
+            ui->labelParentOfJoin->setText(_feeder_ref);
+            ui->radioButtonFjo->setChecked(true);
+            break;
+        case ROSService::FinishState::FinishShuttleFormNew:
+            ui->serviceFinishServiceEdit->setText(_daughter_ref);
+            ui->radioButtonFrsfns->setChecked(true);
+            break;
+        case ROSService::FinishState::FinishShuttleRemainHere:
+            ui->radioButtonFrsrh->setChecked(true);
+            break;
+        case ROSService::FinishState::FinishSingleShuttleFeeder:
+            ui->radioButtonFshf->setChecked(true);
             break;
         default:
             break;
@@ -736,4 +936,67 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
 
     _station_add->show();
     _update_output();
+}
+
+void ROSTTBAppWindow::on_radioButtonFrh_toggled(bool checked)
+{
+    if(checked)
+    {
+        ui->serviceExitEdit->setEnabled(false);
+        ui->serviceFinishServiceEdit->setEnabled(false);
+    }
+}
+
+void ROSTTBAppWindow::on_radioButtonFns_toggled(bool checked)
+{
+    if(checked)
+    {
+        ui->serviceExitEdit->setEnabled(false);
+        ui->serviceFinishServiceEdit->setEnabled(true);
+    }
+}
+
+void ROSTTBAppWindow::on_radioButtonFjo_toggled(bool checked)
+{
+    if(checked)
+    {
+        ui->serviceExitEdit->setEnabled(false);
+        ui->serviceFinishServiceEdit->setEnabled(false);
+    }
+}
+
+void ROSTTBAppWindow::on_radioButtonFrsrh_toggled(bool checked)
+{
+    if(checked)
+    {
+        ui->serviceExitEdit->setEnabled(false);
+        ui->serviceFinishServiceEdit->setEnabled(false);
+    }
+}
+
+void ROSTTBAppWindow::on_radioButtonFrsfns_toggled(bool checked)
+{
+    if(checked)
+    {
+        ui->serviceExitEdit->setEnabled(false);
+        ui->serviceFinishServiceEdit->setEnabled(true);
+    }
+}
+
+void ROSTTBAppWindow::on_radioButtonFshf_toggled(bool checked)
+{
+    if(checked)
+    {
+        ui->serviceExitEdit->setEnabled(false);
+        ui->serviceFinishServiceEdit->setEnabled(true);
+    }
+}
+
+void ROSTTBAppWindow::on_radioButtonFer_toggled(bool checked)
+{
+    if(checked)
+    {
+        ui->serviceExitEdit->setEnabled(true);
+        ui->serviceFinishServiceEdit->setEnabled(false);
+    }
 }

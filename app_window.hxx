@@ -69,6 +69,20 @@ private slots:
 
     void on_tableWidgetService_cellDoubleClicked(int row, int column);
 
+    void on_radioButtonFrh_toggled(bool checked);
+
+    void on_radioButtonFns_toggled(bool checked);
+
+    void on_radioButtonFjo_toggled(bool checked);
+
+    void on_radioButtonFrsrh_toggled(bool checked);
+
+    void on_radioButtonFrsfns_toggled(bool checked);
+
+    void on_radioButtonFshf_toggled(bool checked);
+
+    void on_radioButtonFer_toggled(bool checked);
+
 private:
     Station_add* _station_add = new Station_add(nullptr, this);
     QDir* _ros_timetables = nullptr;
@@ -91,6 +105,7 @@ private:
     void _enable_integer_info(bool enable);
     void _set_tab(bool tab_mode_on);
     void _set_form_info();
+    void _populate_feederboxes();
 
 };
 #endif // ROSTTBAPPWINDOW_HXX

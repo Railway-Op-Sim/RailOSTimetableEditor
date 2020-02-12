@@ -18,13 +18,13 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>590</y>
+      <y>560</y>
       <width>1601</width>
-      <height>301</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="title">
-     <string>Add New Service</string>
+     <string/>
     </property>
     <widget class="QTimeEdit" name="starttimeEdit">
      <property name="geometry">
@@ -54,7 +54,7 @@
       <rect>
        <x>360</x>
        <y>30</y>
-       <width>131</width>
+       <width>101</width>
        <height>31</height>
       </rect>
      </property>
@@ -218,9 +218,9 @@
     <widget class="QTextEdit" name="descEdit">
      <property name="geometry">
       <rect>
-       <x>300</x>
-       <y>70</y>
-       <width>191</width>
+       <x>220</x>
+       <y>100</y>
+       <width>241</width>
        <height>31</height>
       </rect>
      </property>
@@ -228,7 +228,7 @@
     <widget class="QRadioButton" name="radioButtonStandard">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>500</x>
        <y>30</y>
        <width>100</width>
        <height>20</height>
@@ -241,7 +241,7 @@
     <widget class="QRadioButton" name="radioButtonShuttleFeeder">
      <property name="geometry">
       <rect>
-       <x>690</x>
+       <x>650</x>
        <y>30</y>
        <width>201</width>
        <height>20</height>
@@ -251,23 +251,10 @@
       <string>Shuttle from Feeder Service</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEditFeederRef">
+    <widget class="QTextEdit" name="textEditParentShuttleRef">
      <property name="geometry">
       <rect>
-       <x>820</x>
-       <y>60</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="textEditShuttleRef">
-     <property name="geometry">
-      <rect>
-       <x>990</x>
+       <x>940</x>
        <y>80</y>
        <width>151</width>
        <height>31</height>
@@ -277,10 +264,10 @@
       <string/>
      </property>
     </widget>
-    <widget class="QRadioButton" name="radioButtonFeeder">
+    <widget class="QRadioButton" name="radioButtonShuttleFinish">
      <property name="geometry">
       <rect>
-       <x>990</x>
+       <x>920</x>
        <y>30</y>
        <width>181</width>
        <height>20</height>
@@ -290,14 +277,14 @@
       <enum>Qt::DefaultContextMenu</enum>
      </property>
      <property name="text">
-      <string>Feeder for Shuttle Service</string>
+      <string>Shuttle Finish Service</string>
      </property>
     </widget>
     <widget class="QLabel" name="labelFeederRef">
      <property name="geometry">
       <rect>
-       <x>700</x>
-       <y>70</y>
+       <x>650</x>
+       <y>60</y>
        <width>111</width>
        <height>16</height>
       </rect>
@@ -309,7 +296,7 @@
     <widget class="QLabel" name="labelShuttleRef">
      <property name="geometry">
       <rect>
-       <x>990</x>
+       <x>950</x>
        <y>60</y>
        <width>111</width>
        <height>16</height>
@@ -322,8 +309,8 @@
     <widget class="QSpinBox" name="spinBoxRepeats">
      <property name="geometry">
       <rect>
-       <x>840</x>
-       <y>120</y>
+       <x>790</x>
+       <y>160</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -332,8 +319,8 @@
     <widget class="QLabel" name="labelRepeats">
      <property name="geometry">
       <rect>
-       <x>690</x>
-       <y>120</y>
+       <x>650</x>
+       <y>160</y>
        <width>60</width>
        <height>16</height>
       </rect>
@@ -345,8 +332,8 @@
     <widget class="QLabel" name="labelTerminusWaitTime">
      <property name="geometry">
       <rect>
-       <x>690</x>
-       <y>150</y>
+       <x>650</x>
+       <y>190</y>
        <width>141</width>
        <height>16</height>
       </rect>
@@ -358,8 +345,8 @@
     <widget class="QSpinBox" name="spinBoxRepeatInterval">
      <property name="geometry">
       <rect>
-       <x>840</x>
-       <y>150</y>
+       <x>790</x>
+       <y>190</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -368,7 +355,7 @@
     <widget class="QRadioButton" name="radioButtonShuttleStop">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>500</x>
        <y>70</y>
        <width>201</width>
        <height>20</height>
@@ -381,10 +368,10 @@
     <widget class="Line" name="line_3">
      <property name="geometry">
       <rect>
-       <x>1180</x>
+       <x>1110</x>
        <y>30</y>
        <width>16</width>
-       <height>241</height>
+       <height>261</height>
       </rect>
      </property>
      <property name="orientation">
@@ -394,7 +381,7 @@
     <widget class="QRadioButton" name="radioButtonFromOther">
      <property name="geometry">
       <rect>
-       <x>990</x>
+       <x>920</x>
        <y>130</y>
        <width>191</width>
        <height>20</height>
@@ -407,8 +394,8 @@
     <widget class="QLabel" name="labelParentRef">
      <property name="geometry">
       <rect>
-       <x>990</x>
-       <y>160</y>
+       <x>940</x>
+       <y>170</y>
        <width>161</width>
        <height>16</height>
       </rect>
@@ -417,39 +404,13 @@
       <string>Parent Service Reference</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEditParentRef">
-     <property name="geometry">
-      <rect>
-       <x>990</x>
-       <y>180</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="checkBoxParentSplit">
-     <property name="geometry">
-      <rect>
-       <x>990</x>
-       <y>220</y>
-       <width>161</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Parent is a split service</string>
-     </property>
-    </widget>
     <widget class="Line" name="line_4">
      <property name="geometry">
       <rect>
-       <x>500</x>
+       <x>470</x>
        <y>30</y>
        <width>16</width>
-       <height>241</height>
+       <height>271</height>
       </rect>
      </property>
      <property name="orientation">
@@ -459,10 +420,10 @@
     <widget class="Line" name="line_5">
      <property name="geometry">
       <rect>
-       <x>510</x>
+       <x>480</x>
        <y>30</y>
        <width>16</width>
-       <height>241</height>
+       <height>271</height>
       </rect>
      </property>
      <property name="orientation">
@@ -472,10 +433,10 @@
     <widget class="Line" name="line_6">
      <property name="geometry">
       <rect>
-       <x>1190</x>
+       <x>1120</x>
        <y>30</y>
        <width>16</width>
-       <height>241</height>
+       <height>261</height>
       </rect>
      </property>
      <property name="orientation">
@@ -525,8 +486,8 @@
     <widget class="QLabel" name="label_17">
      <property name="geometry">
       <rect>
-       <x>1270</x>
-       <y>250</y>
+       <x>1230</x>
+       <y>260</y>
        <width>261</width>
        <height>31</height>
       </rect>
@@ -542,36 +503,10 @@
       <string>SERVICE TERMINATION</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButtonInsert">
-     <property name="geometry">
-      <rect>
-       <x>1210</x>
-       <y>40</y>
-       <width>113</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Insert</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButtonDelete">
-     <property name="geometry">
-      <rect>
-       <x>1210</x>
-       <y>70</y>
-       <width>113</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Delete</string>
-     </property>
-    </widget>
     <widget class="QTextEdit" name="textEditEnterID1">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>500</x>
        <y>140</y>
        <width>91</width>
        <height>31</height>
@@ -584,7 +519,7 @@
     <widget class="QTextEdit" name="textEditEnterID2">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>500</x>
        <y>210</y>
        <width>91</width>
        <height>31</height>
@@ -597,7 +532,7 @@
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>500</x>
        <y>120</y>
        <width>81</width>
        <height>16</height>
@@ -610,7 +545,7 @@
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>500</x>
        <y>180</y>
        <width>91</width>
        <height>20</height>
@@ -623,8 +558,8 @@
     <widget class="QSpinBox" name="spinBoxRefIncrement">
      <property name="geometry">
       <rect>
-       <x>840</x>
-       <y>180</y>
+       <x>790</x>
+       <y>220</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -633,14 +568,257 @@
     <widget class="QLabel" name="label_11">
      <property name="geometry">
       <rect>
-       <x>690</x>
-       <y>180</y>
+       <x>650</x>
+       <y>220</y>
        <width>140</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
       <string>Reference Increment</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBoxParent">
+     <property name="geometry">
+      <rect>
+       <x>940</x>
+       <y>190</y>
+       <width>161</width>
+       <height>32</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBoxFeeder">
+     <property name="geometry">
+      <rect>
+       <x>760</x>
+       <y>54</y>
+       <width>141</width>
+       <height>32</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonFrh">
+     <property name="geometry">
+      <rect>
+       <x>1140</x>
+       <y>70</y>
+       <width>220</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Finish and Remain at Location</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonFns">
+     <property name="geometry">
+      <rect>
+       <x>1140</x>
+       <y>40</y>
+       <width>220</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Finish and Form New Service</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonFjo">
+     <property name="geometry">
+      <rect>
+       <x>1140</x>
+       <y>160</y>
+       <width>220</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Finish and Join Other</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>1400</x>
+       <y>30</y>
+       <width>191</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>New Formed Service Reference</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonFrsrh">
+     <property name="geometry">
+      <rect>
+       <x>1140</x>
+       <y>100</y>
+       <width>301</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Finish Repeat Shuttle, Remain at Location</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonFrsfns">
+     <property name="geometry">
+      <rect>
+       <x>1140</x>
+       <y>220</y>
+       <width>321</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Finish Repeat Shuttle, Form Finishing Service</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonFshf">
+     <property name="geometry">
+      <rect>
+       <x>1140</x>
+       <y>190</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Finish Shuttle Feeder</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QTextEdit" name="serviceFinishServiceEdit">
+     <property name="geometry">
+      <rect>
+       <x>1430</x>
+       <y>50</y>
+       <width>141</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="serviceExitEdit">
+     <property name="geometry">
+      <rect>
+       <x>1430</x>
+       <y>110</y>
+       <width>141</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_20">
+     <property name="geometry">
+      <rect>
+       <x>1450</x>
+       <y>90</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Exit Location ID</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelParentOfJoin">
+     <property name="geometry">
+      <rect>
+       <x>1460</x>
+       <y>160</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelErrorDisplay">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>305</y>
+       <width>581</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonFer">
+     <property name="geometry">
+      <rect>
+       <x>1140</x>
+       <y>130</y>
+       <width>191</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Finish and Exit at Location</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QTextEdit" name="textEditShuttlePart2">
+     <property name="geometry">
+      <rect>
+       <x>780</x>
+       <y>112</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelFeederRef_2">
+     <property name="geometry">
+      <rect>
+       <x>660</x>
+       <y>110</y>
+       <width>111</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Shuttle Return</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelFeederRef_3">
+     <property name="geometry">
+      <rect>
+       <x>660</x>
+       <y>130</y>
+       <width>111</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Service Reference</string>
      </property>
     </widget>
    </widget>
@@ -751,7 +929,7 @@
       <x>30</x>
       <y>60</y>
       <width>381</width>
-      <height>531</height>
+      <height>491</height>
      </rect>
     </property>
    </widget>
@@ -761,7 +939,7 @@
       <x>440</x>
       <y>60</y>
       <width>941</width>
-      <height>531</height>
+      <height>491</height>
      </rect>
     </property>
    </widget>
@@ -825,6 +1003,32 @@
     </property>
     <property name="text">
      <string>Edit</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonInsert">
+    <property name="geometry">
+     <rect>
+      <x>1400</x>
+      <y>870</y>
+      <width>113</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Insert/Edit</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButtonDelete">
+    <property name="geometry">
+     <rect>
+      <x>1510</x>
+      <y>870</y>
+      <width>113</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Delete</string>
     </property>
    </widget>
   </widget>
@@ -897,4 +1101,7 @@
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>
