@@ -12,6 +12,7 @@
 
 #include "rosttbgen.hxx"
 #include "station_add.hxx"
+#include "clone_dialog.hxx"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ROSTTBAppWindow; }
@@ -83,8 +84,11 @@ private slots:
 
     void on_radioButtonFer_toggled(bool checked);
 
+    void on_pushButtonClone_clicked();
+
 private:
     Station_add* _station_add = new Station_add(nullptr, this);
+    CloneDialog* _clone_srv = new CloneDialog(this);
     QDir* _ros_timetables = nullptr;
     Ui::ROSTTBAppWindow *ui;
     QItemSelectionModel* _tt_model_select;
@@ -94,7 +98,7 @@ private:
     ROSTTBGen* _parser = new ROSTTBGen(this);
     ROSTimetable* _current_timetable = new ROSTimetable;
     QList<int> _ttb_column_widths = {50, 50, 300, 200, 75, 200, 50};
-    QList<int> _srv_column_widths = {50, 50, 200};
+    QList<int> _srv_column_widths = {50, 50, 200, 100};
     ROSService* _current_service_selection = nullptr;
     void save_file();
     void reset();
@@ -106,6 +110,7 @@ private:
     void _set_tab(bool tab_mode_on);
     void _set_form_info();
     void _populate_feederboxes();
+    void _clone_current();
 
 };
 #endif // ROSTTBAPPWINDOW_HXX

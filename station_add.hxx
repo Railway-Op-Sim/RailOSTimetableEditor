@@ -32,6 +32,7 @@ public:
     QTime _srv_start = QTime();
     void setCurrentService(ROSService* service)
     {
+        if(!service || service->getStartTime() == QTime()) return;
         _current_srv = service;
         _srv_start = service->getStartTime();
     }
@@ -42,6 +43,7 @@ public:
     void reset_state();
     void setServiceTable(QTableWidget* serv_table){_service_table = serv_table;}
     void fwdCurrentSelection(const QString& station, const QList<QTime>& times, bool isCDT, bool isPass);
+    void fwdPreviousEventTime(const QTime& time) {_times = {time};}
 
 private slots:
     void on_buttonBoxAddStation_accepted();
@@ -50,8 +52,7 @@ private slots:
 
     void on_checkBoxCDT_stateChanged();
 
-signals:
-    void on_stationAdd_accepted();
+    void on_checkBoxSplit_toggled(bool checked);
 
 private:
     Ui::Station_add *ui;

@@ -41,7 +41,9 @@ class ROSTTBGen
         bool _isStartTypeDefinition(QStringList str_list);
         bool _isCallingPoint(QStringList str_list);
         bool _isStartStopPoint(QStringList str_list);
+        bool _isDirChange(QStringList str_list);
         bool _isRepeat(QStringList str_list);
+        bool _isSplit(QStringList str_list);
         void _process_service_candidate(int int_id, QStringList service);
         ROSService::ServiceType _parseType(QStringList str_list);
         ROSService::FinishState _parseExit(QStringList str_list);

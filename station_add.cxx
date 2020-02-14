@@ -18,6 +18,10 @@ void Station_add::setStations(QSet<QString> stations)
     _station_list = QList<QString>(stations.begin(), stations.end());
     std::sort(_station_list.begin(), _station_list.end());
     ui->comboBoxStations->addItems(_station_list);
+    ui->timeEditArrival->setTime(_times[0]);
+    ui->timeEditDeparture->setTime(_times[0]);
+    ui->timeEditCDT->setTime(_times[0]);
+    ui->timeEditSplit->setTime(_times[0]);
 }
 
 Station_add::~Station_add()
@@ -32,16 +36,36 @@ bool Station_add::setInfo()
         ui->errorLabel->setText("Arrival time cannot be before service start");
         return false;
     }
+    if(ui->comboBoxStations->currentText() != _current_station)
+    {
+        for(auto time_pair : _current_srv->getTimes())
+        {
+            if((_times[0] >= time_pair[0] && _times[0] <= time_pair[1]) || (_times[1] >= time_pair[0] && _times[1] <= time_pair[1]))
+            {
+                ui->errorLabel->setText("Times overlap with current timetable entries");
+                return false;
+            }
+        }
+    }
     if(ui->timeEditArrival->time().msecsTo(ui->timeEditDeparture->time()) < 0)
     {
         ui->errorLabel->setText("Departure time cannot be before arrival.");
         return false;
     }
     ui->errorLabel->setText("");
-    _current_station = ui->comboBoxStations->currentText();
 
     _times[0] = (_stop_class != StopType::StartPoint) ? ui->timeEditArrival->time() : QTime();
     _times[1] = (_stop_class != StopType::Terminus) ? ui->timeEditDeparture->time() : QTime();
+
+    if(ui->checkBoxCDT->isChecked())
+    {
+        if(ui->timeEditCDT->time().msecsTo(ui->timeEditArrival->time()) > 0)
+        {
+            ui->errorLabel->setText("Direction Change Time cannot proceed arrival time");
+            return false;
+        }
+
+    }
 
     return true;
 }
@@ -57,13 +81,19 @@ void Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>
 
 void Station_add::on_buttonBoxAddStation_accepted()
 {
+    _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time()};
+
     if(setInfo())
     {
         this->close();
 
-        if(_current_srv->getStations().contains(_current_station))
+        QTime _cdt_time = (ui->checkBoxCDT->isChecked()) ? ui->timeEditCDT->time() : QTime();
+
+        if(_current_srv->getStations().contains(ui->comboBoxStations->currentText()) || (_current_srv->getStations().size() > 0 && _times == _current_srv->getTimes()[_current_srv->getStations().indexOf(_current_station)]))
         {
-            _current_srv->updateStation(_current_station, _times, ui->checkBoxCDT->isChecked(), ui->checkBoxPASS->isChecked());
+            QString _new_station = ui->comboBoxStations->currentText();
+            _current_srv->updateStation(_current_station, _times, ui->checkBoxCDT->isChecked(), ui->checkBoxPASS->isChecked(), _cdt_time, _new_station);
+            _current_station = _new_station;
 
             this->close();
 
@@ -73,9 +103,10 @@ void Station_add::on_buttonBoxAddStation_accepted()
 
         else
         {
+            _current_station = ui->comboBoxStations->currentText();
             _current_srv->addStation(_times, _current_station);
             _current_srv->setStopAsPassPoint(_current_srv->getStations().size()-1, ui->checkBoxPASS->isChecked());
-            _current_srv->setDirectionChangeAtStop(_current_srv->getStations().size()-1, ui->checkBoxCDT->isChecked());
+            _current_srv->setDirectionChangeAtStop(_current_srv->getStations().size()-1, ui->checkBoxCDT->isChecked(), _cdt_time);
         }
 
         _service_table->setRowCount(0);
@@ -92,6 +123,11 @@ void Station_add::on_buttonBoxAddStation_accepted()
                 _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
                 _service_table->setItem(_service_table->rowCount()-1, j, _new_time_item);
             }
+        }
+
+        if(ui->checkBoxSplit->isChecked())
+        {
+            _current_srv->setSplitData((ui->radioButtonSplitForward->isChecked()) ? QString("F") : QString("R"), _current_srv->getID(), _current_station, ui->timeEditSplit->time().toString("HH:mm"));
         }
 
         _service_table->sortItems(0);
@@ -127,4 +163,12 @@ void Station_add::on_checkBoxCDT_stateChanged()
     {
         ui->timeEditCDT->setEnabled(false);
     }
+}
+
+void Station_add::on_checkBoxSplit_toggled(bool checked)
+{
+    ui->timeEditSplit->setEnabled(checked);
+    ui->textEditSplitRef->setEnabled(checked);
+    ui->radioButtonSplitForward->setEnabled(checked);
+    ui->radioButtonSplitReverse->setEnabled(checked);
 }

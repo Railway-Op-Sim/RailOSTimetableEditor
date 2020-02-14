@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     app_window.cxx \
+    clone_dialog.cxx \
     main.cxx \
     rosservice.cxx \
     rostimetable.cxx \
@@ -25,12 +26,14 @@ SOURCES += \
 
 HEADERS += \
     app_window.hxx \
+    clone_dialog.hxx \
     rosservice.hxx \
     rostimetable.hxx \
     rosttbgen.hxx \
     station_add.hxx
 
 FORMS += \
+    clone_dialog.ui \
     rosttbappwindow.ui \
     station_add.ui
 

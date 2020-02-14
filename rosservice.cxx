@@ -35,6 +35,23 @@ QString join(QChar::SpecialCharacter join_symbol, QStringList list)
     return _temp;
 }
 
+void ROSService::shiftStationTimes(const int n_secs, QString &station)
+{
+    const int index = _stations.indexOf(station);
+    if(index < 0) return;
+    _times[index][0] = _times[index][0].addSecs(n_secs);
+    _times[index][1] = _times[index][1].addSecs(n_secs);
+}
+
+void ROSService::shiftServiceTimes(const int n_secs)
+{
+    if(_parent_service != "") return;
+    _enter_map_time = _enter_map_time.addSecs(n_secs);
+    if(_exit_map_time != QTime()) _exit_map_time = _exit_map_time.addSecs(n_secs);
+    for(auto s : _stations) shiftStationTimes(n_secs, s);
+    for(int i{0}; i < _cdt_times.size(); ++i) if(_cdt_times[i] != QTime()) _cdt_times[i] = _cdt_times[i].addSecs(n_secs);
+}
+
 QString ROSService::_start_new()
 {
     QString out_string = join(";", _service_id,_description, QString(_start_speed), QString(_max_speed),
@@ -135,24 +152,9 @@ QString ROSService::as_string()
     return _out;
 }
 
-void ROSService::setFinishState(ROSService::FinishState fin_state, QString exit_info)
+void ROSService::setFinishState(ROSService::FinishState fin_state)
 {
     _finish_as = fin_state;
-
-    switch (_finish_as)
-    {
-        case FinishState::FinishExit:
-            _exit_id = exit_info;
-            break;
-        case FinishState::FinishFormNew:
-            _daughter_id = exit_info;
-            break;
-        case FinishState::FinishJoinOther:
-            _daughter_id = exit_info;
-            break;
-        default:
-            break;
-    }
 }
 void ROSService::setShuttleRefPosition(QString coordinates[2])
 {
@@ -160,9 +162,4 @@ void ROSService::setShuttleRefPosition(QString coordinates[2])
     _enter_ids[0] = coordinates[0];
     _enter_ids[1] = coordinates[1];
 
-}
-
-void ROSService::orderService()
-{
- //TODO
 }

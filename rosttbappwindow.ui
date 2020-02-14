@@ -49,16 +49,6 @@
       <string>Start Time</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="servicerefEdit">
-     <property name="geometry">
-      <rect>
-       <x>360</x>
-       <y>30</y>
-       <width>101</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
@@ -215,16 +205,6 @@
       <string>Description</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="descEdit">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>100</y>
-       <width>241</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QRadioButton" name="radioButtonStandard">
      <property name="geometry">
       <rect>
@@ -249,19 +229,6 @@
      </property>
      <property name="text">
       <string>Shuttle from Feeder Service</string>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="textEditParentShuttleRef">
-     <property name="geometry">
-      <rect>
-       <x>940</x>
-       <y>80</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
      </property>
     </widget>
     <widget class="QRadioButton" name="radioButtonShuttleFinish">
@@ -503,32 +470,6 @@
       <string>SERVICE TERMINATION</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEditEnterID1">
-     <property name="geometry">
-      <rect>
-       <x>500</x>
-       <y>140</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="textEditEnterID2">
-     <property name="geometry">
-      <rect>
-       <x>500</x>
-       <y>210</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
@@ -546,7 +487,7 @@
      <property name="geometry">
       <rect>
        <x>500</x>
-       <y>180</y>
+       <y>170</y>
        <width>91</width>
        <height>20</height>
       </rect>
@@ -707,26 +648,6 @@
       <string notr="true">buttonGroup</string>
      </attribute>
     </widget>
-    <widget class="QTextEdit" name="serviceFinishServiceEdit">
-     <property name="geometry">
-      <rect>
-       <x>1430</x>
-       <y>50</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="serviceExitEdit">
-     <property name="geometry">
-      <rect>
-       <x>1430</x>
-       <y>110</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_20">
      <property name="geometry">
       <rect>
@@ -782,19 +703,6 @@
       <string notr="true">buttonGroup</string>
      </attribute>
     </widget>
-    <widget class="QTextEdit" name="textEditShuttlePart2">
-     <property name="geometry">
-      <rect>
-       <x>780</x>
-       <y>112</y>
-       <width>111</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string/>
-     </property>
-    </widget>
     <widget class="QLabel" name="labelFeederRef_2">
      <property name="geometry">
       <rect>
@@ -821,6 +729,112 @@
       <string>Service Reference</string>
      </property>
     </widget>
+    <widget class="QLineEdit" name="textEditEnterID1">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>140</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="textEditEnterID2">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>190</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="servicerefEdit">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>40</y>
+       <width>101</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="descEdit">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>100</y>
+       <width>241</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="textEditParentShuttleRef">
+     <property name="geometry">
+      <rect>
+       <x>950</x>
+       <y>80</y>
+       <width>113</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="textEditShuttlePart2">
+     <property name="geometry">
+      <rect>
+       <x>780</x>
+       <y>114</y>
+       <width>113</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="serviceFinishServiceEdit">
+     <property name="geometry">
+      <rect>
+       <x>1430</x>
+       <y>60</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="serviceExitEdit">
+     <property name="geometry">
+      <rect>
+       <x>1440</x>
+       <y>120</y>
+       <width>113</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonClone">
+     <property name="geometry">
+      <rect>
+       <x>1375</x>
+       <y>310</y>
+       <width>113</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Clone</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonInsert">
+     <property name="geometry">
+      <rect>
+       <x>1270</x>
+       <y>310</y>
+       <width>113</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Insert/Edit</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QLabel" name="label_18">
     <property name="geometry">
@@ -838,7 +852,7 @@
    <widget class="QLabel" name="label_19">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>560</x>
       <y>20</y>
       <width>101</width>
       <height>16</height>
@@ -928,7 +942,7 @@
      <rect>
       <x>30</x>
       <y>60</y>
-      <width>381</width>
+      <width>501</width>
       <height>491</height>
      </rect>
     </property>
@@ -936,9 +950,9 @@
    <widget class="QTableWidget" name="tableWidgetTimetable">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>550</x>
       <y>60</y>
-      <width>941</width>
+      <width>831</width>
       <height>491</height>
      </rect>
     </property>
@@ -946,7 +960,7 @@
    <widget class="QTimeEdit" name="timeEditTTBStart">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>760</x>
       <y>17</y>
       <width>118</width>
       <height>22</height>
@@ -956,7 +970,7 @@
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>680</x>
       <y>20</y>
       <width>71</width>
       <height>16</height>
@@ -969,7 +983,7 @@
    <widget class="QPushButton" name="pushButtonTTBTime">
     <property name="geometry">
      <rect>
-      <x>800</x>
+      <x>890</x>
       <y>13</y>
       <width>113</width>
       <height>32</height>
@@ -982,7 +996,7 @@
    <widget class="QLabel" name="labelStartTime">
     <property name="geometry">
      <rect>
-      <x>674</x>
+      <x>764</x>
       <y>19</y>
       <width>59</width>
       <height>16</height>
@@ -995,7 +1009,7 @@
    <widget class="QPushButton" name="pushButtonTTBTimeEdit">
     <property name="geometry">
      <rect>
-      <x>730</x>
+      <x>820</x>
       <y>13</y>
       <width>71</width>
       <height>32</height>
@@ -1003,19 +1017,6 @@
     </property>
     <property name="text">
      <string>Edit</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonInsert">
-    <property name="geometry">
-     <rect>
-      <x>1400</x>
-      <y>870</y>
-      <width>113</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Insert/Edit</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButtonDelete">

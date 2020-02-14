@@ -17,11 +17,3 @@ ROSService* ROSTimetable::operator[](const int& i)
 
     return nullptr;
 }
-
-void ROSTimetable::orderServices()
-{
-    for(int i{0}; i < _services.size(); ++i)
-    {
-        this->operator[](i)->orderService();
-    }
-}

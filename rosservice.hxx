@@ -18,6 +18,7 @@ private:
     QTime _exit_map_time = QTime();
     QStringList _enter_ids = {"", ""};
     QString _exit_id = "";
+    QList<QTime> _cdt_times = {};
     QString _daughter_id = "";
     QString _service_id = "";
     QList<bool> _passing_stops = {};
@@ -63,6 +64,8 @@ public:
         _integer_id(int_id), _enter_map_time(start_time), _service_id(id), _power(power), _mass(mass), _max_speed(max_speed), _max_brake(max_brake_force), _start_speed(start_speed), _description(description)  {}
     void setNRepeats(const int& n) { _n_repeats = n;}
     int getIntegerID() const { return _integer_id;}
+    void shiftStationTimes(const int n_secs, QString& station);
+    void shiftServiceTimes(const int n_secs);
     void setIDIncrement(const int& n) {_id_increment = n;}
     void setRepeatInterval(const int& n_mins) {_repeat_interval = n_mins;}
     void setMaxSpeed(const int& speed){_max_speed = speed;}
@@ -71,9 +74,9 @@ public:
     void setMass(const int& mass){_mass = mass;}
     void setID(const QString& id) {_service_id = id;}
     void setPower(const int& power) {_power = power;}
-    void setSplitData(QString& fr_rear, QString& service_id, QString& station)
+    void setSplitData(const QString& fr_rear, const QString& service_id, const QString& station, const QString& time)
     {
-        _split_data = {{fr_rear, {service_id, station}}};
+        _split_data = {{fr_rear, {service_id, station, time}}};
     }
     QMap<QString, QStringList> getSplitData() const {return _split_data;}
     void setExitPoint(const QString& id) {_exit_id = id;}
@@ -93,7 +96,6 @@ public:
 
         return {false, false};
     }
-    void orderService();
     int getMaxSpeed() const {return _max_speed;}
     int getMaxBrake() const {return _max_brake;}
     int getStartSpeed() const {return _start_speed;}
@@ -111,9 +113,10 @@ public:
     QList<bool> getDirectionChanges() const {return _direction_changes;}
     int getRepeatInterval() const {return _repeat_interval;}
     int getIDIncrement() const {return _id_increment;}
+    QList<QTime> getCDTTimes() const {return _cdt_times;}
     bool checkService();
     void setType(ROSService::ServiceType type) {_service_type = type;}
-    void setFinishState(ROSService::FinishState fin_state, QString exit_info="");
+    void setFinishState(ROSService::FinishState fin_state);
     void setParent(QString parent_service)
     {
         _parent_service = parent_service;
@@ -128,17 +131,21 @@ public:
         _stations.push_back(station);
         _passing_stops.push_back(false);
         _direction_changes.push_back(false);
+        _cdt_times.push_back(QTime());
     }
-    void updateStation(QString station, QList<QTime> time, bool CDT=false, bool Pass=false)
+    void updateStation(QString station, QList<QTime> time, bool CDT=false, bool Pass=false, QTime cdt_time=QTime(), QString new_station=QString())
     {
         const int index = _stations.indexOf(station);
         _times[index] = time;
         _direction_changes[index] = CDT;
         _passing_stops[index] = Pass;
+        _cdt_times[index] = cdt_time;
+        _stations[index] = new_station;
 
     }
     void setStopAsPassPoint(int index, bool state) {_passing_stops[index] = state;}
-    void setDirectionChangeAtStop(int index, bool state) {_direction_changes[index] = state;}
+    void setDirectionChangeAtStop(int index, bool state, QTime time=QTime()) {_direction_changes[index] = state; _cdt_times[index] = time;}
+    void setSplitAtStop(int index, QString type, QString id, QTime time=QTime()) {_split_data = QMap<QString, QStringList>({{type, {id, _stations[index], time.toString("HH:mm")}}});}
     void setShuttleRefPosition(QString coordinates[2]);
     QString as_string();
     QStringList summarise();

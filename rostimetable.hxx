@@ -29,10 +29,8 @@ class ROSTimetable
         void removeService(const QString& service_ref)
         {
             _services.erase(_services.find(service_ref));
-            orderServices();
         }
         QMap<QString, ROSService*> getServices() const {return _services;}
-        void orderServices();
         QString getFileName() const {return _file_name;}
         void setFileName(QString file_name) {_file_name = file_name;}
         ROSService* operator[](const QString&);

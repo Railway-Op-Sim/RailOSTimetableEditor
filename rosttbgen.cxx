@@ -231,6 +231,16 @@ bool ROSTTBGen::_isContinuedServiceDefinition(QStringList str_list)
     return _check_isID(str_list[0]);
 }
 
+bool ROSTTBGen::_isDirChange(QStringList str_list)
+{
+    return str_list.size() == 2 && str_list[1] == "cdt";
+}
+
+bool ROSTTBGen::_isSplit(QStringList str_list)
+{
+    return _check_isTime(str_list[0]) && (str_list[1] == "fsp" || str_list[1] == "rsp");
+}
+
 void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 {
     QString _id = "NULL", _description = "NULL";
@@ -319,13 +329,12 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         _service->setRepeatInterval(_components[1].toInt());
         _service->setIDIncrement(_components[2].toInt());
         _final_index = 2;
-
-        //TODO Need to calculate terminus wait time based on start and finish times
     }
 
     _components = service[service.size()-_final_index].split(";");
     ROSService::FinishState _fin_state = _parseExit(_components);
     _service->setFinishState(_fin_state);
+
     switch(_fin_state)
     {
         case ROSService::FinishState::FinishExit:
@@ -347,7 +356,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             _service->setParent(_components[2]);
             break;
         case ROSService::FinishState::FinishSingleShuttleFeeder:
-            _service->setParent(_components[2]);
+            _service->setDaughter(_components[2]);
             break;
         default:
             break;
@@ -363,7 +372,16 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     {
         bool _pass_point = false;
 
-        if(_isCallingPoint(service[i].split(";")))
+        if(_service->getStations().size() > i-1 && _isDirChange(service[i].split(";")))
+        {
+            _service->setDirectionChangeAtStop(i-1, true, QTime::fromString(service[i].split(";")[0], "HH:mm"));
+        }
+
+        else if(_service->getStations().size() > i-1 && _isSplit(service[i].split(";")))
+        {
+            _service->setSplitAtStop(i-1, service[i].split(";")[1], service[i].split(";")[2], QTime::fromString(service[i].split(";")[0], "HH:mm"));
+        }
+        else if(_isCallingPoint(service[i].split(";")))
         {
             QStringList _components = service[i].split(";");
             _service->addStation({QTime::fromString(_components[0], "HH:mm"),
@@ -497,6 +515,9 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
         const bool _is_pas = service->getPassList()[i],
              _is_cdt = service->getDirectionChanges()[i];
 
+        const QMap<QString, QStringList> _split = service->getSplitData();
+
+
         if(_is_pas)
         {
             _temp.append(join(";", _arrive.toString("HH:mm"), "pas", _name));
@@ -504,6 +525,13 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
         else
         {
             _temp.append(join(";", (_depart != QTime()) ? _arrive.toString("HH:mm")+";"+_depart.toString("HH:mm") : _arrive.toString("HH:mm"), _name));
+        }
+
+        if(_split[_split.keys()[0]][1] == service->getStations()[i])
+        {
+            const QString _type = _split.keys()[0];
+            const QStringList _data = _split[_type];
+            _temp.append(join(";", _data[2], (_type == "Front") ? "fsp" : "rsp", _data[0]));
         }
 
         if(_is_cdt)
