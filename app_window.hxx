@@ -86,6 +86,12 @@ private slots:
 
     void on_pushButtonClone_clicked();
 
+    void on_pushButtonClear_clicked();
+
+    void on_comboBoxParent_currentTextChanged(const QString &arg1);
+
+    void on_checkBoxManualTimeEdit_toggled(bool checked);
+
 private:
     Station_add* _station_add = new Station_add(nullptr, this);
     CloneDialog* _clone_srv = new CloneDialog(this);
@@ -103,6 +109,7 @@ private:
     void save_file();
     void reset();
     bool checkROS();
+    void _clear();
     void _record_current_info();
     void delete_entries();
     void _set_initial_open_file();

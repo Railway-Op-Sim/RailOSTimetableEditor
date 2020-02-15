@@ -45,6 +45,7 @@ class ROSTTBGen
         bool _isRepeat(QStringList str_list);
         bool _isSplit(QStringList str_list);
         void _process_service_candidate(int int_id, QStringList service);
+        QString _get_partner(const QString& id);
         ROSService::ServiceType _parseType(QStringList str_list);
         ROSService::FinishState _parseExit(QStringList str_list);
         QString _make_service_definition(ROSService* service);

@@ -14,6 +14,7 @@ class ROSService
 {
 private:
     int _integer_id = 0;
+    bool _labelled_location_start = true;
     QTime _enter_map_time = QTime();
     QTime _exit_map_time = QTime();
     QStringList _enter_ids = {"", ""};
@@ -24,6 +25,7 @@ private:
     QList<bool> _passing_stops = {};
     QList<bool> _direction_changes = {};
     QMap<QString, QStringList> _split_data = QMap<QString, QStringList>();
+    QMap<QString, QStringList> _join_data = QMap<QString, QStringList>();
     QStringList _stations = QStringList();
     QString _parent_service = "";
     QList<QList<QTime>> _times = QList<QList<QTime>>();
@@ -70,6 +72,7 @@ public:
     void setRepeatInterval(const int& n_mins) {_repeat_interval = n_mins;}
     void setMaxSpeed(const int& speed){_max_speed = speed;}
     void setMaxBrake(const int& force){_max_brake = force;}
+    void setLabelledLocationStart(bool isLoc) {_labelled_location_start = isLoc;}
     void setStartSpeed(const int& speed){_start_speed = speed;}
     void setMass(const int& mass){_mass = mass;}
     void setID(const QString& id) {_service_id = id;}
@@ -78,7 +81,12 @@ public:
     {
         _split_data = {{fr_rear, {service_id, station, time}}};
     }
+    void setJoinData(const QString& joining_srv, const QString& station, const QString& time)
+    {
+        _join_data = {{joining_srv, {station, time}}};
+    }
     QMap<QString, QStringList> getSplitData() const {return _split_data;}
+    QMap<QString, QStringList> getJoinData() const {return _split_data;}
     void setExitPoint(const QString& id) {_exit_id = id;}
     void setEntryPoint(const QStringList& ids) {_enter_ids = ids;}
     void setExitTime(const QTime& time) {_exit_map_time = time;}
@@ -115,6 +123,7 @@ public:
     int getIDIncrement() const {return _id_increment;}
     QList<QTime> getCDTTimes() const {return _cdt_times;}
     bool checkService();
+    bool labelledLocationStart() const {return _labelled_location_start;}
     void setType(ROSService::ServiceType type) {_service_type = type;}
     void setFinishState(ROSService::FinishState fin_state);
     void setParent(QString parent_service)
@@ -166,6 +175,8 @@ private:
 public:
       ROSService::ServiceType getType() const {return _service_type;}
       ROSService::FinishState getFinState() const {return _finish_as;}
+      void deleteEntry(const int& index);
+      void deleteEntry(const QString& station);
 };
 
 #endif // ROSSERVICE_HXX

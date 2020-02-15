@@ -35,6 +35,7 @@ private:
     QStringList _current_service_list = {};
     bool _check_new();
     void _create_clone();
+    QString _create_new_id(const QString& current_id);
 };
 
 #endif // CLONE_DIALOG_HXX

@@ -38,6 +38,7 @@ public:
     }
     QList<QTime> getTimes() const {return _times;}
     QString getStation() const {return _current_station;}
+    bool setEditMode(bool on);
     void setType(StopType type) {_stop_class = type;}
     StopType getType() const {return _stop_class;}
     void reset_state();
@@ -54,14 +55,22 @@ private slots:
 
     void on_checkBoxSplit_toggled(bool checked);
 
+    void on_checkBoxJoinOther_toggled(bool checked);
+
+    void on_checkBoxPASS_toggled(bool checked);
+
+    void on_pushButtonDeleteEntry_clicked();
+
 private:
     Ui::Station_add *ui;
     QList<QString> _station_list = {};
+    bool _edit_mode = false;
     ROSService* _current_srv;
     QTableWidget* _service_table;
     QString _current_station = "";
     QList<QTime> _times = {QTime(), QTime()};
     StopType _stop_class = StopType::CallingPoint;
+    void _redraw_table();
 };
 
 #endif // STATION_ADD_HXX

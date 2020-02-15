@@ -14,40 +14,50 @@ CloneDialog::~CloneDialog()
     delete ui;
 }
 
-void CloneDialog::setInitialValues()
+QString CloneDialog::_create_new_id(const QString& current_id)
 {
-    ui->timeEditCloneStart->setTime(_current_srv->getStartTime().addSecs(3600));
-    const QString _current_id = _current_srv->getID();
-    QString _new_id = "";
-    if(_current_id[3].isNumber())
+    QString _new_id = _current_srv->getID();
+
+    if(current_id[3].isNumber())
     {
-        if(_current_id[2].isNumber())
+        if(current_id[2].isNumber())
         {
-            int _end_num = _current_id.right(2).toInt()+1;
-            while(_current_service_list.contains(_current_id.left(2)+QString::number(_end_num)))
+            int _end_num = current_id.right(2).toInt()+1;
+            while(_current_service_list.contains(current_id.left(2)+QString::number(_end_num)))
             {
                 _end_num++;
-                if(_end_num > 99) _new_id = _current_srv->getID();
+                if(_end_num > 99) return _new_id;
             }
 
             QString _as_str = (_end_num < 10) ? "0"+QString::number(_end_num) : QString::number(_end_num);
-            _new_id = _current_id.left(2)+_as_str;
+            _new_id = current_id.left(2)+_as_str;
         }
 
         else
         {
-            int _end_num = _current_id.right(1).toInt()+1;
-            while(_current_service_list.contains(_current_id.left(3)+QString::number(_end_num)))
+            int _end_num = current_id.right(1).toInt()+1;
+            while(_current_service_list.contains(current_id.left(3)+QString::number(_end_num)))
             {
                 _end_num++;
                 if(_end_num > 9) _new_id = _current_srv->getID();
             }
 
-            _new_id = _current_id.left(3)+QString::number(_end_num);
+            _new_id = current_id.left(3)+QString::number(_end_num);
         }
 
-        ui->textEditCloneRef->setText(_new_id);
     }
+
+    return _new_id;
+}
+
+void CloneDialog::setInitialValues()
+{
+    if(_current_srv->getDaughter() == "") ui->textEditCloneDaughter->setEnabled(false);
+    ui->timeEditCloneStart->setTime(_current_srv->getStartTime().addSecs(3600));
+    const QString _current_id = _current_srv->getID();
+    ui->textEditCloneRef->setText(_create_new_id(_current_id));
+    if(_current_srv->getDaughter() != "") ui->textEditCloneDaughter->setText(_create_new_id(_current_srv->getDaughter()));
+
 }
 
 bool CloneDialog::_check_new()
@@ -117,6 +127,7 @@ void CloneDialog::_create_clone()
     _cloned_srv->shiftServiceTimes(_temporal_diff);
     QString _srv_id = ui->textEditCloneRef->text();
     _cloned_srv->setID(_srv_id);
+    if(_current_srv->getDaughter() != "") _cloned_srv->setDaughter(ui->textEditCloneDaughter->text());
     _current_ttb->addService(_cloned_srv);
     qDebug() << "Created Clone: " << _cloned_srv->summarise();
 }

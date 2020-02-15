@@ -10,6 +10,7 @@ ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
     _tt_model_select = new QItemSelectionModel(ui->tableWidgetTimetable->model());
     ui->ROSStatus->setStyleSheet("QLabel { color : red; }");
     ui->SelectedRoute->setStyleSheet("QLabel { color : red; }");
+    ui->checkBoxManualTimeEdit->setEnabled(false);
     QHeaderView* _header_ttb = ui->tableWidgetTimetable->horizontalHeader();
     _header_ttb->setStretchLastSection(true);
     QHeaderView* _header_srv = ui->tableWidgetService->horizontalHeader();
@@ -29,6 +30,7 @@ ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
     ui->tableWidgetTimetable->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidgetService->verticalHeader()->setVisible(false);
     ui->tableWidgetService->horizontalHeader()->setVisible(false);
+    ui->checkBoxAtStation->setChecked(true);
     ui->tableWidgetService->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidgetService->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableWidgetService->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -210,10 +212,20 @@ void ROSTTBAppWindow::_record_current_info()
         }
     }
 
+    if(ui->checkBoxManualTimeEdit->isChecked())
+    {
+        if(ui->timeEditTermination->time().secsTo(_current_service_selection->getStartTime()) > 0)
+        {
+            QMessageBox::critical(this, "Invalid Exit Time", "Exit time cannot be before start time");
+            return;
+        }
+    }
+
     if(!_current_timetable->getServices().contains(_srv_id))
     {
         _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, _start_speed, _max_speed, _mass, _max_brake, _max_power);
         _current_service_selection = _current_timetable->operator[](-1);
+        _current_service_selection->setLabelledLocationStart(ui->checkBoxAtStation);
     }
 
     else
@@ -224,13 +236,18 @@ void ROSTTBAppWindow::_record_current_info()
         _current_service_selection->setMaxSpeed(_max_speed);
         _current_service_selection->setMaxBrake(_max_brake);
         _current_service_selection->setPower(_max_power);
+        _current_service_selection->setLabelledLocationStart(ui->checkBoxAtStation);
+    }
+
+    if(ui->checkBoxManualTimeEdit->isChecked())
+    {
+        _current_service_selection->setExitTime(ui->timeEditTermination->time());
     }
 
     if(ui->radioButtonShuttleFinish->isChecked())
     {
         const ROSService* _parent = _current_timetable->getServices()[ui->comboBoxFeeder->currentText()];
-        QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][1];
-        _parent_last_time = (_parent_last_time != QTime()) ? _parent_last_time : _parent->getTimes()[_parent->getTimes().size()-1][0];
+        QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][0];
 
         const QString _service_id = _current_timetable->getServices()[_current_service_selection->getParent()]->getDaughter();
         if(_service_id == "")
@@ -240,11 +257,12 @@ void ROSTTBAppWindow::_record_current_info()
         }
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
         {
-            QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent end time.");
+            QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent arrival time.");
             return;
         }
 
         _current_service_selection->setType(ROSService::ServiceType::ShuttleFinishService);
+        _current_service_selection->setEntryTime(_parent_last_time);
         _current_service_selection->setParent(ui->comboBoxFeeder->currentText());
         _current_service_selection->setID(_service_id);
         ui->servicerefEdit->setText(_service_id);
@@ -283,18 +301,22 @@ void ROSTTBAppWindow::_record_current_info()
     else if(ui->radioButtonFromOther->isChecked())
     {
         const ROSService* _parent = _current_timetable->getServices()[ui->comboBoxParent->currentText()];
-        QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][1];
-        _parent_last_time = (_parent_last_time != QTime()) ? _parent_last_time : _parent->getTimes()[_parent->getTimes().size()-1][0];
+        QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][0];
 
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
         {
             QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent end time.");
             return;
         }
-        const QString _service_id = _current_timetable->getServices()[_current_service_selection->getParent()]->getDaughter();
+        const QString _service_id = _parent->getDaughter();
         if(_service_id == "")
         {
             QMessageBox::critical(this, "No Parent Daughter Found", "Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service.");
+            return;
+        }
+        if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
+        {
+            QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent arrival time.");
             return;
         }
 
@@ -310,7 +332,9 @@ void ROSTTBAppWindow::_record_current_info()
 
 
         _current_service_selection->setID(_service_id);
+        _current_service_selection->setEntryTime(_parent_last_time);
         _current_service_selection->setParent(ui->comboBoxParent->currentText());
+        _current_service_selection->addStation({_parent->getTimes()[_parent->getTimes().size()-1][0], _parent->getTimes()[_parent->getTimes().size()-1][0]}, _parent->getStations()[_parent->getStations().size()-1]);
         ui->servicerefEdit->setText(_service_id);
 
     }
@@ -386,12 +410,17 @@ void ROSTTBAppWindow::_record_current_info()
 
 void ROSTTBAppWindow::_update_output(ROSService* current_serv)
 {
-    // IMPORTANT: If Timetable is Empty there is nothing to show!
-
+    // Do not allow daughter service creation without at least one timetable entry already present
+    if(_current_timetable->size() > 0)
+    {
+        ui->radioButtonFromOther->setEnabled(true);
+        ui->radioButtonShuttleFeeder->setEnabled(true);
+    }
     ui->tableWidgetService->clear();
     ui->tableWidgetTimetable->clear();
     ui->tableWidgetTimetable->setRowCount(0);
     ui->tableWidgetService->setRowCount(0);
+    // IMPORTANT: If Timetable is Empty there is nothing to show!
     if(_current_timetable->size() < 1) return;
     if(current_serv) _current_service_selection = current_serv;
     ui->labelStartTime->setText(_current_timetable->getStartTime().toString("HH:mm"));
@@ -574,23 +603,46 @@ bool ROSTTBAppWindow::checkROS()
     return true;
 }
 
+void ROSTTBAppWindow::_clear()
+{
+    ui->servicerefEdit->clear();
+    ui->spinBoxMaxSpeed->setValue(0);
+    ui->spinBoxForce->setValue(0);
+    ui->spinBoxRepeats->setValue(0);
+    ui->spinBoxStartSpeed->setValue(0);
+    ui->spinBoxRefIncrement->setValue(0);
+    ui->spinBoxRepeatInterval->setValue(0);
+    ui->textEditEnterID1->setText("");
+    ui->textEditEnterID2->setText("");
+    ui->checkBoxAtStation->setChecked(true);
+    ui->serviceFinishServiceEdit->setText("");
+    ui->textEditParentShuttleRef->setText("");
+    ui->descEdit->setText("");
+    ui->spinBoxMass->setValue(0);
+    ui->spinBoxPower->setValue(0);
+}
+
 void ROSTTBAppWindow::on_pushButtonInsert_clicked()
 {
     _record_current_info();
     _station_add->setCurrentService(_current_service_selection);
-    ui->radioButtonFromOther->setEnabled(true);
-    ui->radioButtonShuttleFeeder->setEnabled(true);
+    _clear();
 }
 
 void ROSTTBAppWindow::delete_entries()
 {
-    if(!_current_service_selection) return;
+    if(!_current_service_selection)
+    {
+        qDebug() << "No current selection registered, delete ignored.";
+    }
     QModelIndexList _entries = _tt_model_select->selectedRows();
-    if(_entries.size() < 1) return;
     for(auto i : _entries)
     {
+        qDebug() << "Removing row: " << i.row() <<" from Timetable Table.";
         ui->tableWidgetTimetable->removeRow(i.row());
     }
+
+    qDebug() << "Removing service '" << _current_service_selection->getID() << "' from timetable.";
     _current_timetable->removeService(_current_service_selection->getID());
     _current_service_selection = (_current_timetable->size() == 0) ? nullptr : _current_timetable->operator[](-1);
     _update_output();
@@ -662,6 +714,9 @@ void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
     _enable_integer_info(true);
     if(checked)
     {
+        ui->servicerefEdit->setEnabled(true);
+        ui->starttimeEdit->setEnabled(true);
+        ui->checkBoxAtStation->setEnabled(true);
         ui->textEditShuttlePart2->clear();
         ui->textEditShuttlePart2->setEnabled(false);
         ui->spinBoxMass->setEnabled(true);
@@ -688,6 +743,9 @@ void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->servicerefEdit->setEnabled(false);
+        ui->starttimeEdit->setEnabled(false);
+        ui->checkBoxAtStation->setEnabled(false);
         ui->textEditShuttlePart2->setEnabled(true);
         ui->servicerefEdit->clear();
         ui->servicerefEdit->setEnabled(false);
@@ -721,6 +779,9 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->servicerefEdit->setEnabled(true);
+        ui->starttimeEdit->setEnabled(true);
+        ui->checkBoxAtStation->setEnabled(true);
         ui->textEditShuttlePart2->setEnabled(true);
         ui->servicerefEdit->setEnabled(true);
         ui->spinBoxMass->setEnabled(true);
@@ -747,6 +808,9 @@ void ROSTTBAppWindow::on_radioButtonFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->servicerefEdit->setEnabled(true);
+        ui->starttimeEdit->setEnabled(true);
+        ui->checkBoxAtStation->setEnabled(false);
         ui->textEditShuttlePart2->clear();
         ui->textEditShuttlePart2->setEnabled(false);
         ui->servicerefEdit->setEnabled(true);
@@ -783,6 +847,9 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->servicerefEdit->setEnabled(false);
+        ui->starttimeEdit->setEnabled(false);
+        ui->checkBoxAtStation->setEnabled(false);
         ui->textEditShuttlePart2->clear();
         ui->textEditShuttlePart2->setEnabled(false);
         ui->servicerefEdit->setEnabled(true);
@@ -833,7 +900,8 @@ void ROSTTBAppWindow::_set_form_info()
               _interval    = _current_service_selection->getIDIncrement(),
               _t_interv    = _current_service_selection->getRepeatInterval();
     const QStringList _start_ids = _current_service_selection->getStartPoint();
-    const QTime _start_time = _current_service_selection->getStartTime();
+    const QTime _start_time = _current_service_selection->getStartTime(),
+                _exit_time = _current_service_selection->getExitTime();
 
     ui->spinBoxMass->setValue(_mass);
     ui->spinBoxForce->setValue(_max_brake);
@@ -853,8 +921,9 @@ void ROSTTBAppWindow::_set_form_info()
     ui->textEditParentShuttleRef->setText(_feeder_ref);
     ui->servicerefEdit->setText(_serv_id);
     ui->starttimeEdit->setTime(_start_time);
+    ui->timeEditTermination->setTime(_exit_time);
 
-
+    ui->checkBoxAtStation->setChecked(_current_service_selection->labelledLocationStart());
 
     switch(_type)
     {
@@ -885,28 +954,35 @@ void ROSTTBAppWindow::_set_form_info()
     switch(_exit_as)
     {
         case ROSService::FinishState::FinishRemainHere:
+            ui->checkBoxManualTimeEdit->setChecked(false);
             ui->radioButtonFrh->setChecked(true);
             break;
         case ROSService::FinishState::FinishExit:
+            ui->checkBoxManualTimeEdit->setChecked(true);
             ui->serviceExitEdit->setText(_exit_loc);
             ui->radioButtonFer->setChecked(true);
             break;
         case ROSService::FinishState::FinishFormNew:
+            ui->checkBoxManualTimeEdit->setChecked(false);
             ui->serviceFinishServiceEdit->setText(_daughter_ref);
             ui->radioButtonFns->setChecked(true);
             break;
         case ROSService::FinishState::FinishJoinOther:
+            ui->checkBoxManualTimeEdit->setChecked(false);
             ui->labelParentOfJoin->setText(_feeder_ref);
             ui->radioButtonFjo->setChecked(true);
             break;
         case ROSService::FinishState::FinishShuttleFormNew:
+            ui->checkBoxManualTimeEdit->setChecked(false);
             ui->serviceFinishServiceEdit->setText(_daughter_ref);
             ui->radioButtonFrsfns->setChecked(true);
             break;
         case ROSService::FinishState::FinishShuttleRemainHere:
+            ui->checkBoxManualTimeEdit->setChecked(false);
             ui->radioButtonFrsrh->setChecked(true);
             break;
         case ROSService::FinishState::FinishSingleShuttleFeeder:
+            ui->checkBoxManualTimeEdit->setChecked(false);
             ui->radioButtonFshf->setChecked(true);
             break;
         default:
@@ -938,6 +1014,8 @@ void ROSTTBAppWindow::save_file()
         QTextStream out(&_file);
         out << _output;
     }
+
+    _file.close();
 }
 
 void ROSTTBAppWindow::on_actionSave_triggered()
@@ -982,7 +1060,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
       _update_output();
       return;
     }
-
+    _station_add->setEditMode(true);
     _station_add->setCurrentService(_current_service_selection);
     _station_add->setStations(_parser->getStations());
     const QString _station_name = ui->tableWidgetService->takeItem(row, 2)->text();
@@ -1009,6 +1087,7 @@ void ROSTTBAppWindow::on_radioButtonFrh_toggled(bool checked)
 {
     if(checked)
     {
+        ui->checkBoxManualTimeEdit->setEnabled(false);
         ui->serviceExitEdit->clear();
         ui->serviceFinishServiceEdit->clear();
         ui->serviceExitEdit->setEnabled(false);
@@ -1020,6 +1099,7 @@ void ROSTTBAppWindow::on_radioButtonFns_toggled(bool checked)
 {
     if(checked)
     {
+        ui->checkBoxManualTimeEdit->setEnabled(false);
         ui->serviceExitEdit->clear();
         ui->serviceExitEdit->setEnabled(false);
         ui->serviceFinishServiceEdit->setEnabled(true);
@@ -1030,6 +1110,7 @@ void ROSTTBAppWindow::on_radioButtonFjo_toggled(bool checked)
 {
     if(checked)
     {
+        ui->checkBoxManualTimeEdit->setEnabled(false);
         ui->serviceExitEdit->clear();
         ui->serviceFinishServiceEdit->clear();
         ui->serviceExitEdit->setEnabled(false);
@@ -1041,6 +1122,7 @@ void ROSTTBAppWindow::on_radioButtonFrsrh_toggled(bool checked)
 {
     if(checked)
     {
+        ui->checkBoxManualTimeEdit->setEnabled(false);
         ui->serviceExitEdit->clear();
         ui->serviceFinishServiceEdit->clear();
         ui->serviceExitEdit->setEnabled(false);
@@ -1052,6 +1134,7 @@ void ROSTTBAppWindow::on_radioButtonFrsfns_toggled(bool checked)
 {
     if(checked)
     {
+        ui->checkBoxManualTimeEdit->setEnabled(false);
         ui->serviceExitEdit->clear();
         ui->serviceExitEdit->setEnabled(false);
         ui->serviceFinishServiceEdit->setEnabled(true);
@@ -1062,6 +1145,7 @@ void ROSTTBAppWindow::on_radioButtonFshf_toggled(bool checked)
 {
     if(checked)
     {
+        ui->checkBoxManualTimeEdit->setEnabled(false);
         ui->serviceExitEdit->clear();
         ui->serviceExitEdit->setEnabled(false);
         ui->serviceFinishServiceEdit->setEnabled(true);
@@ -1072,6 +1156,7 @@ void ROSTTBAppWindow::on_radioButtonFer_toggled(bool checked)
 {
     if(checked)
     {
+        ui->checkBoxManualTimeEdit->setEnabled(true);
         ui->serviceFinishServiceEdit->clear();
         ui->serviceExitEdit->setEnabled(true);
         ui->serviceFinishServiceEdit->setEnabled(false);
@@ -1094,4 +1179,23 @@ void ROSTTBAppWindow::on_pushButtonClone_clicked()
     _clone_current();
     if(!_clone_srv->getNewService()) return;
     _update_output();
+}
+
+void ROSTTBAppWindow::on_pushButtonClear_clicked()
+{
+    _clear();
+}
+
+void ROSTTBAppWindow::on_comboBoxParent_currentTextChanged(const QString &arg1)
+{
+    if(_current_timetable->size() < 1 || !_current_timetable->getServices().contains(arg1) || _current_service_selection->getID() == arg1) return;
+    const ROSService* _parent = _current_timetable->getServices()[arg1];
+    QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][0];
+    ui->starttimeEdit->setTime(_parent_last_time);
+    ui->servicerefEdit->setText(_parent->getDaughter());
+}
+
+void ROSTTBAppWindow::on_checkBoxManualTimeEdit_toggled(bool checked)
+{
+    ui->timeEditTermination->setEnabled(checked);
 }

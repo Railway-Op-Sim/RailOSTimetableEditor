@@ -36,7 +36,7 @@ bool Station_add::setInfo()
         ui->errorLabel->setText("Arrival time cannot be before service start");
         return false;
     }
-    if(ui->comboBoxStations->currentText() != _current_station)
+    if(!_edit_mode && ui->comboBoxStations->currentText() != _current_station)
     {
         for(auto time_pair : _current_srv->getTimes())
         {
@@ -69,6 +69,8 @@ bool Station_add::setInfo()
 
     return true;
 }
+
+bool Station_add::setEditMode(bool on){ui->pushButtonDeleteEntry->setVisible(on); _edit_mode = on;}
 
 void Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>& times, const bool isCDT, const bool isPass)
 {
@@ -109,26 +111,21 @@ void Station_add::on_buttonBoxAddStation_accepted()
             _current_srv->setDirectionChangeAtStop(_current_srv->getStations().size()-1, ui->checkBoxCDT->isChecked(), _cdt_time);
         }
 
-        _service_table->setRowCount(0);
-
-        for(int i{0}; i < _current_srv->getStations().size(); ++i)
-        {
-            QTime _arrival_time = _current_srv->getTimes()[i][0],
-                  _depart_time  = _current_srv->getTimes()[i][1];
-            QStringList _station_item =  {_arrival_time.toString("HH:mm"), _depart_time.toString("HH:mm"), _current_srv->getStations()[i]};
-            _service_table->insertRow(_service_table->rowCount());
-            for(int j{0}; j < _station_item.size(); ++j)
-            {
-                QTableWidgetItem* _new_time_item = new QTableWidgetItem(_station_item[j], 0);
-                _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-                _service_table->setItem(_service_table->rowCount()-1, j, _new_time_item);
-            }
-        }
+        _redraw_table();
 
         if(ui->checkBoxSplit->isChecked())
         {
             _current_srv->setSplitData((ui->radioButtonSplitForward->isChecked()) ? QString("F") : QString("R"), _current_srv->getID(), _current_station, ui->timeEditSplit->time().toString("HH:mm"));
         }
+
+        else if(ui->checkBoxJoinOther->isChecked())
+        {
+            _current_srv->setJoinData(ui->textEditSplitRef->text(), ui->comboBoxStations->currentText(), ui->timeEditDeparture->time().toString("HH:mm"));
+        }
+
+
+        // Ensure the exit time is always beyond the latest station addition
+        if(_current_srv->getExitTime() == QTime() || ui->timeEditArrival->time().secsTo(_current_srv->getExitTime()) < 0) _current_srv->setExitTime(ui->timeEditArrival->time());
 
         _service_table->sortItems(0);
 
@@ -141,6 +138,25 @@ void Station_add::on_buttonBoxAddStation_accepted()
     }
 }
 
+void Station_add::_redraw_table()
+{
+    _service_table->setRowCount(0);
+
+    for(int i{0}; i < _current_srv->getStations().size(); ++i)
+    {
+        QTime _arrival_time = _current_srv->getTimes()[i][0],
+              _depart_time  = _current_srv->getTimes()[i][1];
+        QStringList _station_item =  {_arrival_time.toString("HH:mm"), _depart_time.toString("HH:mm"), _current_srv->getStations()[i]};
+        _service_table->insertRow(_service_table->rowCount());
+        for(int j{0}; j < _station_item.size(); ++j)
+        {
+            QTableWidgetItem* _new_time_item = new QTableWidgetItem(_station_item[j], 0);
+            _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+            _service_table->setItem(_service_table->rowCount()-1, j, _new_time_item);
+        }
+    }
+}
+
 void Station_add::on_buttonBoxAddStation_rejected()
 {
     this->close();
@@ -148,6 +164,8 @@ void Station_add::on_buttonBoxAddStation_rejected()
 
 void Station_add::reset_state()
 {
+    _edit_mode = false;
+    ui->pushButtonDeleteEntry->setVisible(false);
     ui->timeEditArrival->setTime(QTime(0,0));
     ui->timeEditDeparture->setTime(QTime(0,0));
     ui->checkBoxCDT->setChecked(false);
@@ -167,8 +185,39 @@ void Station_add::on_checkBoxCDT_stateChanged()
 
 void Station_add::on_checkBoxSplit_toggled(bool checked)
 {
+    ui->checkBoxPASS->setEnabled(!checked);
+    ui->checkBoxJoinOther->setEnabled(!checked);
     ui->timeEditSplit->setEnabled(checked);
     ui->textEditSplitRef->setEnabled(checked);
     ui->radioButtonSplitForward->setEnabled(checked);
     ui->radioButtonSplitReverse->setEnabled(checked);
+}
+
+void Station_add::on_checkBoxJoinOther_toggled(bool checked)
+{
+    ui->checkBoxPASS->setEnabled(!checked);
+    ui->checkBoxSplit->setEnabled(!checked);
+    ui->timeEditSplit->setEnabled(!checked);
+    ui->textEditSplitRef->setEnabled(checked);
+    ui->radioButtonSplitForward->setEnabled(!checked);
+    ui->radioButtonSplitReverse->setEnabled(!checked);
+}
+
+void Station_add::on_checkBoxPASS_toggled(bool checked)
+{
+    ui->checkBoxJoinOther->setEnabled(!checked);
+    ui->checkBoxSplit->setEnabled(!checked);
+    ui->timeEditSplit->setEnabled(!checked);
+    ui->textEditSplitRef->setEnabled(!checked);
+    ui->radioButtonSplitForward->setEnabled(!checked);
+    ui->radioButtonSplitReverse->setEnabled(!checked);
+}
+
+
+void Station_add::on_pushButtonDeleteEntry_clicked()
+{
+    _current_srv->deleteEntry(ui->comboBoxStations->currentText());
+    reset_state();
+    _redraw_table();
+    this->close();
 }

@@ -25,7 +25,6 @@ QString join(QString join_symbol, QStringList list)
     return _temp;
 }
 
-
 QString join(QChar::SpecialCharacter join_symbol, QStringList list)
 {
     QString _temp = list[0];
@@ -50,6 +49,25 @@ void ROSService::shiftServiceTimes(const int n_secs)
     if(_exit_map_time != QTime()) _exit_map_time = _exit_map_time.addSecs(n_secs);
     for(auto s : _stations) shiftStationTimes(n_secs, s);
     for(int i{0}; i < _cdt_times.size(); ++i) if(_cdt_times[i] != QTime()) _cdt_times[i] = _cdt_times[i].addSecs(n_secs);
+}
+
+void ROSService::deleteEntry(const int &index)
+{
+    if(index < 0 || index > _stations.size()-1) return;
+    _stations.removeAt(index);
+    _times.removeAt(index);
+    _direction_changes.removeAt(index);
+    _stations.removeAt(index);
+    _passing_stops.removeAt(index);
+    _cdt_times.removeAt(index);
+
+}
+
+void ROSService::deleteEntry(const QString& station)
+{
+    const int index = _stations.indexOf(station);
+    if(index < 0) return;
+    deleteEntry(index);
 }
 
 QString ROSService::_start_new()
