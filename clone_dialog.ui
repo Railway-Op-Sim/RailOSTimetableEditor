@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Clone Service</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBoxClone">
    <property name="geometry">
