@@ -7,5 +7,7 @@ var searchData=
   ['finishshuttleformnew_34',['FinishShuttleFormNew',['../class_r_o_s_service.html#ab0f0f7e8e78fbf3e3190f20a0d90c5ccaf509759be6d0323ab2feb1ed7c68c42b',1,'ROSService']]],
   ['finishshuttleremainhere_35',['FinishShuttleRemainHere',['../class_r_o_s_service.html#ab0f0f7e8e78fbf3e3190f20a0d90c5cca219caa7960082f2c91fe54117e8cd3cd',1,'ROSService']]],
   ['finishsingleshuttlefeeder_36',['FinishSingleShuttleFeeder',['../class_r_o_s_service.html#ab0f0f7e8e78fbf3e3190f20a0d90c5ccaeda81db78cda5a5c9fc1021dafdcf32b',1,'ROSService']]],
-  ['finishstate_37',['FinishState',['../class_r_o_s_service.html#ab0f0f7e8e78fbf3e3190f20a0d90c5cc',1,'ROSService']]]
+  ['finishstate_37',['FinishState',['../class_r_o_s_service.html#ab0f0f7e8e78fbf3e3190f20a0d90c5cc',1,'ROSService']]],
+  ['fwdcurrentservice_38',['fwdCurrentService',['../class_clone_dialog.html#a73f21b34875d6014d13d689e160ff97d',1,'CloneDialog']]],
+  ['fwdserviceslist_39',['fwdServicesList',['../class_clone_dialog.html#a45f35f1d1563c33967d4c100bfed9930',1,'CloneDialog']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ROS Timetable Editor: clone_dialog.hxx Source File</title>
+<title>ROS Timetable Editor: /Users/krizar/Documents/Computing_Lab/CPlusplus/Qt_Lab/ROSTTBGen/clone_dialog.hxx Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -63,7 +63,7 @@ $(function() {
 
 <div class="header">
   <div class="headertitle">
-<div class="title">clone_dialog.hxx</div>  </div>
+<div class="title">/Users/krizar/Documents/Computing_Lab/CPlusplus/Qt_Lab/ROSTTBGen/clone_dialog.hxx</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">//-------------------------------------------------------------------------//</span></div>
@@ -115,30 +115,39 @@ $(function() {
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_clone_dialog.html">CloneDialog</a>(QWidget *parent = <span class="keyword">nullptr</span>);</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    ~<a class="code" href="class_clone_dialog.html">CloneDialog</a>();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">void</span> fwdCurrentService(<a class="code" href="class_r_o_s_timetable.html">ROSTimetable</a>* ttb, <a class="code" href="class_r_o_s_service.html">ROSService</a>* service, QTableWidget* ttb_table){_current_ttb = ttb; _ttb_table = ttb_table; _current_srv = service;}</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">void</span> fwdServicesList(QStringList&amp; services){_current_service_list = services;}</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="class_r_o_s_service.html">ROSService</a>* getNewService()<span class="keyword"> const </span>{<span class="keywordflow">return</span> _cloned_srv;}</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">void</span> setInitialValues();</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">private</span> slots:</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">void</span> on_buttonBoxClone_accepted();</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">void</span> on_buttonBoxClone_rejected();</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    Ui::CloneDialog *ui;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="class_r_o_s_timetable.html">ROSTimetable</a>* _current_ttb = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    QTableWidget* _ttb_table = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <a class="code" href="class_r_o_s_service.html">ROSService</a>* _current_srv = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="class_r_o_s_service.html">ROSService</a>* _cloned_srv = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    QStringList _current_service_list = {};</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">bool</span> _check_new();</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordtype">void</span> _create_clone();</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    QString _create_new_id(<span class="keyword">const</span> QString&amp; current_id);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;};</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="class_clone_dialog.html#a73f21b34875d6014d13d689e160ff97d">   64</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_clone_dialog.html#a73f21b34875d6014d13d689e160ff97d">fwdCurrentService</a>(<a class="code" href="class_r_o_s_timetable.html">ROSTimetable</a>* ttb, <a class="code" href="class_r_o_s_service.html">ROSService</a>* service, QTableWidget* ttb_table){_current_ttb = ttb; _ttb_table = ttb_table; _current_srv = service;}</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="class_clone_dialog.html#a45f35f1d1563c33967d4c100bfed9930">   70</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_clone_dialog.html#a45f35f1d1563c33967d4c100bfed9930">fwdServicesList</a>(QStringList&amp; services){_current_service_list = services;}</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="class_clone_dialog.html#aef387b2957b81c1fae28f2fefc41c4dd">   75</a></span>&#160;    <a class="code" href="class_r_o_s_service.html">ROSService</a>* <a class="code" href="class_clone_dialog.html#aef387b2957b81c1fae28f2fefc41c4dd">getNewService</a>()<span class="keyword"> const </span>{<span class="keywordflow">return</span> _cloned_srv;}</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#endif // CLONE_DIALOG_HXX</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_clone_dialog.html#af61c335ef956ef5252c9d5120e9f8f7d">setInitialValues</a>();</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">private</span> slots:</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordtype">void</span> on_buttonBoxClone_accepted();</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordtype">void</span> on_buttonBoxClone_rejected();</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    Ui::CloneDialog *ui;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="class_r_o_s_timetable.html">ROSTimetable</a>* _current_ttb = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    QTableWidget* _ttb_table = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="class_r_o_s_service.html">ROSService</a>* _current_srv = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="class_r_o_s_service.html">ROSService</a>* _cloned_srv = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    QStringList _current_service_list = {};</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordtype">bool</span> _check_new();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordtype">void</span> _create_clone();</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    QString _create_new_id(<span class="keyword">const</span> QString&amp; current_id);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;};</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#endif // CLONE_DIALOG_HXX</span></div>
 </div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="aclass_clone_dialog_html_af61c335ef956ef5252c9d5120e9f8f7d"><div class="ttname"><a href="class_clone_dialog.html#af61c335ef956ef5252c9d5120e9f8f7d">CloneDialog::setInitialValues</a></div><div class="ttdeci">void setInitialValues()</div><div class="ttdoc">Reset dialogue to initial values.</div><div class="ttdef"><b>Definition:</b> <a href="clone__dialog_8cxx_source.html#l00082">clone_dialog.cxx:82</a></div></div>
+<div class="ttc" id="aclass_clone_dialog_html_aef387b2957b81c1fae28f2fefc41c4dd"><div class="ttname"><a href="class_clone_dialog.html#aef387b2957b81c1fae28f2fefc41c4dd">CloneDialog::getNewService</a></div><div class="ttdeci">ROSService * getNewService() const</div><div class="ttdoc">Fetch pointer to the newly created service.</div><div class="ttdef"><b>Definition:</b> <a href="clone__dialog_8hxx_source.html#l00075">clone_dialog.hxx:75</a></div></div>
+<div class="ttc" id="aclass_clone_dialog_html_a73f21b34875d6014d13d689e160ff97d"><div class="ttname"><a href="class_clone_dialog.html#a73f21b34875d6014d13d689e160ff97d">CloneDialog::fwdCurrentService</a></div><div class="ttdeci">void fwdCurrentService(ROSTimetable *ttb, ROSService *service, QTableWidget *ttb_table)</div><div class="ttdoc">Forward the current service information from the main application window to this instance.</div><div class="ttdef"><b>Definition:</b> <a href="clone__dialog_8hxx_source.html#l00064">clone_dialog.hxx:64</a></div></div>
 <div class="ttc" id="aclass_clone_dialog_html"><div class="ttname"><a href="class_clone_dialog.html">CloneDialog</a></div><div class="ttdoc">ROS Timetable Editor Service Clone Window.</div><div class="ttdef"><b>Definition:</b> <a href="clone__dialog_8hxx_source.html#l00050">clone_dialog.hxx:50</a></div></div>
 <div class="ttc" id="aclass_r_o_s_timetable_html"><div class="ttname"><a href="class_r_o_s_timetable.html">ROSTimetable</a></div><div class="ttdoc">ROS Timetable Editor Timetable Class.</div><div class="ttdef"><b>Definition:</b> <a href="rostimetable_8hxx_source.html#l00047">rostimetable.hxx:47</a></div></div>
+<div class="ttc" id="aclass_clone_dialog_html_a45f35f1d1563c33967d4c100bfed9930"><div class="ttname"><a href="class_clone_dialog.html#a45f35f1d1563c33967d4c100bfed9930">CloneDialog::fwdServicesList</a></div><div class="ttdeci">void fwdServicesList(QStringList &amp;services)</div><div class="ttdoc">Forward the list of available service identifiers from the main application.</div><div class="ttdef"><b>Definition:</b> <a href="clone__dialog_8hxx_source.html#l00070">clone_dialog.hxx:70</a></div></div>
 <div class="ttc" id="aclass_r_o_s_service_html"><div class="ttname"><a href="class_r_o_s_service.html">ROSService</a></div><div class="ttdoc">ROS Timetable Editor Service Class.</div><div class="ttdef"><b>Definition:</b> <a href="rosservice_8hxx_source.html#l00056">rosservice.hxx:56</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
