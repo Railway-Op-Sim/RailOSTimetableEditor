@@ -1,0 +1,5 @@
+\mainpage Code Definitions for ROS Timetable Editor
+
+\parblock
+This GitHub hosted site outlines the class and variable definitions associated with the ROS Timetable Editor, an application built to simplify the timetable creation process for Railway Operation Simulator (c) 2010 Albert Ball.
+\endparblock
