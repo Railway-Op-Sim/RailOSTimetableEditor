@@ -35,77 +35,203 @@
 #include <QMap>
 #include <QDebug>
 
-extern QString join(QString join_symbol, QString a, QString b, QString c="NULL", QString d="NULL", QString e="NULL", QString f="NULL", QString g="NULL", QString h="NULL");
+//! Join function for combining up to 8 QStrings using a connector symbol
+extern QString join(QString join_symbol, QString a, QString b, QString c="NULL",
+                    QString d="NULL", QString e="NULL", QString f="NULL",
+                    QString g="NULL", QString h="NULL");
+
+//! Join function for combining multiple QStrings as a QStringList using a connector symbol
 extern QString join(QString join_symbol, QStringList list);
+
+//! Join function for combining multiple QStrings as a QStringList using a special character (e.g. null string) as a connector symbol
 extern QString join(QChar::SpecialCharacter join_symbol, QStringList list);
 
+/*! @brief      ROS Timetable Editor Service Class
+    @details    A class to handle all properties of an ROS service
+    @version    0.1.0
+    @author     Kristian Zarebski
+    @date 	    last modified 2020-02-16
+    @copyright  GNU Public License v3
+*/
 class ROSService
 {
 private:
+    //! Unique integer ID
     int _integer_id = 0;
+    //! Whether service starts from location point
     bool _labelled_location_start = true;
+    //! Service entry/start time
     QTime _enter_map_time = QTime();
+    //! Service exit/end time
     QTime _exit_map_time = QTime();
+    //! ROS map location IDs for entrance
     QStringList _enter_ids = {"", ""};
+    //! ROS map exit location ID
     QString _exit_id = "";
+    //! Times for direction changes
     QList<QTime> _cdt_times = {};
+    //! ROS service ID for newly formed service
     QString _daughter_id = "";
+    //! ROS service ID for the current service
     QString _service_id = "";
+    //! Array containing whether stops are passed or called at
     QList<bool> _passing_stops = {};
+    //! Array containing whether stops have direction changes
     QList<bool> _direction_changes = {};
+    //! Array containing a single element (where applicable): {rear/front split, {new service ID, time as string}}
     QMap<QString, QStringList> _split_data = QMap<QString, QStringList>();
+    //! Array containing a single element (where applicable): {join service ID, {location name, time}}
     QMap<QString, QStringList> _join_data = QMap<QString, QStringList>();
+    //! Lists of strings consisting of names of calling/passing points
     QStringList _stations = QStringList();
+    //! ROS service ID for service which formed current service (where applicable)
     QString _parent_service = "";
+    //! List of two element lists consisting of arrival and departure times
     QList<QList<QTime>> _times = QList<QList<QTime>>();
+    //! Maximum Power (kW)
     int _power = -1;
+    //! Mass (te)
     int _mass= -1;
+    //! Maximum Speed (kph)
     int _max_speed = -1;
+    //! Maximum Brake Force (te)
     int _max_brake = -1;
+    //! Starting Speed (kph)
     int _start_speed = -1;
+    //! Number of service repetitions
     int _n_repeats = 0;
+    //! Time interval of service repeats (mins)
     int _repeat_interval = 0;
+    //! Increment of ROS service ID with each repeat
     int _id_increment = 1;
+    //! Service description
     QString _description = "";
     QString _start_new();
     QString _add_stops();
     QString _finalize();
 public:
+    //! Service initialisation type
     enum class ServiceType
     {
-        Service,
-        ServiceFromSplit,
-        ServiceFromService,
-        ShuttleFinishService,
-        ShuttleFromStop,
-        ShuttleFromFeeder,
+        Service,                //!< New Standard Service
+        ServiceFromSplit,       //!< New Service from a Split Service
+        ServiceFromService,     //!< New Service from another Service
+        ShuttleFinishService,   //!< New Service which terminates a shuttle
+        ShuttleFromStop,        //!< New shuttle service starting from a location
+        ShuttleFromFeeder,      //!< New shuttle service formed from another service
     };
 
+    //! Service termination type
     enum class FinishState
     {
-        FinishRemainHere,
-        FinishFormNew,
-        FinishJoinOther,
-        FinishExit,
-        FinishShuttleRemainHere,
-        FinishShuttleFormNew,
-        FinishSingleShuttleFeeder,
+        FinishRemainHere,          //!< Finish service and stay at location
+        FinishFormNew,             //!< Finish service and form a new service
+        FinishJoinOther,           //!< Finish service and join another service
+        FinishExit,                //!< Finish service by exiting at location
+        FinishShuttleRemainHere,   //!< Finish a shuttle service at location
+        FinishShuttleFormNew,      //!< Finish a shuttle service and form a new service
+        FinishSingleShuttleFeeder, //!< Finish a feeder service for a shuttle
     };
+
+    /*! @brief Create a new ROS Service object
+    @param int_id Unique integer identifier for service
+    @param start_time Entry time/service start time
+    @param description A short comment describing the service
+    @param start_speed Service start speed in kph
+    @param max_speed Maximum service speed in kph
+    @param mass Train mass in te
+    @param max_brake_force Maximum brake force in te
+    @param power Maximum power in kW
+    @return void
+    */
     ROSService(int int_id, QTime start_time, QString id, QString description, int start_speed=-1, int max_speed=-1, int mass=-1, int max_brake_force=-1, int power=-1) :
         _integer_id(int_id), _enter_map_time(start_time), _service_id(id), _power(power), _mass(mass), _max_speed(max_speed), _max_brake(max_brake_force), _start_speed(start_speed), _description(description)  {}
+
+    /*! @brief Set number of service repetitions
+    @param n Number of repetitions
+    @return void
+    */
     void setNRepeats(const int& n) { _n_repeats = n;}
+
+    /*! @brief Get the unique internal service integer id
+    @return int
+    */
     int getIntegerID() const { return _integer_id;}
+
+    /*! @brief Increment all times corresponding to a service station call by @f$n@f$ seconds
+    @param n_secs Number of seconds
+    @param station Name of station/location in service
+    @return void
+    */
     void shiftStationTimes(const int n_secs, QString& station);
+
+    /*! @brief Increment all times for a given service by @f$n@f$ seconds
+    @param n_secs
+    @return void
+    */
     void shiftServiceTimes(const int n_secs);
+
+    /*! @brief Set the increment of service ID between repetitions
+    @param n Integer increase
+    @return void
+    */
     void setIDIncrement(const int& n) {_id_increment = n;}
+
+    /*! @brief Set the repeat time interval
+    @param n_mins Number of minutes between intervals
+    @return void
+    */
     void setRepeatInterval(const int& n_mins) {_repeat_interval = n_mins;}
+
+    /*! @brief Set maximum speed limit of service
+    @param speed Maximum speed in kph
+    @return void
+    */
     void setMaxSpeed(const int& speed){_max_speed = speed;}
+
+    /*! @brief Set maximum braking force
+    @param force Maximum braking force in te
+    @return void
+    */
     void setMaxBrake(const int& force){_max_brake = force;}
+
+    /*! @brief Set whether the service starts from a location
+    @param isLoc Whether start point is a location
+    @return void
+    */
     void setLabelledLocationStart(bool isLoc) {_labelled_location_start = isLoc;}
+
+    /*! @brief Set the initial service speed (should be 0 for starting at location)
+    @param speed Initial speed in kph
+    @return void
+    */
     void setStartSpeed(const int& speed){_start_speed = speed;}
+
+    /*! @brief Set the train mass
+    @param mass Mass of service in te
+    @return void
+    */
     void setMass(const int& mass){_mass = mass;}
+
+    /*! @brief Set the ROS service identifier
+    @param id Identifier of length 4
+    @return void
+    */
     void setID(const QString& id) {_service_id = id;}
+
+    /*! @brief Set the maximum power of the service
+    @param power Maximum power in kW
+    @return void
+    */
     void setPower(const int& power) {_power = power;}
+
+    /*! @brief Set the service split data
+    @param fr_rear Whether service is front "fsp" or rear "rsp" split
+    @param service_id Newly formed service ROS service ID
+    @param station Station where split takes place
+    @param time Time at which split occurs
+    @return void
+    */
     void setSplitData(const QString& fr_rear, const QString& service_id, const QString& station, const QString& time)
     {
         _split_data = {{fr_rear, {service_id, station, time}}};

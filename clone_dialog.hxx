@@ -40,6 +40,13 @@ namespace Ui {
 class CloneDialog;
 }
 
+/*! @brief      ROS Timetable Editor Service Clone Window
+    @details    Pop-up window for cloning an existing service
+    @version    0.1.0
+    @author     Kristian Zarebski
+    @date 	    last modified 2020-02-16
+    @copyright  GNU Public License v3
+*/
 class CloneDialog : public QDialog
 {
     Q_OBJECT

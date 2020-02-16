@@ -573,7 +573,7 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
         {
             const QString _type = _split.keys()[0];
             const QStringList _data = _split[_type];
-            _temp.append(join(";", _data[2], (_type == "Front") ? "fsp" : "rsp", _data[0]));
+            _temp.append(join(";", _data[2], _type, _data[0]));
         }
         if(_is_join)
         {
