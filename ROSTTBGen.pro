@@ -7,7 +7,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 ######################################################################
 
 TEMPLATE = app
-TARGET = ROSTTBGen
+TARGET = "ROS Timetable Editor"
 INCLUDEPATH += .
 
 # You can make your code fail to compile if you use deprecated APIs.
@@ -18,6 +18,9 @@ INCLUDEPATH += .
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
+macx: ICON = img/rosttbgen_icon.icns
+win32:RC_ICONS += img/rosttbgen_icon.ico
+
 HEADERS += app_window.hxx \
            clone_dialog.hxx \
            rosservice.hxx \

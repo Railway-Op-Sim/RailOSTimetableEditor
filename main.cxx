@@ -36,5 +36,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     ROSTTBAppWindow w;
     w.show();
+    a.setWindowIcon(QIcon("./img/rosttbgen_icon.png"));
     return a.exec();
 }
