@@ -54,10 +54,31 @@ class CloneDialog : public QDialog
 public:
     explicit CloneDialog(QWidget *parent = nullptr);
     ~CloneDialog();
+
+    /*! @brief Forward the current service information from the main application window to this instance
+    @param ttb Pointer to current timetable instance
+    @param service Pointer to current selected service
+    @param ttb_table Pointer to the service list table
+    @return void
+    */
     void fwdCurrentService(ROSTimetable* ttb, ROSService* service, QTableWidget* ttb_table){_current_ttb = ttb; _ttb_table = ttb_table; _current_srv = service;}
+
+    /*! @brief Forward the list of available service identifiers from the main application
+    @param services List of strings of service IDs
+    @return void
+    */
     void fwdServicesList(QStringList& services){_current_service_list = services;}
+
+    /*! @brief Fetch pointer to the newly created service
+    @return Pointer to newly created ROSService instane
+    */
     ROSService* getNewService() const {return _cloned_srv;}
+
+    /*! @brief Reset dialogue to initial values
+    @return void
+    */
     void setInitialValues();
+
 private slots:
     void on_buttonBoxClone_accepted();
     void on_buttonBoxClone_rejected();
