@@ -154,7 +154,7 @@ public:
     void setNRepeats(const int& n) { _n_repeats = n;}
 
     /*! @brief Get the unique internal service integer id
-    @return int
+    @return integer ID
     */
     int getIntegerID() const { return _integer_id;}
 
@@ -236,17 +236,62 @@ public:
     {
         _split_data = {{fr_rear, {service_id, station, time}}};
     }
+
+    /*! @brief set the service join data
+    @param joining_srv ROS Service ID of joining service
+    @param station Station at which join occurs
+    @param time Time at which join occurs as string
+    @return void
+    */
     void setJoinData(const QString& joining_srv, const QString& station, const QString& time)
     {
         _join_data = {{joining_srv, {station, time}}};
     }
+
+    /*! @brief Fetch the split data
+    @return QMap<QString, QStringList> of the form {"fsp"/"rsp", {station, time as string}}
+    */
     QMap<QString, QStringList> getSplitData() const {return _split_data;}
+
+    /*! @brief Fetch the join data
+    @return QMap<QString, QStringList> of the form {other service id, {station, time as string}}
+    */
     QMap<QString, QStringList> getJoinData() const {return _split_data;}
+
+    /*! @brief Set the map ID for the exit location of ther service
+    @param id ROS Map ID for exit location
+    @return void
+    */
     void setExitPoint(const QString& id) {_exit_id = id;}
+
+    /*! @brief Set the map IDs (rear, front) for the entrance location
+    @param ids An array of size 2 containing rear element ID and front element ID
+    @return void
+    */
     void setEntryPoint(const QStringList& ids) {_enter_ids = ids;}
+
+    /*! @brief Set the time for service finish/exit
+    @param time Time of service termination/exit
+    @return void
+    */
     void setExitTime(const QTime& time) {_exit_map_time = time;}
+
+    /*! @brief Set the service description
+    @param desc Single line describing the current service
+    @return void
+    */
     void setDescription(const QString& desc) {_description = desc;}
+
+    /*! @brief Set the service entry time/start time
+    @param time Time of service start
+    @return void
+    */
     void setEntryTime(const QTime& time) {_enter_map_time = time;}
+
+    /*! @brief Fetch the two booleans describing whether the service changes direction or passes at a location
+    @param station Name of location/station in service
+    @return QList<bool> containing {direction change?, passing point?}
+    */
     QList<bool> getCDTPass(const QString& station_name)
     {
         for(int i{0}; i < _stations.size(); ++i)
@@ -259,36 +304,142 @@ public:
 
         return {false, false};
     }
+
+    /*! @brief Fetch the service maximum speed
+    @return Integer maximum speed in kph
+    */
     int getMaxSpeed() const {return _max_speed;}
+
+    /*! @brief Fetch maximum braking power
+    @return Integer maximum brake power in te
+    */
     int getMaxBrake() const {return _max_brake;}
+
+    /*! @brief Fetch starting speed
+     @return Integer starting speed in kph
+    */
     int getStartSpeed() const {return _start_speed;}
+
+    /*! @brief Fetch mass of service
+    @return Integer mass in te
+    */
     int getMass() const {return _mass;}
+
+    /*! @brief Fetch maximum power of service
+    @return Integer maximum power in kW
+    */
     int getPower() const {return _power;}
+
+    /*! @brief Fetch entry location
+     @return QStringList of size 2 {rear element location, front element location}
+    */
     QStringList getStartPoint() const {return _enter_ids;}
+
+    /*! @brief Fetch service start time
+    @return QTime of service start
+    */
     QTime getStartTime() const {return _enter_map_time;}
+
+    /*! @brief Fetch service exit/finish time
+    @return QTime of service termination/exit time
+    */
     QTime getExitTime() const {return _exit_map_time;}
+
+    /*! @brief Fetch service description
+    @return QString of service single line description
+    */
     QString getDescription() const {return _description;}
+
+    /*! @brief Fetch service daughter ID (default is empty string)
+    @return QString of the service formed when current service finishes
+    */
     QString getDaughter() const {return _daughter_id;}
+
+    /*! @brief Fetch service parent ID (default is empty string)
+    @return QString of the service from which the current service was formed
+    */
     QString getParent() const {return _parent_service;}
+
+    /*! @brief Fetch the location ID for the service exit (where appropriate)
+    @return QString of the exit location ID
+    */
     QString getExitID() const {return _exit_id;}
+
+    /*! @brief Fetch the number of service repeats
+    @return Integer number of repeats
+    */
     int getNRepeats() const {return _n_repeats;}
+
+    /*! @brief Fetch the passing point boolean list
+    @return QList<bool> list of whether stations are passing points or not
+    */
     QList<bool> getPassList() const {return _passing_stops;}
+
+    /*! @brief Fetch the change direction boolean list
+    @return QList<bool> list of whether stations are points where service changes direction
+    */
     QList<bool> getDirectionChanges() const {return _direction_changes;}
+
+    /*! @brief Fetch the repeat interval of this service
+    @return Integer number of minutes between service repeats
+    */
     int getRepeatInterval() const {return _repeat_interval;}
+
+    /*! @brief Fetch the ID increment between repeats
+    @return Integer number by which the service ID increases between repetitions
+    */
     int getIDIncrement() const {return _id_increment;}
+
+    /*! @brief Fetch times of direction changes
+    @return QList<QTime> of the times (where appropriate) that a service changes direction (matching stations by index)
+    */
     QList<QTime> getCDTTimes() const {return _cdt_times;}
+
+    /*! @brief Check service is valid
+    @returns True if service passes all requirement checks
+    */
     bool checkService();
+
+    /*! @brief Check if service starts from a map location
+    @return True if service commences at a valid map location
+    */
     bool labelledLocationStart() const {return _labelled_location_start;}
+
+    /*! @brief Set the service type
+    @param type A valid ROSService::ServiceType describing the initialisation state
+    @return void
+    */
     void setType(ROSService::ServiceType type) {_service_type = type;}
+
+    /*! @brief Set the service termination category
+    @param fin_state A valid ROSService::FinishState describing the service conclusion
+    @return void
+    */
     void setFinishState(ROSService::FinishState fin_state);
+
+    /*! @brief Set the ID of the parent of the current service
+    @param parent_service ROS service identifier for the parent
+    @return void
+    */
     void setParent(QString parent_service)
     {
         _parent_service = parent_service;
     }
+
+    /*! @brief Set the ID of the daughter of the current service
+     @param daughter_service ROS service identifier for the daughter
+     @return void
+    */
     void setDaughter(QString daughter_service)
     {
         _daughter_id = daughter_service;
     }
+
+    /*! @brief Add a station to the current service timetable
+    @param time A QList<QTime> of size 2 giving the arrival and departure time respectively
+    @param station Name of the station to add
+    @return void
+    */
     void addStation(QList<QTime> time, QString station)
     {
         _times.push_back(time);
@@ -297,6 +448,16 @@ public:
         _direction_changes.push_back(false);
         _cdt_times.push_back(QTime());
     }
+
+    /*! @brief Update the current calling point information
+    @param station Name of station to modify in service
+    @param time A QList<QTime> of size 2 giving the arrival and departure times respectively
+    @param CDT Where the stop is a place where a direction change occurs
+    @param Pass If the service should pass through the location without stopping
+    @param cdt_time If the service changes direction here, the time the change occurs
+    @param new_station Swap current station for another (for correcting mistakes)
+    @return void
+    */
     void updateStation(QString station, QList<QTime> time, bool CDT=false, bool Pass=false, QTime cdt_time=QTime(), QString new_station=QString())
     {
         const int index = _stations.indexOf(station);
@@ -307,20 +468,60 @@ public:
         _stations[index] = new_station;
 
     }
+
+    /*! @brief Set a given stop (by index) to be a passing point
+    @param index Index of the station to alter
+    @param state True if a passing point
+    @return void
+    */
     void setStopAsPassPoint(int index, bool state) {_passing_stops[index] = state;}
+
+    /*! @brief Change direction at a stop (by index)
+    @param index Index of the station to alter
+    @param state True if direction change occurs
+    @param time QTime of the direction change
+    @return void
+    */
     void setDirectionChangeAtStop(int index, bool state, QTime time=QTime()) {_direction_changes[index] = state; _cdt_times[index] = time;}
+
+    /*! @brief Change whether a service split occurs at a location
+    @param index Index of location in service
+    @param type Split type either "fsp" or "rsp" for front and rear split respectively
+    @param id Newly formed service ID
+    @param time QTime of when split occurs
+    @return void
+    */
     void setSplitAtStop(int index, QString type, QString id, QTime time=QTime()) {_split_data = QMap<QString, QStringList>({{type, {id, _stations[index], time.toString("HH:mm")}}});}
-    void setShuttleRefPosition(QString coordinates[2]);
+
+    /*! @brief Full length summary of service
+    @return String of service information
+    */
     QString as_string();
+
+    /*! @brief Brief service summary for easy debug viewing: start time, ID, description & stations
+    @return String of summarised information
+    */
     QStringList summarise();
+
+    /*! @brief Get list of stations
+    @return A QStringList of the calling/passing points in the service
+    */
     QStringList getStations() const
     {
         return _stations;
     }
+
+    /*! @brief Returns the time array
+    @return QList<QList<QTime>> an array of all the arrival and departure times for each location
+    */
     QList<QList<QTime>> getTimes() const
     {
         return _times;
     }
+
+    /*! @brief Fetch service ID
+     @return A string of the ROS service identifier
+    */
     QString getID() const {return _service_id; }
 
 private:
@@ -328,9 +529,24 @@ private:
     FinishState _finish_as = FinishState::FinishRemainHere;
 
 public:
+      /*! @brief Fetch the initialisation type
+      @return ROSService::ServiceType which describes the type of service
+      */
       ROSService::ServiceType getType() const {return _service_type;}
+
+      /*! @brief Fetch termination type
+      @return ROSService:FinishState describing the service state at termination
+      */
       ROSService::FinishState getFinState() const {return _finish_as;}
+
+      /*! @brief Remove a station by index from the service
+      @param index Index of station in stations list
+      */
       void deleteEntry(const int& index);
+
+      /*! @brief Remove a station by name from the service
+       @param station Name of the station to remove
+       */
       void deleteEntry(const QString& station);
 };
 

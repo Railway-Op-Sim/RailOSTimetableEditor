@@ -203,10 +203,3 @@ void ROSService::setFinishState(ROSService::FinishState fin_state)
 {
     _finish_as = fin_state;
 }
-void ROSService::setShuttleRefPosition(QString coordinates[2])
-{
-    _service_type = ServiceType::ShuttleFromStop;
-    _enter_ids[0] = coordinates[0];
-    _enter_ids[1] = coordinates[1];
-
-}
