@@ -426,7 +426,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         }
 
         _service->setStopAsPassPoint(_service->getStations().size()-1, _pass_point);
-        bool _cdt = (i < service.size()-2 && _checkCDT(service[i+1].split(";")));
+        bool _cdt = (i < service.size()-2 && _isDirChange(service[i+1].split(";")));
         _service->setDirectionChangeAtStop(_service->getStations().size()-1, _cdt);
 
     }
