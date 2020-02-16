@@ -41,14 +41,6 @@ namespace Ui {
 class Station_add;
 }
 
-enum class StopType
-{
-    CallingPoint,
-    StartPoint,
-    Terminus,
-    PassingPoint
-};
-
 /*! @brief      ROS Timetable Editor Location Addition Window
     @details    Pop-up window for adding a new location to an existing service
     @version    0.1.0
@@ -61,51 +53,125 @@ class Station_add : public QDialog
     Q_OBJECT
 
 public:
+    /*! @brief Add Location Dialogue Class
+    @param service Current service open for edit
+    @param parent Parent application window
+    */
     explicit Station_add(ROSService* service=nullptr, QWidget *parent = nullptr);
+
+    //! Destructor for Dialogue
     ~Station_add();
+
+    /*! @brief Set the stations in the choice list
+    @return void
+    */
     void setStations(QSet<QString> stations);
+
+    /*! @brief Perform checks on whether information is acceptable
+    @return True if all checks are passed
+    */
     bool setInfo();
+
+    //! Current service start time
     QTime _srv_start = QTime();
+
+    /*! @brief Set the current editable service
+    @param service Pointer to service to edit
+    @return void
+    */
     void setCurrentService(ROSService* service)
     {
         if(!service || service->getStartTime() == QTime()) return;
         _current_srv = service;
         _srv_start = service->getStartTime();
     }
+
+    /*! @brief Fetch current time values
+    @return QList<QTime> of arrival and departure times
+    */
     QList<QTime> getTimes() const {return _times;}
+
+    /*! @brief Fetch the current station being edited
+    @return Station name
+    */
     QString getStation() const {return _current_station;}
-    bool setEditMode(bool on);
-    void setType(StopType type) {_stop_class = type;}
-    StopType getType() const {return _stop_class;}
+
+    /*! @brief Switch between adding new station and editting current
+    @return void
+    */
+    void setEditMode(bool on);
+
+    /*! @brief Reset Dialogue state
+    @return void
+    */
     void reset_state();
+
+    /*! @brief Set pointer to main application service table
+    @return void*/
     void setServiceTable(QTableWidget* serv_table){_service_table = serv_table;}
+
+    /*! @brief Forward to this class information from parent on current selected location
+    @param station Current selection name
+    @param times Current selection arrival and departure times
+    @param isCDT Whether current location includes a service direction change
+    @param isPass Whether current location is a passed location
+    @return void
+    */
     void fwdCurrentSelection(const QString& station, const QList<QTime>& times, bool isCDT, bool isPass);
+
+    /*! @brief Forward time from last timetable event
+    @param time Most recent event time from current timetable
+    @return void
+    */
     void fwdPreviousEventTime(const QTime& time) {_times = {time};}
 
 private slots:
+    //! Station add accepted Action
     void on_buttonBoxAddStation_accepted();
 
+    //! Station add rejected Action
     void on_buttonBoxAddStation_rejected();
 
+    //! Toggle Direction Change Action
     void on_checkBoxCDT_stateChanged();
 
+    //! Toggle Service Split Action
     void on_checkBoxSplit_toggled(bool checked);
 
+    //! Toggle Service Join Action
     void on_checkBoxJoinOther_toggled(bool checked);
 
+    //! Toggle Service Pass Action
     void on_checkBoxPASS_toggled(bool checked);
 
+    //! Delete Current Location Button Press Action
     void on_pushButtonDeleteEntry_clicked();
 
 private:
+    //! Current window user interface pointer
     Ui::Station_add *ui;
+
+    //! List of currently added stations
     QList<QString> _station_list = {};
+
+    //! Whether to open dialogue as edit mode
     bool _edit_mode = false;
+
+    //! Pointer to currently editable service
     ROSService* _current_srv;
+
+    //! Pointer to display table for locations
     QTableWidget* _service_table;
+
+    //! Name of currently editable location stop
     QString _current_station = "";
+
+    //! Arrive and Depart times
     QList<QTime> _times = {QTime(), QTime()};
-    StopType _stop_class = StopType::CallingPoint;
+
+    /*! @brief Redraw the table in the main window
+    @return void
+    */
     void _redraw_table();
 };
 

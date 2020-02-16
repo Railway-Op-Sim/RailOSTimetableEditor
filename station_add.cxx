@@ -83,8 +83,8 @@ bool Station_add::setInfo()
     }
     ui->errorLabel->setText("");
 
-    _times[0] = (_stop_class != StopType::StartPoint) ? ui->timeEditArrival->time() : QTime();
-    _times[1] = (_stop_class != StopType::Terminus) ? ui->timeEditDeparture->time() : QTime();
+    _times[0] = ui->timeEditArrival->time();
+    _times[1] = ui->timeEditDeparture->time();
 
     if(ui->checkBoxCDT->isChecked())
     {
@@ -99,7 +99,7 @@ bool Station_add::setInfo()
     return true;
 }
 
-bool Station_add::setEditMode(bool on){ui->pushButtonDeleteEntry->setVisible(on); _edit_mode = on;}
+void Station_add::setEditMode(bool on){ui->pushButtonDeleteEntry->setVisible(on); _edit_mode = on;}
 
 void Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>& times, const bool isCDT, const bool isPass)
 {
