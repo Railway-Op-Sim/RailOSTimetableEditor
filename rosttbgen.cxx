@@ -54,7 +54,7 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
         {
             if(part.contains(";"))
             {
-                _record_ttb = _check_isID(part.split(";")[0]);
+                _record_ttb = _isID(part.split(";")[0]);
 
                 if(_record_ttb)
                 {
@@ -67,7 +67,7 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
                 {
                     for(int i{0}; i < part.size(); ++i)
                     {
-                        if(_check_isTime(part.mid(i, i+5)))
+                        if(_isTime(part.mid(i, i+5)))
                         {
                             _input_data.append(part.mid(i, i+5));
                             _start_time_found = true;
@@ -124,20 +124,20 @@ QString ROSTTBGen::parse_rly(const QString railways_dir)
     return _current_route;
 }
 
-bool ROSTTBGen::_check_isTime(QString string)
+bool ROSTTBGen::_isTime(QString string)
 {
     if(string.size() != 5) return false;
     return string[0].isNumber() && string[1].isNumber() && string[2] == ":" && string[3].isNumber() && string[4].isNumber();
 }
 
-bool ROSTTBGen::_check_isID(QString string)
+bool ROSTTBGen::_isID(QString string)
 {
-    if(string.size() != 4 || _check_isTime("0"+string)) return false;
+    if(string.size() != 4 || _isTime("0"+string)) return false;
 
     return true;
 }
 
-bool ROSTTBGen::_check_Integer(QString string)
+bool ROSTTBGen::_isInteger(QString string)
 {
     for(auto n : string)
     {
@@ -147,21 +147,14 @@ bool ROSTTBGen::_check_Integer(QString string)
     return true;
 }
 
-bool ROSTTBGen::_checkPas(QStringList str_list)
+bool ROSTTBGen::_isPass(QStringList str_list)
 {
     if(str_list.contains("pas")) return true;
 
     return false;
 }
 
-bool ROSTTBGen::_checkCDT(QStringList str_list)
-{
-    if(str_list.contains("cdt")) return true;
-
-    return false;
-}
-
-bool ROSTTBGen::_checkIfStart(QStringList str_list)
+bool ROSTTBGen::_isStart(QStringList str_list)
 {
     QStringList _types = _start_types.values();
     for(auto type : _types)
@@ -199,7 +192,7 @@ ROSService::FinishState ROSTTBGen::_parseExit(QStringList str_list)
     return ROSService::FinishState::FinishExit;
 }
 
-bool ROSTTBGen::_checkIfEnd(QStringList str_list)
+bool ROSTTBGen::_isEnd(QStringList str_list)
 {
     QStringList _types = _exit_types.values();
     for(auto type : _types)
@@ -210,12 +203,7 @@ bool ROSTTBGen::_checkIfEnd(QStringList str_list)
     return false;
 }
 
-bool ROSTTBGen::_checkStationCall(QStringList str_list)
-{
-    return _check_isTime(str_list[0]) && !_checkCDT(str_list) && !_checkPas(str_list) && !_checkIfStart(str_list) && !_checkIfEnd(str_list);
-}
-
-bool ROSTTBGen::_checkIsCoordinate(QString string)
+bool ROSTTBGen::_isCoordinate(QString string)
 {
     int n_chars = 0, n_nums = 0;
 
@@ -232,32 +220,32 @@ bool ROSTTBGen::_isRepeat(QStringList str_list)
 {
     if(str_list.size() != 4) return false;
 
-    return str_list[0] == "R" && _check_Integer(str_list[1]) && _check_Integer(str_list[2]) && _check_Integer(str_list[3]);
+    return str_list[0] == "R" && _isInteger(str_list[1]) && _isInteger(str_list[2]) && _isInteger(str_list[3]);
 }
 
 bool ROSTTBGen::_isCallingPoint(QStringList str_list)
 {
     if(str_list.size() != 3) return false;
-    return _check_isTime(str_list[0]) && _check_isTime(str_list[1]) && str_list[2][0].isLetter();
+    return _isTime(str_list[0]) && _isTime(str_list[1]) && str_list[2][0].isLetter();
 }
 
 bool ROSTTBGen::_isStartStopPoint(QStringList str_list)
 {
     if(str_list.size() != 2) return false;
-    return !_check_isID(str_list[0]) && _check_isTime(str_list[0]) && str_list[1][0].isLetter() && !_checkCDT(str_list) && !_checkPas(str_list);
+    return !_isID(str_list[0]) && _isTime(str_list[0]) && str_list[1][0].isLetter() && !_isDirChange(str_list) && !_isPass(str_list);
 }
 
 bool ROSTTBGen::_isServiceDefinition(QStringList str_list)
 {
     if(str_list.size() != 7) return false;
-    return _check_isID(str_list[0]) && _check_Integer(str_list[2]) && _check_Integer(str_list[3]) && _check_Integer(str_list[4]) && _check_Integer(str_list[5]) && _check_Integer(str_list[6]);
+    return _isID(str_list[0]) && _isInteger(str_list[2]) && _isInteger(str_list[3]) && _isInteger(str_list[4]) && _isInteger(str_list[5]) && _isInteger(str_list[6]);
 }
 
 bool ROSTTBGen::_isContinuedServiceDefinition(QStringList str_list)
 {
     if(str_list.size() != 2) return false;
 
-    return _check_isID(str_list[0]);
+    return _isID(str_list[0]);
 }
 
 bool ROSTTBGen::_isDirChange(QStringList str_list)
@@ -267,7 +255,7 @@ bool ROSTTBGen::_isDirChange(QStringList str_list)
 
 bool ROSTTBGen::_isSplit(QStringList str_list)
 {
-    return _check_isTime(str_list[0]) && (str_list[1] == "fsp" || str_list[1] == "rsp");
+    return _isTime(str_list[0]) && (str_list[1] == "fsp" || str_list[1] == "rsp");
 }
 
 void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
@@ -287,7 +275,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         _description = _components[1];
     }
 
-    if(_checkIfStart(service[1].split(";")))
+    if(_isStart(service[1].split(";")))
     {
         QStringList _components = service[1].split(";");
         _start_time = QTime::fromString(_components[0], "HH:mm");
@@ -311,7 +299,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         _service->setPower(_components[6].toInt());
     }
 
-    if(_checkIfStart(service[1].split(";")))
+    if(_isStart(service[1].split(";")))
     {
         QStringList _components = service[1].split(";");
 
@@ -428,7 +416,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
                                  _components[1]);
         }
 
-        else if(_checkPas(service[i].split(";")))
+        else if(_isPass(service[i].split(";")))
         {
             QStringList _components = service[i].split(";");
             _service->addStation({QTime::fromString(_components[0]), QTime()},
@@ -659,11 +647,6 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             return "NULL";
             break;
      }
-}
-
-int ROSTTBGen::_calculate_repeat_time_interval(ROSService* service)
-{
-    return service->getStartTime().msecsTo(service->getExitTime())/60*1000.;
 }
 
 QString ROSTTBGen::_make_repeat_line(ROSService *service)
