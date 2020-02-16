@@ -97,16 +97,16 @@ $(function() {
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;rostimetable.hxx&quot;</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<a class="code" href="class_r_o_s_service.html">ROSService</a>* ROSTimetable::operator[](<span class="keyword">const</span> QString&amp; <span class="keywordtype">id</span>)</div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="class_r_o_s_timetable.html#ac4a6f79050b1b69806f1dcfb9337803c">   32</a></span>&#160;<a class="code" href="class_r_o_s_service.html">ROSService</a>* <a class="code" href="class_r_o_s_timetable.html#ac4a6f79050b1b69806f1dcfb9337803c">ROSTimetable::operator[]</a>(<span class="keyword">const</span> QString&amp; <span class="keywordtype">id</span>)</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;{</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">return</span> _services[id];</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="class_r_o_s_timetable.html#a35725b3ae1576c1250ff116daf491979">_services</a>[id];</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;}</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<a class="code" href="class_r_o_s_service.html">ROSService</a>* ROSTimetable::operator[](<span class="keyword">const</span> <span class="keywordtype">int</span>&amp; i)</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="class_r_o_s_timetable.html#a13b4b155a23f7e7646d89203907fd9ca">   37</a></span>&#160;<a class="code" href="class_r_o_s_service.html">ROSService</a>* <a class="code" href="class_r_o_s_timetable.html#ac4a6f79050b1b69806f1dcfb9337803c">ROSTimetable::operator[]</a>(<span class="keyword">const</span> <span class="keywordtype">int</span>&amp; i)</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">int</span> counter = 0;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> index = (i == -1) ? _services.size()-1 : i;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> srv : _services)</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> index = (i == -1) ? <a class="code" href="class_r_o_s_timetable.html#a35725b3ae1576c1250ff116daf491979">_services</a>.size()-1 : i;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordflow">for</span>(<span class="keyword">auto</span> srv : <a class="code" href="class_r_o_s_timetable.html#a35725b3ae1576c1250ff116daf491979">_services</a>)</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    {</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keywordflow">if</span>(counter == index) <span class="keywordflow">return</span> srv;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        ++counter;</div>
@@ -115,6 +115,8 @@ $(function() {
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="aclass_r_o_s_timetable_html_a35725b3ae1576c1250ff116daf491979"><div class="ttname"><a href="class_r_o_s_timetable.html#a35725b3ae1576c1250ff116daf491979">ROSTimetable::_services</a></div><div class="ttdeci">QMap&lt; QString, ROSService * &gt; _services</div><div class="ttdoc">List of services as map with service ID as keys.</div><div class="ttdef"><b>Definition:</b> <a href="rostimetable_8hxx_source.html#l00054">rostimetable.hxx:54</a></div></div>
+<div class="ttc" id="aclass_r_o_s_timetable_html_ac4a6f79050b1b69806f1dcfb9337803c"><div class="ttname"><a href="class_r_o_s_timetable.html#ac4a6f79050b1b69806f1dcfb9337803c">ROSTimetable::operator[]</a></div><div class="ttdeci">ROSService * operator[](const QString &amp;)</div><div class="ttdoc">Access services from the timetable by ID.</div><div class="ttdef"><b>Definition:</b> <a href="rostimetable_8cxx_source.html#l00032">rostimetable.cxx:32</a></div></div>
 <div class="ttc" id="aclass_r_o_s_service_html"><div class="ttname"><a href="class_r_o_s_service.html">ROSService</a></div><div class="ttdoc">ROS Timetable Editor Service Class.</div><div class="ttdef"><b>Definition:</b> <a href="rosservice_8hxx_source.html#l00056">rosservice.hxx:56</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

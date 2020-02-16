@@ -106,8 +106,20 @@ private:
     int _id_increment = 1;
     //! Service description
     QString _description = "";
+
+    /*! @brief Create new service definition line
+    @return String representing the defining line of the service in ROS
+    */
     QString _start_new();
+
+    /*! @brief Summarise all stations in service
+    @return A String listing all service stops
+    */
     QString _add_stops();
+
+    /*! @brief Create service termination string
+    @return a string representing service termination in ROS
+    */
     QString _finalize();
 public:
     //! Service initialisation type

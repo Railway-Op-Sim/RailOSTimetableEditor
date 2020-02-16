@@ -129,7 +129,7 @@ QString ROSService::_start_new()
     return out_string;
 }
 
-QString ROSService::_add_stops()
+QString ROSService::()
 {
 
     if(_stations.size() < 2) return "";

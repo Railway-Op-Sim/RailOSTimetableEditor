@@ -253,7 +253,7 @@ void ROSTTBAppWindow::_record_current_info()
     if(!_current_timetable->getServices().contains(_srv_id))
     {
         _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, _start_speed, _max_speed, _mass, _max_brake, _max_power);
-        _current_service_selection = _current_timetable->operator[](-1);
+        _current_service_selection = _current_timetable->end();
         _current_service_selection->setLabelledLocationStart(ui->checkBoxAtStation);
     }
 
@@ -561,7 +561,7 @@ void ROSTTBAppWindow::open_file()
         ui->radioButtonFromOther->setEnabled(true);
         ui->radioButtonShuttleFeeder->setEnabled(true);
     }
-    _current_service_selection = _current_timetable->operator[](-1);
+    _current_service_selection = _current_timetable->end();
     update_output();
 }
 
@@ -673,7 +673,7 @@ void ROSTTBAppWindow::_delete_entries()
 
     qDebug() << "Removing service '" << _current_service_selection->getID() << "' from timetable.";
     _current_timetable->removeService(_current_service_selection->getID());
-    _current_service_selection = (_current_timetable->size() == 0) ? nullptr : _current_timetable->operator[](-1);
+    _current_service_selection = (_current_timetable->size() == 0) ? nullptr : _current_timetable->end();
     update_output();
 }
 
