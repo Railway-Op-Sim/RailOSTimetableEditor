@@ -80,18 +80,44 @@ public:
     void setInitialValues();
 
 private slots:
+    //! Accept Current Form Values Action
     void on_buttonBoxClone_accepted();
+
+    //! Reject and Close Dialogue Action
     void on_buttonBoxClone_rejected();
 
 private:
+    //! User Interface Class member instance
     Ui::CloneDialog *ui;
+
+    //! Pointer to current active timetable for edit
     ROSTimetable* _current_ttb = nullptr;
+
+    //! Pointer to table displaying service list
     QTableWidget* _ttb_table = nullptr;
+
+    //! Pointer to current service open for edit
     ROSService* _current_srv = nullptr;
+
+    //! Pointer to the newly created clone service
     ROSService* _cloned_srv = nullptr;
+
+    //! List of services in current timetable
     QStringList _current_service_list = {};
+
+    /*! @brief Check that service to clone is a top level (no parent) service
+    @return True if service has no parent
+    */
     bool _check_new();
+
+    /*! @brief Create a clone of the current selection with new time and ID
+    @return void
+    */
     void _create_clone();
+
+    /*! @brief Attempt to create a new ID based on the previous
+    @return ID as a string
+    */
     QString _create_new_id(const QString& current_id);
 };
 
