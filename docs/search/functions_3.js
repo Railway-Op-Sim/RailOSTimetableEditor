@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['fwdcurrentservice_120',['fwdCurrentService',['../class_clone_dialog.html#a73f21b34875d6014d13d689e160ff97d',1,'CloneDialog']]],
-  ['fwdserviceslist_121',['fwdServicesList',['../class_clone_dialog.html#a45f35f1d1563c33967d4c100bfed9930',1,'CloneDialog']]]
+  ['deleteentry_191',['deleteEntry',['../class_r_o_s_service.html#ae250c5beb0b53f54237e48f90db1a40d',1,'ROSService::deleteEntry(const int &amp;index)'],['../class_r_o_s_service.html#a722cbdf56d5e0e040f18a36343681cfd',1,'ROSService::deleteEntry(const QString &amp;station)']]]
 ];

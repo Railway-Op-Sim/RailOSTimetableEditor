@@ -30,8 +30,8 @@
 #include "app_window.hxx"
 #include "ui_rosttbappwindow.h"
 
-ROSTTBAppWindow::ROSTTBAppWindow(QWidget *parent)
-    : QMainWindow(parent)
+ROSTTBAppWindow::ROSTTBAppWindow()
+    : QMainWindow()
     , ui(new Ui::ROSTTBAppWindow)
 {
     const int SERV_COL_COUNT = 4, TTB_COL_COUNT = 3;
@@ -174,7 +174,7 @@ bool ROSTTBAppWindow::checkIDsAreNeighbours(QStringList ids)
 void ROSTTBAppWindow::_record_current_info()
 {
     ui->labelParentOfJoin->setText("");
-    if(!checkROS()) return;
+    if(!_checkROS()) return;
     QString _srv_id = ui->servicerefEdit->text();
     const QString _desc = ui->descEdit->text();
     const QTime _start_time = ui->starttimeEdit->time();
@@ -434,10 +434,10 @@ void ROSTTBAppWindow::_record_current_info()
     else if(ui->radioButtonFrh->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishRemainHere);
     else _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleRemainHere);
 
-    _update_output();
+    update_output();
 }
 
-void ROSTTBAppWindow::_update_output(ROSService* current_serv)
+void ROSTTBAppWindow::update_output(ROSService* current_serv)
 {
     // Do not allow daughter service creation without at least one timetable entry already present
     if(_current_timetable->size() > 0)
@@ -536,13 +536,13 @@ void ROSTTBAppWindow::on_actionOpen_triggered()
 
 void ROSTTBAppWindow::on_actionNew_triggered()
 {
-    reset();
+    _reset();
 }
 
 void ROSTTBAppWindow::on_actionSave_As_triggered()
 {
     _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), "Timetable (*.ttb)" );
-    save_file();
+    _save_file();
 }
 
 void ROSTTBAppWindow::open_file()
@@ -552,7 +552,7 @@ void ROSTTBAppWindow::open_file()
         QMessageBox::critical(this, "Invalid Application Address", "You need to first set the location of the Railway Operation Simulator executable.");
         return;
     }
-    reset();
+    _reset();
     QString _parsed = _parser->parse_file(_current_file, _ros_timetables);
     _open_file_str = (_parsed != "NULL")? _parsed : _open_file_str;
     _current_timetable = _parser->getParsedTimetable();
@@ -562,7 +562,7 @@ void ROSTTBAppWindow::open_file()
         ui->radioButtonShuttleFeeder->setEnabled(true);
     }
     _current_service_selection = _current_timetable->operator[](-1);
-    _update_output();
+    update_output();
 }
 
 void ROSTTBAppWindow::_set_initial_open_file()
@@ -607,7 +607,7 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
     }
 }
 
-void ROSTTBAppWindow::reset()
+void ROSTTBAppWindow::_reset()
 {
     delete _current_file;
     delete _parser;
@@ -621,7 +621,7 @@ void ROSTTBAppWindow::reset()
     _station_add = new Station_add(nullptr, this);
 }
 
-bool ROSTTBAppWindow::checkROS()
+bool ROSTTBAppWindow::_checkROS()
 {
     if(!_ros_timetables)
     {
@@ -658,7 +658,7 @@ void ROSTTBAppWindow::on_pushButtonInsert_clicked()
     _clear();
 }
 
-void ROSTTBAppWindow::delete_entries()
+void ROSTTBAppWindow::_delete_entries()
 {
     if(!_current_service_selection)
     {
@@ -674,12 +674,12 @@ void ROSTTBAppWindow::delete_entries()
     qDebug() << "Removing service '" << _current_service_selection->getID() << "' from timetable.";
     _current_timetable->removeService(_current_service_selection->getID());
     _current_service_selection = (_current_timetable->size() == 0) ? nullptr : _current_timetable->operator[](-1);
-    _update_output();
+    update_output();
 }
 
 void ROSTTBAppWindow::on_pushButtonDelete_clicked()
 {
-    delete_entries();
+    _delete_entries();
 }
 
 void ROSTTBAppWindow::_populate_feederboxes()
@@ -727,7 +727,7 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     {
       QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable.");
       ui->pushButtonRoute->click();
-      _update_output();
+      update_output();
       return;
     }
     _station_add->setCurrentService(_current_service_selection);
@@ -735,7 +735,7 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     _station_add->show();
     _station_add->fwdPreviousEventTime((_current_service_selection->getTimes().size() > 0) ? _current_service_selection->getTimes()[_current_service_selection->getTimes().size()-1][1] : _current_service_selection->getStartTime());
 
-    _update_output();
+    update_output();
 }
 
 void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
@@ -1025,12 +1025,12 @@ void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
     if(ui->tableWidgetTimetable->rowCount() < 1) return;
     _current_service_selection = _current_timetable->operator[](ui->tableWidgetTimetable->takeItem(row, 1)->text());
     qDebug() << "Selected: " << _current_service_selection->summarise();
-    _update_output();
+    update_output();
     ui->tableWidgetTimetable->selectRow(row);
     _set_form_info();
 }
 
-void ROSTTBAppWindow::save_file()
+void ROSTTBAppWindow::_save_file()
 {
     QStringList _ttb = _parser->createTimetableStrings(_current_timetable);
     QString _output = join(QChar::Null, _ttb);
@@ -1049,7 +1049,7 @@ void ROSTTBAppWindow::save_file()
 
 void ROSTTBAppWindow::on_actionSave_triggered()
 {
-    save_file();
+    _save_file();
 }
 
 void ROSTTBAppWindow::on_pushButtonTTBTime_clicked()
@@ -1086,7 +1086,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     {
       QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable.");
       ui->pushButtonRoute->click();
-      _update_output();
+      update_output();
       return;
     }
     _station_add->setEditMode(true);
@@ -1098,7 +1098,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     {
         QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable (station not found in current route).");
         ui->pushButtonRoute->click();
-        _update_output();
+        update_output();
         return;
     }
 
@@ -1109,7 +1109,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     _station_add->fwdCurrentSelection(_station_name, {QTime::fromString(_arrive, "HH:mm"), QTime::fromString(_depart, "HH:mm")}, _cdtPass[0], _cdtPass[1]);
 
     _station_add->show();
-    _update_output();
+    update_output();
 }
 
 void ROSTTBAppWindow::on_radioButtonFrh_toggled(bool checked)
@@ -1207,7 +1207,7 @@ void ROSTTBAppWindow::on_pushButtonClone_clicked()
 {
     _clone_current();
     if(!_clone_srv->getNewService()) return;
-    _update_output();
+    update_output();
 }
 
 void ROSTTBAppWindow::on_pushButtonClear_clicked()
