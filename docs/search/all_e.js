@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['_7erosttbappwindow_255',['~ROSTTBAppWindow',['../class_r_o_s_t_t_b_app_window.html#a4c7f41c04f68b9924ff2ea5668b9eacd',1,'ROSTTBAppWindow']]],
-  ['_7estation_5fadd_256',['~Station_add',['../class_station__add.html#aa28555b39823052083c57bc20655c982',1,'Station_add']]]
+  ['tops_357',['TOPS',['../namespace_t_o_p_s.html',1,'']]],
+  ['traintype_358',['TrainType',['../class_train_type.html',1,'TrainType'],['../class_train_type.html#a5c7b1b7e5f771836628934b6a020f50c',1,'TrainType::TrainType()'],['../class_train_type.html#a458a26c99605c103924066a463b58f7b',1,'TrainType::TrainType(const QString &amp;tops_class, const int &amp;mass, const int &amp;power, const int &amp;max_speed, const int &amp;max_brake)']]]
 ];

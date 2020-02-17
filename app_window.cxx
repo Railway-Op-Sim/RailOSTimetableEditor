@@ -66,7 +66,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->radioButtonFromOther->setEnabled(false);
     ui->radioButtonShuttleFeeder->setEnabled(false);
     ui->radioButtonFrh->setChecked(true);
-    ui->comboBoxTOPS->addItems(tops.keys());
+    ui->comboBoxTOPS->addItems(TOPS::tops.keys());
     ui->servicerefEdit->setMaxLength(4);
     ui->serviceFinishServiceEdit->setMaxLength(4);
     ui->textEditShuttlePart2->setMaxLength(4);
@@ -1239,10 +1239,10 @@ void ROSTTBAppWindow::on_checkBoxManualTimeEdit_toggled(bool checked)
 void ROSTTBAppWindow::on_comboBoxTOPS_currentTextChanged(const QString &arg1)
 {
     if(arg1 == "") return;
-    const int _max_speed = tops[arg1]->getMaxSpeed();
-    const int _max_power = tops[arg1]->getMaxPower();
-    const int _max_brake = tops[arg1]->getMaxBrake();
-    const int _mass = tops[arg1]->getMass();
+    const int _max_speed = TOPS::tops[arg1]->getMaxSpeed();
+    const int _max_power = TOPS::tops[arg1]->getMaxPower();
+    const int _max_brake = TOPS::tops[arg1]->getMaxBrake();
+    const int _mass = TOPS::tops[arg1]->getMass();
 
     ui->spinBoxMass->setValue(_mass);
     ui->spinBoxForce->setValue(_max_brake);
