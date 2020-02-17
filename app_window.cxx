@@ -66,6 +66,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->radioButtonFromOther->setEnabled(false);
     ui->radioButtonShuttleFeeder->setEnabled(false);
     ui->radioButtonFrh->setChecked(true);
+    ui->comboBoxTOPS->addItems(tops.keys());
     ui->servicerefEdit->setMaxLength(4);
     ui->serviceFinishServiceEdit->setMaxLength(4);
     ui->textEditShuttlePart2->setMaxLength(4);
@@ -635,6 +636,7 @@ bool ROSTTBAppWindow::_checkROS()
 void ROSTTBAppWindow::_clear()
 {
     ui->servicerefEdit->clear();
+    ui->comboBoxTOPS->clear();
     ui->spinBoxMaxSpeed->setValue(0);
     ui->spinBoxForce->setValue(0);
     ui->spinBoxRepeats->setValue(0);
@@ -743,6 +745,7 @@ void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
     _enable_integer_info(true);
     if(checked)
     {
+        ui->comboBoxTOPS->setEnabled(true);
         ui->servicerefEdit->setEnabled(true);
         ui->starttimeEdit->setEnabled(true);
         ui->checkBoxAtStation->setEnabled(true);
@@ -772,6 +775,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->comboBoxTOPS->setEnabled(false);
         ui->servicerefEdit->setEnabled(false);
         ui->starttimeEdit->setEnabled(false);
         ui->checkBoxAtStation->setEnabled(false);
@@ -808,6 +812,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->comboBoxTOPS->setEnabled(true);
         ui->servicerefEdit->setEnabled(true);
         ui->starttimeEdit->setEnabled(true);
         ui->checkBoxAtStation->setEnabled(true);
@@ -837,6 +842,7 @@ void ROSTTBAppWindow::on_radioButtonFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->comboBoxTOPS->setEnabled(false);
         ui->servicerefEdit->setEnabled(true);
         ui->starttimeEdit->setEnabled(true);
         ui->checkBoxAtStation->setEnabled(false);
@@ -876,6 +882,7 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->comboBoxTOPS->setEnabled(false);
         ui->servicerefEdit->setEnabled(false);
         ui->starttimeEdit->setEnabled(false);
         ui->checkBoxAtStation->setEnabled(false);
@@ -1227,4 +1234,18 @@ void ROSTTBAppWindow::on_comboBoxParent_currentTextChanged(const QString &arg1)
 void ROSTTBAppWindow::on_checkBoxManualTimeEdit_toggled(bool checked)
 {
     ui->timeEditTermination->setEnabled(checked);
+}
+
+void ROSTTBAppWindow::on_comboBoxTOPS_currentTextChanged(const QString &arg1)
+{
+    if(arg1 == "") return;
+    const int _max_speed = tops[arg1]->getMaxSpeed();
+    const int _max_power = tops[arg1]->getMaxPower();
+    const int _max_brake = tops[arg1]->getMaxBrake();
+    const int _mass = tops[arg1]->getMass();
+
+    ui->spinBoxMass->setValue(_mass);
+    ui->spinBoxForce->setValue(_max_brake);
+    ui->spinBoxPower->setValue(_max_power);
+    ui->spinBoxMaxSpeed->setValue(_max_speed);
 }

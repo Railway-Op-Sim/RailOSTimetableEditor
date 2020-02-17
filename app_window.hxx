@@ -42,6 +42,7 @@
 #include "rosttbgen.hxx"
 #include "station_add.hxx"
 #include "clone_dialog.hxx"
+#include "TOPS.hxx"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ROSTTBAppWindow; }
@@ -179,6 +180,9 @@ private slots:
 
     //! Toggle Time Edit Checkbox Action
     void on_checkBoxManualTimeEdit_toggled(bool checked);
+
+    //! Toggle TOPS Service Combo Box Action
+    void on_comboBoxTOPS_currentTextChanged(const QString &arg1);
 
 private:
     //! Station Add Dialogue Class member instance

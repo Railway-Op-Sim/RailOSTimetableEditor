@@ -22,16 +22,20 @@ macx: ICON = img/rosttbgen_icon.icns
 win32:RC_ICONS += img/rosttbgen_icon.ico
 
 HEADERS += app_window.hxx \
+           TOPS.hxx \
            clone_dialog.hxx \
            rosservice.hxx \
            rostimetable.hxx \
            rosttbgen.hxx \
-           station_add.hxx
+           station_add.hxx \
+           train_type.hxx
 FORMS += clone_dialog.ui rosttbappwindow.ui station_add.ui
 SOURCES += app_window.cxx \
+           TOPS.cxx \
            clone_dialog.cxx \
            main.cxx \
            rosservice.cxx \
            rostimetable.cxx \
            rosttbgen.cxx \
-           station_add.cxx
+           station_add.cxx \
+           train_type.cxx
