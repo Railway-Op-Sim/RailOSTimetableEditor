@@ -48,7 +48,7 @@ extern QString join(QChar::SpecialCharacter join_symbol, QStringList list);
 
 /*! @brief      ROS Timetable Editor Service Class
     @details    A class to handle all properties of an ROS service
-    @version    0.1.1
+    @version    0.1.2
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-16
     @copyright  GNU Public License v3
@@ -74,9 +74,9 @@ private:
     QString _daughter_id = "";
     //! ROS service ID for the current service
     QString _service_id = "";
-    //! Array containing whether stops are passed or called at
-    QList<bool> _passing_stops = {};
-    //! Array containing whether stops have direction changes
+    //! Array containing whether sTrainSet are passed or called at
+    QList<bool> _passing_sTrainSet = {};
+    //! Array containing whether sTrainSet have direction changes
     QList<bool> _direction_changes = {};
     //! Array containing a single element (where applicable): {rear/front split, {new service ID, time as string}}
     QMap<QString, QStringList> _split_data = QMap<QString, QStringList>();
@@ -113,9 +113,9 @@ private:
     QString _start_new();
 
     /*! @brief Summarise all stations in service
-    @return A String listing all service stops
+    @return A String listing all service sTrainSet
     */
-    QString _add_stops();
+    QString _add_sTrainSet();
 
     /*! @brief Create service termination string
     @return a string representing service termination in ROS
@@ -310,7 +310,7 @@ public:
         {
             if(_stations[i] == station_name)
             {
-                return {_direction_changes[i], _passing_stops[i]};
+                return {_direction_changes[i], _passing_sTrainSet[i]};
             }
         }
 
@@ -385,7 +385,7 @@ public:
     /*! @brief Fetch the passing point boolean list
     @return QList<bool> list of whether stations are passing points or not
     */
-    QList<bool> getPassList() const {return _passing_stops;}
+    QList<bool> getPassList() const {return _passing_sTrainSet;}
 
     /*! @brief Fetch the change direction boolean list
     @return QList<bool> list of whether stations are points where service changes direction
@@ -456,7 +456,7 @@ public:
     {
         _times.push_back(time);
         _stations.push_back(station);
-        _passing_stops.push_back(false);
+        _passing_sTrainSet.push_back(false);
         _direction_changes.push_back(false);
         _cdt_times.push_back(QTime());
     }
@@ -475,7 +475,7 @@ public:
         const int index = _stations.indexOf(station);
         _times[index] = time;
         _direction_changes[index] = CDT;
-        _passing_stops[index] = Pass;
+        _passing_sTrainSet[index] = Pass;
         _cdt_times[index] = cdt_time;
         _stations[index] = new_station;
 
@@ -486,7 +486,7 @@ public:
     @param state True if a passing point
     @return void
     */
-    void setStopAsPassPoint(int index, bool state) {_passing_stops[index] = state;}
+    void setStopAsPassPoint(int index, bool state) {_passing_sTrainSet[index] = state;}
 
     /*! @brief Change direction at a stop (by index)
     @param index Index of the station to alter

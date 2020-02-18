@@ -87,7 +87,7 @@ void ROSService::deleteEntry(const int &index)
     _times.removeAt(index);
     _direction_changes.removeAt(index);
     _stations.removeAt(index);
-    _passing_stops.removeAt(index);
+    _passing_sTrainSet.removeAt(index);
     _cdt_times.removeAt(index);
 
 }
@@ -129,7 +129,7 @@ QString ROSService::_start_new()
     return out_string;
 }
 
-QString ROSService::_add_stops()
+QString ROSService::_add_sTrainSet()
 {
 
     if(_stations.size() < 2) return "";
@@ -193,7 +193,7 @@ bool ROSService::checkService()
 QString ROSService::as_string()
 {
     QString _out = _start_new();
-    _out = join(",", _out, _add_stops());
+    _out = join(",", _out, _add_sTrainSet());
     _out = join(",", _out, _finalize());
 
     return _out;

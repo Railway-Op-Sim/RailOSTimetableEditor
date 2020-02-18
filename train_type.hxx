@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//              ROS Timetable Editor TOPS Train Class                      //
+//              ROS Timetable Editor train Train Class                      //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.14 framework.              //
@@ -32,18 +32,18 @@
 
 #include <QString>
 
-/*! @brief      ROS Timetable Editor TOPS Train Class
-    @details    Template train definitions for TOPS
-    @version    0.1.1
+/*! @brief      ROS Timetable Editor train Train Class
+    @details    Template train definitions for train
+    @version    0.1.2
     @author     Kristian Zarebski
-    @date 	    last modified 2020-02-17
+    @date 	    last modified 2020-02-18
     @copyright  GNU Public License v3
 */
 class TrainType
 {
     private:
-        //! TOPS Classification
-        const QString _tops_classification = "";
+        //! Train Classification
+        const QString _train_classification = "";
 
         //! Mass in Short Tons
         const int _mass = -1;           // In short tonnes
@@ -62,17 +62,17 @@ class TrainType
         TrainType() {}
 
         /*! @brief Constructor for Initialising All Parameters
-        @param tops_class The TOPS classification of the multiple unit
+        @param train_class The train classification of the multiple unit
         @param mass Mass of full multiple unit in Short Tons
         @param power Maximum power in kW
         @param max_speed Maximum speed in km/h
         @param max_brake Maximum braking force in Short Tons
         @return void
         */
-        TrainType(const QString& tops_class, const int& mass,
+        TrainType(const QString& train_class, const int& mass,
                   const int& power, const int& max_speed,
                   const int& max_brake) :
-                    _tops_classification(tops_class), _mass(mass),
+                    _train_classification(train_class), _mass(mass),
                     _max_power(power), _max_speed(max_speed), _max_brake(max_brake) {}
 
         /*! @brief Fetch Maximum Speed
@@ -95,10 +95,10 @@ class TrainType
         */
         int getMass() const {return _mass;}
 
-        /*! @brief Fetch TOPS Class
-        @return TOPS Classification label
+        /*! @brief Fetch train Class
+        @return train Classification label
         */
-        QString getClass() const {return _tops_classification;}
+        QString getClass() const {return _train_classification;}
 
         /*! @brief Summarise information
         @return A summary of all properties for this class

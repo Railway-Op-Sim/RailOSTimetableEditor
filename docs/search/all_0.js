@@ -1,7 +1,7 @@
 var searchData=
 [
   ['_5fadd_5fstations_0',['_add_stations',['../class_r_o_s_t_t_b_gen.html#a6d31574b98e2b9b234687edf1e3de614',1,'ROSTTBGen']]],
-  ['_5fadd_5fstops_1',['_add_stops',['../class_r_o_s_service.html#ae466d1855acec04dc25fc579c99dfcd8',1,'ROSService']]],
+  ['_5fadd_5fstrainset_1',['_add_sTrainSet',['../class_r_o_s_service.html#a34f5a72a76fa9090a646ee829187a569',1,'ROSService']]],
   ['_5fcached_5ftext_2',['_cached_text',['../class_r_o_s_t_t_b_gen.html#ad33168cdbb80e1d0fdf9531917661178',1,'ROSTTBGen']]],
   ['_5fcdt_5ftimes_3',['_cdt_times',['../class_r_o_s_service.html#ae5bfe237fe8fb3c395b6721af4163bef',1,'ROSService']]],
   ['_5fcheck_5fnew_4',['_check_new',['../class_clone_dialog.html#afb99bc087465057e0f9cba73c1c38dfc',1,'CloneDialog']]],
@@ -70,7 +70,7 @@ var searchData=
   ['_5fparseexit_67',['_parseExit',['../class_r_o_s_t_t_b_gen.html#ab89f06e84c7cb8894b958da95df5f766',1,'ROSTTBGen']]],
   ['_5fparser_68',['_parser',['../class_r_o_s_t_t_b_app_window.html#adadf40defacddf67d6622cdfdb4bd7f4',1,'ROSTTBAppWindow']]],
   ['_5fparsetype_69',['_parseType',['../class_r_o_s_t_t_b_gen.html#a7148cfda9aec1a3a11b29981b9bd3aac',1,'ROSTTBGen']]],
-  ['_5fpassing_5fstops_70',['_passing_stops',['../class_r_o_s_service.html#a5728f4ea4ab41b2b765201bb4cb7ce89',1,'ROSService']]],
+  ['_5fpassing_5fstrainset_70',['_passing_sTrainSet',['../class_r_o_s_service.html#a5cdf04450434fc33d3b9c36efaa32055',1,'ROSService']]],
   ['_5fpopulate_5ffeederboxes_71',['_populate_feederboxes',['../class_r_o_s_t_t_b_app_window.html#a9da601a1ba69bc6d428d8bb50e910f4b',1,'ROSTTBAppWindow']]],
   ['_5fpower_72',['_power',['../class_r_o_s_service.html#adf78cbb9afd17b066e9b745ff8dcbfce',1,'ROSService']]],
   ['_5fprocess_5fdata_73',['_process_data',['../class_r_o_s_t_t_b_gen.html#a04a9c15273dbd9e52b635ea447cdfd78',1,'ROSTTBGen']]],
@@ -99,7 +99,7 @@ var searchData=
   ['_5fstations_5flist_96',['_stations_list',['../class_r_o_s_t_t_b_gen.html#ad632223f61107aeb95d0f78ccbbbcc10',1,'ROSTTBGen']]],
   ['_5fstored_5flocations_97',['_stored_locations',['../class_r_o_s_timetable.html#aa93b9060c51b6e00b59e5096df63651d',1,'ROSTimetable']]],
   ['_5ftimes_98',['_times',['../class_r_o_s_service.html#a7a32989efd2f284898bed043d65a0b8b',1,'ROSService::_times()'],['../class_station__add.html#a6cf7e066d95332770017f3642d3d9a77',1,'Station_add::_times()']]],
-  ['_5ftops_5fclassification_99',['_tops_classification',['../class_train_type.html#a018a6914afcfb9b60629595a1669afa6',1,'TrainType']]],
+  ['_5ftrain_5fclassification_99',['_train_classification',['../class_train_type.html#a8f830a2630924fadc3a74c5e23c41c82',1,'TrainType']]],
   ['_5ftt_5fmodel_5fselect_100',['_tt_model_select',['../class_r_o_s_t_t_b_app_window.html#a327933df5c2676a16d74115fdd588004',1,'ROSTTBAppWindow']]],
   ['_5fttb_5fcolumn_5fwidths_101',['_ttb_column_widths',['../class_r_o_s_t_t_b_app_window.html#a6b8936ee634f188d7a1474b960436ee2',1,'ROSTTBAppWindow']]],
   ['_5fttb_5ftable_102',['_ttb_table',['../class_clone_dialog.html#a93796cb79155332719af2dbd82881a22',1,'CloneDialog']]]

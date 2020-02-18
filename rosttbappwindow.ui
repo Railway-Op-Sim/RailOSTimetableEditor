@@ -897,12 +897,12 @@
       <string/>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBoxTOPS">
+    <widget class="QComboBox" name="comboBoxTrainSet">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>220</x>
        <y>160</y>
-       <width>171</width>
+       <width>191</width>
        <height>32</height>
       </rect>
      </property>
@@ -910,14 +910,43 @@
     <widget class="QLabel" name="label_21">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>250</x>
        <y>140</y>
        <width>131</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>From TOPS Template</string>
+      <string>From Train Template</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spinBoxMU">
+     <property name="geometry">
+      <rect>
+       <x>425</x>
+       <y>163</y>
+       <width>42</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>5</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_22">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>140</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>In Multiple</string>
      </property>
     </widget>
    </widget>

@@ -42,7 +42,7 @@
 #include "rosttbgen.hxx"
 #include "station_add.hxx"
 #include "clone_dialog.hxx"
-#include "TOPS.hxx"
+#include "TrainListing.hxx"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ROSTTBAppWindow; }
@@ -50,7 +50,7 @@ QT_END_NAMESPACE
 
 /*! @brief      ROS Timetable Editor Main Application Window
     @details    Main window for viewing, creating and editting services within a ROS timetable
-    @version    0.1.1
+    @version    0.1.2
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-16
     @copyright  GNU Public License v3
@@ -181,8 +181,11 @@ private slots:
     //! Toggle Time Edit Checkbox Action
     void on_checkBoxManualTimeEdit_toggled(bool checked);
 
-    //! Toggle TOPS Service Combo Box Action
-    void on_comboBoxTOPS_currentTextChanged(const QString &arg1);
+    //! Toggle TrainSet Service Combo Box Action
+    void on_comboBoxTrainSet_currentTextChanged(const QString &arg1);
+
+    //! Toggle # Units Change Spin Box Action
+    void on_spinBoxMU_valueChanged(int arg1);
 
 private:
     //! Station Add Dialogue Class member instance

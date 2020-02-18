@@ -26,11 +26,9 @@ var menudata={children:[
 {text:"Namespace List",url:"namespaces.html"},
 {text:"Namespace Members",url:"namespacemembers.html",children:[
 {text:"All",url:"namespacemembers.html",children:[
-{text:"c",url:"namespacemembers.html#index_c"},
-{text:"h",url:"namespacemembers.html#index_h"}]},
+{text:"c",url:"namespacemembers.html#index_c"}]},
 {text:"Variables",url:"namespacemembers_vars.html",children:[
-{text:"c",url:"namespacemembers_vars.html#index_c"},
-{text:"h",url:"namespacemembers_vars.html#index_h"}]}]}]},
+{text:"c",url:"namespacemembers_vars.html#index_c"}]}]}]},
 {text:"Classes",url:"annotated.html",children:[
 {text:"Class List",url:"annotated.html"},
 {text:"Class Index",url:"classes.html"},
