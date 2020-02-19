@@ -39,7 +39,7 @@
 
 /*! @brief      ROS Timetable Editor Timetable Class
     @details    A class that acts as a container for multiple services forming the basis for a .ttb file
-    @version    0.1.2
+    @version    0.1.3
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-16
     @copyright  GNU Public License v3

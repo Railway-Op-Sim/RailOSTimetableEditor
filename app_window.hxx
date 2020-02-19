@@ -222,7 +222,7 @@ private:
     QList<int> _ttb_column_widths = {50, 50, 300, 200, 75, 200, 50};
 
     //! Array containing Service table column widths
-    QList<int> _srv_column_widths = {50, 50, 200, 100};
+    QList<int> _srv_column_widths = {50, 50, 150, 50};
 
     //! Current active service under modification
     ROSService* _current_service_selection = nullptr;
