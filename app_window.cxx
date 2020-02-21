@@ -575,7 +575,7 @@ void ROSTTBAppWindow::_set_initial_open_file()
 void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
 {
     QString _file_name = _current_file->getOpenFileName(this, tr("Open File"), QDir::currentPath(),
-                                                        tr("ROS Executable (*.exe, *.app)"));
+                                                        tr("ROS Executable (*.exe *.app)"));
     if(_file_name == QString()) return;
 
     QStringList _dot_split = _file_name.split(".");
