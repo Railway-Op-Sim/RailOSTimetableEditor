@@ -542,7 +542,7 @@ void ROSTTBAppWindow::on_actionNew_triggered()
 
 void ROSTTBAppWindow::on_actionSave_As_triggered()
 {
-    _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), "Timetable (*.ttb)" );
+    _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), tr("Timetable (*.ttb)") );
     _save_file();
 }
 
@@ -574,8 +574,8 @@ void ROSTTBAppWindow::_set_initial_open_file()
 
 void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
 {
-    QString _file_name = _current_file->getOpenFileName(this, "Open File", QDir::currentPath(),
-                                                        "ROS Executable (*.exe, *.app)");
+    QString _file_name = _current_file->getOpenFileName(this, tr("Open File"), QDir::currentPath(),
+                                                        tr("ROS Executable (*.exe, *.app)"));
     if(_file_name == QString()) return;
 
     QStringList _dot_split = _file_name.split(".");

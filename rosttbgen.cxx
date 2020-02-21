@@ -94,8 +94,8 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 QString ROSTTBGen::parse_rly(const QString railways_dir)
 {
     QFileDialog* _route_diag = new QFileDialog;
-    QString _current_route = _route_diag->getOpenFileName(_parent, "Open Route", railways_dir,
-                                   "ROS Railway Files (*.rly)");
+    QString _current_route = _route_diag->getOpenFileName(_parent,  QObject::tr("Open Route"), railways_dir,
+                                   QObject::tr("ROS Railway Files (*.rly)"));
     QStringList _stations = {};
     QFile open_file(_current_route);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
