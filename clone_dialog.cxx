@@ -98,21 +98,21 @@ bool CloneDialog::_check_new()
     }
     if(_current_srv->getParent() != "")
     {
-        ui->labelCloneInfo->setText("Currently cannot clone a daughter service.");
+        ui->labelCloneInfo->setText(QObject::tr("Currently cannot clone a daughter service."));
         qDebug() << "Attempt by user to clone a daughter service. Due to the fact parent services would also have to be cloned "\
                     "adding complication, this feature is not yet present.";
         return false;
     }
     if(ui->timeEditCloneStart->time() == _current_srv->getStartTime())
     {
-        ui->labelCloneInfo->setText("New service start time cannot match old.");
+        ui->labelCloneInfo->setText(QObject::tr("New service start time cannot match old."));
         qDebug() << "Attempt by user to set clone to be at the same time as the current service.";
         return false;
     }
 
     if(ui->textEditCloneRef->text() == _current_srv->getID())
     {
-        ui->labelCloneInfo->setText("New service ID cannot match old.");
+        ui->labelCloneInfo->setText(QObject::tr("New service ID cannot match old."));
         qDebug() << "Attempt by user to set clone to be have the same ID as the current service.";
         return false;
     }

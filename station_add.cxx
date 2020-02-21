@@ -62,7 +62,7 @@ bool Station_add::setInfo()
 {
     if(_srv_start.msecsTo(ui->timeEditArrival->time()) < 0)
     {
-        ui->errorLabel->setText("Arrival time cannot be before service start");
+        ui->errorLabel->setText(QObject::tr("Arrival time cannot be before service start"));
         return false;
     }
     if(!_edit_mode && ui->comboBoxStations->currentText() != _current_station)
@@ -71,14 +71,14 @@ bool Station_add::setInfo()
         {
             if((_times[0] >= time_pair[0] && _times[0] <= time_pair[1]) || (_times[1] >= time_pair[0] && _times[1] <= time_pair[1]))
             {
-                ui->errorLabel->setText("Times overlap with current timetable entries");
+                ui->errorLabel->setText(QObject::tr("Times overlap with current timetable entries"));
                 return false;
             }
         }
     }
     if(ui->timeEditArrival->time().msecsTo(ui->timeEditDeparture->time()) < 0)
     {
-        ui->errorLabel->setText("Departure time cannot be before arrival.");
+        ui->errorLabel->setText(QObject::tr("Departure time cannot be before arrival."));
         return false;
     }
     ui->errorLabel->setText("");
@@ -90,7 +90,7 @@ bool Station_add::setInfo()
     {
         if(ui->timeEditCDT->time().msecsTo(ui->timeEditArrival->time()) > 0)
         {
-            ui->errorLabel->setText("Direction Change Time cannot proceed arrival time");
+            ui->errorLabel->setText(QObject::tr("Direction Change Time cannot proceed arrival time"));
             return false;
         }
 

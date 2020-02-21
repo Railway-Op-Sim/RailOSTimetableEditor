@@ -84,7 +84,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     if(_cache_file.exists())
     {
         if(!_cache_file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(0,"error",_cache_file.errorString());
+            QMessageBox::information(0,QObject::tr("error"), _cache_file.errorString());
         }
         QTextStream in(&_cache_file);
         while (!in.atEnd()) {
@@ -186,7 +186,7 @@ void ROSTTBAppWindow::_record_current_info()
     const QString _shuttle_partner = ui->textEditShuttlePart2->text();
     if(_current_timetable->getStartTime().msecsTo(_start_time) < 0)
     {
-        QMessageBox::critical(this, "Invalid Service", "Service start time must not precede timetable start time.");
+        QMessageBox::critical(this, QObject::tr("Invalid Service"), QObject::tr("Service start time must not precede timetable start time."));
         return;
     }
     const int _max_power   = ui->spinBoxPower->value(),
@@ -198,7 +198,7 @@ void ROSTTBAppWindow::_record_current_info()
     const bool info_missing = _srv_id == "" || _desc == "";
     if(info_missing)
     {
-        QMessageBox::critical(this, "Missing Information", "Service Identifier or Description Missing");
+        QMessageBox::critical(this, QObject::tr("Missing Information"), QObject::tr("Service Identifier or Description Missing"));
         return;
     }
 
@@ -206,27 +206,27 @@ void ROSTTBAppWindow::_record_current_info()
     {
         if(_max_speed == 0)
         {
-            QMessageBox::critical(this, "Invalid Maximum Speed", "Maximum service speed cannot be 0 kph for Standard Service or Shuttle from Stop.");
+            QMessageBox::critical(this, QObject::tr("Invalid Maximum Speed"), QObject::tr("Maximum service speed cannot be 0 kph for Standard Service or Shuttle from Stop."));
             return;
         }
         if(_max_power == 0)
         {
-            QMessageBox::critical(this, "Invalid Maximum Power", "Maximum service power cannot be 0 kW for Standard Service or Shuttle from Stop.");
+            QMessageBox::critical(this, QObject::tr("Invalid Maximum Power"), QObject::tr("Maximum service power cannot be 0 kW for Standard Service or Shuttle from Stop."));
             return;
         }
         if(_mass == 0)
         {
-            QMessageBox::critical(this, "Invalid Mass", "Mass value cannot be 0 te for Standard Service or Shuttle from Stop.");
+            QMessageBox::critical(this, QObject::tr("Invalid Mass"), QObject::tr("Mass value cannot be 0 te for Standard Service or Shuttle from Stop."));
             return;
         }
         if(_max_brake == 0)
         {
-            QMessageBox::critical(this, "Invalid Maximum Braking Force", "Maximum brake force cannot be 0 te for Standard Service or Shuttle from Stop.");
+            QMessageBox::critical(this, QObject::tr("Invalid Maximum Braking Force"), QObject::tr("Maximum brake force cannot be 0 te for Standard Service or Shuttle from Stop."));
             return;
         }
         if(_start_ids[0] == "" || _start_ids[1] == "")
         {
-            QMessageBox::critical(this, "Invalid Start Position", "IDs for start location rear and front track elements must be provided for a Standard Service or Shuttle from Stop.");
+            QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("IDs for start location rear and front track elements must be provided for a Standard Service or Shuttle from Stop."));
             return;
         }
 
@@ -234,14 +234,14 @@ void ROSTTBAppWindow::_record_current_info()
         {
             if(!checkLocID(id))
             {
-                QMessageBox::critical(this, "Invalid Start Position", "Location IDs must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number.");
+                QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("Location IDs must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number."));
                 return;
             }
         }
 
         if(!checkIDsAreNeighbours(_start_ids))
         {
-            QMessageBox::critical(this, "Invalid Start Position", "Location IDs must be neighbouring map elements.");
+            QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("Location IDs must be neighbouring map elements."));
             return;
         }
     }
@@ -250,7 +250,7 @@ void ROSTTBAppWindow::_record_current_info()
     {
         if(ui->timeEditTermination->time().secsTo(_current_service_selection->getStartTime()) > 0)
         {
-            QMessageBox::critical(this, "Invalid Exit Time", "Exit time cannot be before start time");
+            QMessageBox::critical(this, QObject::tr("Invalid Exit Time"), QObject::tr("Exit time cannot be before start time"));
             return;
         }
     }
@@ -290,12 +290,12 @@ void ROSTTBAppWindow::_record_current_info()
         const QString _service_id = _current_timetable->getServices()[_current_service_selection->getParent()]->getDaughter();
         if(_service_id == "")
         {
-            QMessageBox::critical(this, "No Parent Daughter Found", "Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service.");
+            QMessageBox::critical(this, QObject::tr("No Parent Daughter Found"), QObject::tr("Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service."));
             return;
         }
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
         {
-            QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent arrival time.");
+            QMessageBox::critical(this, QObject::tr("Invalid Start Time"), QObject::tr("Daughter service start time cannot be before parent arrival time."));
             return;
         }
 
@@ -309,7 +309,7 @@ void ROSTTBAppWindow::_record_current_info()
     {
         if(_shuttle_partner == "")
         {
-            QMessageBox::critical(this, "No Partner", "You must specify an accompanying return service ID.");
+            QMessageBox::critical(this, QObject::tr("No Partner"), QObject::tr("You must specify an accompanying return service ID."));
             return;
         }
         _current_service_selection->setDaughter(_shuttle_partner);
@@ -321,7 +321,7 @@ void ROSTTBAppWindow::_record_current_info()
     {
         if(_shuttle_partner == "")
         {
-            QMessageBox::critical(this, "No Partner", "You must specify an accompanying return service ID.");
+            QMessageBox::critical(this, QObject::tr("No Partner"), QObject::tr("You must specify an accompanying return service ID."));
             return;
         }
         _current_service_selection->setDaughter(_shuttle_partner);
@@ -335,18 +335,18 @@ void ROSTTBAppWindow::_record_current_info()
 
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
         {
-            QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent end time.");
+            QMessageBox::critical(this, QObject::tr("Invalid Start Time"), QObject::tr("Daughter service start time cannot be before parent end time."));
             return;
         }
         const QString _service_id = _parent->getDaughter();
         if(_service_id == "")
         {
-            QMessageBox::critical(this, "No Parent Daughter Found", "Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service.");
+            QMessageBox::critical(this, QObject::tr("No Parent Daughter Found"), QObject::tr("Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service."));
             return;
         }
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
         {
-            QMessageBox::critical(this, "Invalid Start Time", "Daughter service start time cannot be before parent arrival time.");
+            QMessageBox::critical(this, QObject::tr("Invalid Start Time"), QObject::tr("Daughter service start time cannot be before parent arrival time."));
             return;
         }
 
@@ -379,13 +379,13 @@ void ROSTTBAppWindow::_record_current_info()
         const QString _exit_id = ui->serviceExitEdit->text();
         if(_exit_id == "")
         {
-            QMessageBox::critical(this, "No Exit Location", "You must provide an exit location ID.");
+            QMessageBox::critical(this, QObject::tr("No Exit Location"), QObject::tr("You must provide an exit location ID."));
             return;
         }
 
         if(!checkLocID(_exit_id))
         {
-            QMessageBox::critical(this, "Invalid Start Position", "Location ID must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number.");
+            QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("Location ID must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number."));
             return;
         }
 
@@ -407,8 +407,8 @@ void ROSTTBAppWindow::_record_current_info()
 
         if(_found_candidate == "NULL")
         {
-            QMessageBox::critical(this, "No Parent Found", "Could not find split reference in existing service matching current service. You must define a forward or rear split "\
-                                  "in an existing service first.");
+            QMessageBox::critical(this, QObject::tr("No Parent Found"), QObject::tr("Could not find split reference in existing service matching current service. You must define a forward or rear split "\
+                                  "in an existing service first."));
             return;
         }
 
@@ -422,7 +422,7 @@ void ROSTTBAppWindow::_record_current_info()
 
         if(_srv_id == "")
         {
-            QMessageBox::critical(this, "Missing Daughter Service", "You must provide an identifier for the newly formed service.");
+            QMessageBox::critical(this, QObject::tr("Missing Daughter Service"), QObject::tr("You must provide an identifier for the newly formed service."));
             return;
         }
 
@@ -550,7 +550,7 @@ void ROSTTBAppWindow::open_file()
 {
     if(!_ros_timetables)
     {
-        QMessageBox::critical(this, "Invalid Application Address", "You need to first set the location of the Railway Operation Simulator executable.");
+        QMessageBox::critical(this, QObject::tr("Invalid Application Address"), QObject::tr("You need to first set the location of the Railway Operation Simulator executable."));
         return;
     }
     _reset();
@@ -628,7 +628,7 @@ bool ROSTTBAppWindow::_checkROS()
 {
     if(!_ros_timetables)
     {
-        QMessageBox::critical(this, "Invalid Application Address", "You need to first set the location of the Railway Operation Simulator executable.");
+        QMessageBox::critical(this, QObject::tr("Invalid Application Address"), QObject::tr("You need to first set the location of the Railway Operation Simulator executable."));
         return false;
     }
 
@@ -725,12 +725,12 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
 {
     if(_current_timetable->size() == 0)
     {
-        QMessageBox::critical(this, "No Service Defined", "You must add a service before selecting calling points.");
+        QMessageBox::critical(this, QObject::tr("No Service Defined"), QObject::tr("You must add a service before selecting calling points."));
         return;
     }    
     if(_parser->getStations().size() == 0)
     {
-      QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable.");
+      QMessageBox::critical(this, QObject::tr("No Route"), QObject::tr("You must open the relevant route before adjusting an existing timetable."));
       ui->pushButtonRoute->click();
       update_output();
       return;
@@ -1075,7 +1075,7 @@ void ROSTTBAppWindow::on_pushButtonTTBTime_clicked()
     {
         if(service->getStartTime().msecsTo(_temp_time) < 0)
         {
-            QMessageBox::critical(this, "Invalid Start Time", "Start time for timetable cannot be after first service time.");
+            QMessageBox::critical(this, QObject::tr("Invalid Start Time"), QObject::tr("Start time for timetable cannot be after first service time."));
             return;
         }
     }
@@ -1099,7 +1099,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
 {
     if(_parser->getStations().size() == 0)
     {
-      QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable.");
+      QMessageBox::critical(this, QObject::tr("No Route"), QObject::tr("You must open the relevant route before adjusting an existing timetable."));
       ui->pushButtonRoute->click();
       update_output();
       return;
@@ -1111,7 +1111,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
 
     if(!_parser->getStations().contains(_station_name))
     {
-        QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable (station not found in current route).");
+        QMessageBox::critical(this, QObject::tr("No Route"), QObject::tr("You must open the relevant route before adjusting an existing timetable (station not found in current route)."));
         ui->pushButtonRoute->click();
         update_output();
         return;
