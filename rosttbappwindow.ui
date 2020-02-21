@@ -1500,6 +1500,56 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>pushButtonROSLoc</tabstop>
+  <tabstop>pushButtonRoute</tabstop>
+  <tabstop>pushButtonAddLocation</tabstop>
+  <tabstop>timeEditTTBStart</tabstop>
+  <tabstop>pushButtonTTBTimeEdit</tabstop>
+  <tabstop>pushButtonTTBTime</tabstop>
+  <tabstop>starttimeEdit</tabstop>
+  <tabstop>spinBoxStartSpeed</tabstop>
+  <tabstop>spinBoxMaxSpeed</tabstop>
+  <tabstop>spinBoxMass</tabstop>
+  <tabstop>spinBoxForce</tabstop>
+  <tabstop>spinBoxPower</tabstop>
+  <tabstop>servicerefEdit</tabstop>
+  <tabstop>descEdit</tabstop>
+  <tabstop>comboBoxTrainSet</tabstop>
+  <tabstop>spinBoxMU</tabstop>
+  <tabstop>radioButtonStandard</tabstop>
+  <tabstop>radioButtonShuttleStop</tabstop>
+  <tabstop>radioButtonShuttleFeeder</tabstop>
+  <tabstop>radioButtonShuttleFinish</tabstop>
+  <tabstop>radioButtonFromOther</tabstop>
+  <tabstop>comboBoxParent</tabstop>
+  <tabstop>textEditEnterID1</tabstop>
+  <tabstop>textEditEnterID2</tabstop>
+  <tabstop>checkBoxAtStation</tabstop>
+  <tabstop>textEditParentShuttleRef</tabstop>
+  <tabstop>textEditShuttlePart2</tabstop>
+  <tabstop>comboBoxFeeder</tabstop>
+  <tabstop>radioButtonFns</tabstop>
+  <tabstop>radioButtonFrh</tabstop>
+  <tabstop>radioButtonFrsrh</tabstop>
+  <tabstop>radioButtonFer</tabstop>
+  <tabstop>radioButtonFjo</tabstop>
+  <tabstop>radioButtonFshf</tabstop>
+  <tabstop>radioButtonFrsfns</tabstop>
+  <tabstop>serviceExitEdit</tabstop>
+  <tabstop>serviceFinishServiceEdit</tabstop>
+  <tabstop>checkBoxManualTimeEdit</tabstop>
+  <tabstop>timeEditTermination</tabstop>
+  <tabstop>tableWidgetTimetable</tabstop>
+  <tabstop>spinBoxRepeats</tabstop>
+  <tabstop>spinBoxRepeatInterval</tabstop>
+  <tabstop>spinBoxRefIncrement</tabstop>
+  <tabstop>pushButtonInsert</tabstop>
+  <tabstop>pushButtonDelete</tabstop>
+  <tabstop>pushButtonClear</tabstop>
+  <tabstop>pushButtonClone</tabstop>
+  <tabstop>tableWidgetService</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>
