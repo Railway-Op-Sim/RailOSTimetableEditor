@@ -32,12 +32,12 @@
 QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 {
     _cached_text = "";
-    QString in_file = file->getOpenFileName(_parent, "Open Timetable",directory->absolutePath(), "ROS Timetable Files (*.ttb)");
+    QString in_file = file->getOpenFileName(_parent, QObject::tr("Open Timetable"), directory->absolutePath(), QObject::tr("ROS Timetable Files (*.ttb)"));
     QFile open_file(in_file);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
     {
         if(in_file.isEmpty() || in_file.isNull()) return "NULL";
-        QMessageBox::critical(_parent, "File Open Failure", "Failed to open file '"+in_file+"'");
+        QMessageBox::critical(_parent, QObject::tr("File Open Failure"), QObject::tr("Failed to open file '")+in_file+"'");
         return QString();
     }
 

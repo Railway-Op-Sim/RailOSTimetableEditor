@@ -253,6 +253,11 @@ class ROSTTBGen
         @return List of strings representing lines for output .ttb file
         */
         QStringList createTimetableStrings(ROSTimetable* timetable);
+
+        /*! @brief Set the Station List (used to maintain station listing when parser is reset/remade
+        @return void
+        */
+        void setStations(QSet<QString> stations) {_stations_list = stations;}
 };
 
 #endif // ROSTTBGEN_HXX

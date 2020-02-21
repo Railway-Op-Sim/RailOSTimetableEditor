@@ -610,9 +610,11 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
 
 void ROSTTBAppWindow::_reset()
 {
+    const QSet<QString> _temp = _parser->getStations();
     delete _current_file;
     delete _parser;
     _parser = new ROSTTBGen(this);
+    _parser->setStations(_temp);
     ui->tableWidgetService->setRowCount(0);
     ui->tableWidgetTimetable->setRowCount(0);
     ui->tableWidgetService->clear();
@@ -725,7 +727,7 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     {
         QMessageBox::critical(this, "No Service Defined", "You must add a service before selecting calling points.");
         return;
-    }
+    }    
     if(_parser->getStations().size() == 0)
     {
       QMessageBox::critical(this, "No Route", "You must open the relevant route before adjusting an existing timetable.");
