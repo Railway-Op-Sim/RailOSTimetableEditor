@@ -73,6 +73,10 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->textEditParentShuttleRef->setMaxLength(4);
     _station_add->setServiceTable(ui->tableWidgetService);
 
+    QFont font = qApp->font();
+    font.setPixelSize(12);
+    qApp->setFont(font);
+
     QDir cache_dir("cache");
     if(!cache_dir.exists()) cache_dir.mkpath(".");
     QFile _cache_file(cache_dir.absolutePath()+"/"+"ros_location_cache.dat");
