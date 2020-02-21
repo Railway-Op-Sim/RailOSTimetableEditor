@@ -39,3 +39,6 @@ SOURCES += app_window.cxx \
            rosttbgen.cxx \
            station_add.cxx \
            train_type.cxx
+
+DISTFILES += \
+    doxygen/Doxyfile

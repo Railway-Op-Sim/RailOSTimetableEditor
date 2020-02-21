@@ -255,7 +255,6 @@ void ROSTTBAppWindow::_record_current_info()
     {
         _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, _start_speed, _max_speed, _mass, _max_brake, _max_power);
         _current_service_selection = _current_timetable->end();
-        _current_service_selection->setLabelledLocationStart(ui->checkBoxAtStation);
     }
 
     else
@@ -266,8 +265,13 @@ void ROSTTBAppWindow::_record_current_info()
         _current_service_selection->setMaxSpeed(_max_speed);
         _current_service_selection->setMaxBrake(_max_brake);
         _current_service_selection->setPower(_max_power);
-        _current_service_selection->setLabelledLocationStart(ui->checkBoxAtStation);
     }
+
+    const int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
+    _current_service_selection->setNRepeats(n_repeats);
+    _current_service_selection->setRepeatInterval(nmins_interval);
+    _current_service_selection->setIDIncrement(id_inc);
+    _current_service_selection->setLabelledLocationStart(ui->checkBoxAtStation->isChecked());
 
     if(ui->checkBoxManualTimeEdit->isChecked())
     {
@@ -307,10 +311,7 @@ void ROSTTBAppWindow::_record_current_info()
         _current_service_selection->setDaughter(_shuttle_partner);
         _current_service_selection->setType(ROSService::ServiceType::ShuttleFromStop);
         _current_service_selection->setEntryPoint(_start_ids);
-        int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
-        _current_service_selection->setNRepeats(n_repeats);
-        _current_service_selection->setRepeatInterval(nmins_interval);
-        _current_service_selection->setIDIncrement(id_inc);
+
     }
     else if(ui->radioButtonShuttleFeeder->isChecked())
     {
@@ -321,11 +322,6 @@ void ROSTTBAppWindow::_record_current_info()
         }
         _current_service_selection->setDaughter(_shuttle_partner);
         _current_service_selection->setType(ROSService::ServiceType::ShuttleFromFeeder);
-
-        int n_repeats = ui->spinBoxRepeats->value(), nmins_interval = ui->spinBoxRepeatInterval->value(), id_inc = ui->spinBoxRefIncrement->value();
-        _current_service_selection->setNRepeats(n_repeats);
-        _current_service_selection->setRepeatInterval(nmins_interval);
-        _current_service_selection->setIDIncrement(id_inc);
         _current_service_selection->setParent(ui->comboBoxFeeder->currentText());
     }
     else if(ui->radioButtonFromOther->isChecked())

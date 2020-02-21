@@ -536,6 +536,11 @@ public:
     */
     QString getID() const {return _service_id; }
 
+    /*! @brief Fetch if service starts from stop
+     @return True if service commences from a location
+    */
+    bool hasLocationStart() const {return _labelled_location_start;}
+
 private:
     ServiceType _service_type = ServiceType::Service;
     FinishState _finish_as = FinishState::FinishRemainHere;
