@@ -65,6 +65,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->tableWidgetService->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->radioButtonFromOther->setEnabled(false);
     ui->radioButtonShuttleFeeder->setEnabled(false);
+    ui->radioButtonShuttleFinish->setEnabled(false);
     ui->radioButtonFrh->setChecked(true);
     ui->comboBoxTrainSet->addItems(TrainSet::TrainSet.keys());
     ui->servicerefEdit->setMaxLength(4);
@@ -77,12 +78,20 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     font.setPixelSize(12);
     qApp->setFont(font);
 
-    QDir cache_dir("cache");
-    if(!cache_dir.exists()) cache_dir.mkpath(".");
-    QFile _cache_file(cache_dir.absolutePath()+"/"+"ros_location_cache.dat");
+    QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
+    QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
+
+    QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
+    if(!cache_dir.exists())
+    {
+        qDebug() << "Creating Cache Folder at: " << cache_dir.absolutePath();
+        cache_dir.mkpath(".");
+    }
+    QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat"));
 
     if(_cache_file.exists())
     {
+        qDebug() << "Reading ROS Location from cache";
         if(!_cache_file.open(QIODevice::ReadOnly)) {
             QMessageBox::information(0,QObject::tr("error"), _cache_file.errorString());
         }
@@ -445,6 +454,7 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
     {
         ui->radioButtonFromOther->setEnabled(true);
         ui->radioButtonShuttleFeeder->setEnabled(true);
+        ui->radioButtonShuttleFinish->setEnabled(true);
     }
     ui->tableWidgetService->clear();
     ui->tableWidgetTimetable->clear();
@@ -600,12 +610,24 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
     ui->ROSStatus->setText(_file_name);
     ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
     _set_initial_open_file();
-    QFile _cache_file("cache/ros_location_cache.dat");
+
+    QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
+    QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
+
+    QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
+
+    if(!cache_dir.exists())
+    {
+        qDebug() << "Creating Cache Folder at: " << cache_dir.absolutePath();
+        cache_dir.mkpath(".");
+    }
+    QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat"));
     if ( _cache_file.open(QIODevice::ReadWrite) )
     {
         QTextStream stream( &_cache_file );
         stream << _ros_timetables->absolutePath() << endl;
     }
+    _cache_file.close();
 }
 
 void ROSTTBAppWindow::_reset()
@@ -843,47 +865,6 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonFeeder_toggled(bool checked)
-{
-    _enable_integer_info(false);
-    if(checked)
-    {
-        ui->spinBoxMU->setEnabled(false);
-        ui->comboBoxTrainSet->setEnabled(false);
-        ui->servicerefEdit->setEnabled(true);
-        ui->starttimeEdit->setEnabled(true);
-        ui->checkBoxAtStation->setEnabled(false);
-        ui->textEditShuttlePart2->clear();
-        ui->textEditShuttlePart2->setEnabled(false);
-        ui->servicerefEdit->setEnabled(true);
-        ui->spinBoxMass->clear();
-        ui->spinBoxMass->setEnabled(false);
-        ui->spinBoxForce->clear();
-        ui->spinBoxForce->setEnabled(false);
-        ui->spinBoxPower->clear();
-        ui->spinBoxPower->setEnabled(false);
-        ui->spinBoxMaxSpeed->clear();
-        ui->spinBoxMaxSpeed->setEnabled(false);
-        ui->spinBoxStartSpeed->clear();
-        ui->spinBoxStartSpeed->setEnabled(false);
-
-        ui->spinBoxRefIncrement->setEnabled(false);
-        ui->spinBoxRefIncrement->clear();
-        ui->spinBoxRepeatInterval->setEnabled(false);
-        ui->spinBoxRepeats->clear();
-        ui->spinBoxRepeats->setEnabled(false);
-        ui->textEditEnterID1->clear();
-        ui->textEditEnterID1->setEnabled(false);
-        ui->textEditEnterID2->clear();
-        ui->textEditEnterID2->setEnabled(false);
-        ui->comboBoxFeeder->clear();
-        ui->comboBoxFeeder->setEnabled(false);
-        ui->comboBoxParent->clear();
-        ui->comboBoxParent->setEnabled(false);
-        ui->textEditParentShuttleRef->setEnabled(true);
-    }
-}
-
 void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
 {
     _enable_integer_info(false);
@@ -919,6 +900,44 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
         ui->comboBoxParent->setEnabled(true);
         ui->textEditParentShuttleRef->clear();
         ui->textEditParentShuttleRef->setEnabled(false);
+    }
+}
+
+void ROSTTBAppWindow::on_radioButtonShuttleFinish_toggled(bool checked)
+{
+    _enable_integer_info(false);
+    if(checked)
+    {
+        ui->spinBoxMU->setEnabled(false);
+        ui->comboBoxTrainSet->setEnabled(false);
+        ui->servicerefEdit->setEnabled(false);
+        ui->starttimeEdit->setEnabled(false);
+        ui->checkBoxAtStation->setEnabled(false);
+        ui->textEditShuttlePart2->clear();
+        ui->textEditShuttlePart2->setEnabled(false);
+        ui->servicerefEdit->setEnabled(true);
+        ui->spinBoxMass->clear();
+        ui->spinBoxMass->setEnabled(false);
+        ui->spinBoxForce->clear();
+        ui->spinBoxForce->setEnabled(false);
+        ui->spinBoxPower->clear();
+        ui->spinBoxPower->setEnabled(false);
+        ui->spinBoxMaxSpeed->clear();
+        ui->spinBoxMaxSpeed->setEnabled(false);
+        ui->spinBoxStartSpeed->clear();
+        ui->spinBoxStartSpeed->setEnabled(false);
+        ui->spinBoxRefIncrement->setEnabled(true);
+        ui->spinBoxRepeatInterval->setEnabled(true);
+        ui->spinBoxRepeats->setEnabled(true);
+        ui->textEditEnterID1->clear();
+        ui->textEditEnterID1->setEnabled(false);
+        ui->textEditEnterID2->clear();
+        ui->textEditEnterID2->setEnabled(false);
+        ui->comboBoxFeeder->clear();
+        ui->comboBoxFeeder->setEnabled(false);
+        ui->comboBoxParent->setEnabled(true);
+        ui->textEditParentShuttleRef->clear();
+        ui->textEditParentShuttleRef->setEnabled(true);
     }
 }
 

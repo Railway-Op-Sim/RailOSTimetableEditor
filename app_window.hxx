@@ -38,6 +38,7 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QHeaderView>
+#include <QtGlobal>
 
 #include "rosttbgen.hxx"
 #include "station_add.hxx"
@@ -50,9 +51,9 @@ QT_END_NAMESPACE
 
 /*! @brief      ROS Timetable Editor Main Application Window
     @details    Main window for viewing, creating and editting services within a ROS timetable
-    @version    0.1.4
+    @version    0.1.5
     @author     Kristian Zarebski
-    @date 	    last modified 2020-02-16
+    @date 	    last modified 2020-02-24
     @copyright  GNU Public License v3
 */
 class ROSTTBAppWindow : public QMainWindow
@@ -130,11 +131,11 @@ private slots:
     //! Toggle Service Type Shuttle From Stop Action
     void on_radioButtonShuttleStop_toggled(bool checked);
 
-    //! Toggle Service Type Feeder Action
-    void on_radioButtonFeeder_toggled(bool checked);
-
     //! Toggle Service Type Service from Other Action
     void on_radioButtonFromOther_toggled(bool checked);
+
+    //! Toggle Shuttle Finish Service Action
+    void on_radioButtonShuttleFinish_toggled(bool checked);
 
     //! Toggle Cell Clicked in Service List Action
     void on_tableWidgetTimetable_cellClicked(int row, int column);
