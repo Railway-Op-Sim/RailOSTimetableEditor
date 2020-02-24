@@ -1,4 +1,4 @@
-//-------------------------------------------------------------------------//
+    //-------------------------------------------------------------------------//
 //              ROS Timetable Editor Main Application Window               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
@@ -49,6 +49,10 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->pushButtonTTBTime->setVisible(false);
     ui->pushButtonTTBTimeEdit->setVisible(true);
     ui->timeEditTTBStart->setVisible(false);
+    ui->lineEditTemplateName->setVisible(false);
+    ui->pushButtonTemplateSave->setVisible(false);
+    ui->pushButtonTemplateCancel->setVisible(false);
+    ui->labelTemplateName->setVisible(false);
     ui->labelStartTime->setText(_current_timetable->getStartTime().toString("HH:mm"));
     for(int i{0}; i < TTB_COL_COUNT; ++i) ui->tableWidgetTimetable->setColumnWidth(i, _ttb_column_widths[i]);
     for(int i{0}; i < SERV_COL_COUNT; ++i) ui->tableWidgetService->setColumnWidth(i, _srv_column_widths[i]);
@@ -67,7 +71,8 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->radioButtonShuttleFeeder->setEnabled(false);
     ui->radioButtonShuttleFinish->setEnabled(false);
     ui->radioButtonFrh->setChecked(true);
-    ui->comboBoxTrainSet->addItems(TrainSet::TrainSet.keys());
+    _read_in_custom_templates();
+    ui->comboBoxTrainSet->setCurrentIndex(0);
     ui->servicerefEdit->setMaxLength(4);
     ui->serviceFinishServiceEdit->setMaxLength(4);
     ui->textEditShuttlePart2->setMaxLength(4);
@@ -759,6 +764,7 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     }
     _station_add->setCurrentService(_current_service_selection);
     _station_add->setStations(_parser->getStations());
+    _station_add->clearForm();
     _station_add->show();
     _station_add->fwdPreviousEventTime((_current_service_selection->getTimes().size() > 0) ? _current_service_selection->getTimes()[_current_service_selection->getTimes().size()-1][1] : _current_service_selection->getStartTime());
 
@@ -1265,20 +1271,222 @@ void ROSTTBAppWindow::on_checkBoxManualTimeEdit_toggled(bool checked)
 
 void ROSTTBAppWindow::on_comboBoxTrainSet_currentTextChanged(const QString &arg1)
 {
-    if(arg1 == "") return;
+    if(arg1 == "Custom" || arg1 == "") return;
     const int factor = ui->spinBoxMU->value();
-    const int _max_speed = TrainSet::TrainSet[arg1]->getMaxSpeed();
-    const int _max_power = TrainSet::TrainSet[arg1]->getMaxPower();
-    const int _max_brake = TrainSet::TrainSet[arg1]->getMaxBrake()*factor;
-    const int _mass = TrainSet::TrainSet[arg1]->getMass()*factor;
+    if(TrainSet::TrainSet.keys().contains(arg1))
+    {
+        const int _max_speed = TrainSet::TrainSet[arg1]->getMaxSpeed();
+        const int _max_power = TrainSet::TrainSet[arg1]->getMaxPower();
+        const int _max_brake = TrainSet::TrainSet[arg1]->getMaxBrake()*factor;
+        const int _mass = TrainSet::TrainSet[arg1]->getMass()*factor;
 
-    ui->spinBoxMass->setValue(_mass);
-    ui->spinBoxForce->setValue(_max_brake);
-    ui->spinBoxPower->setValue(_max_power);
-    ui->spinBoxMaxSpeed->setValue(_max_speed);
+        _is_template_change = true;
+        ui->spinBoxMass->setValue(_mass);
+        _is_template_change = true;
+        ui->spinBoxForce->setValue(_max_brake);
+        _is_template_change = true;
+        ui->spinBoxPower->setValue(_max_power);
+        _is_template_change = true;
+        ui->spinBoxMaxSpeed->setValue(_max_speed);
+    }
+
+    else
+    {
+        const int _max_speed = _custom_types[arg1]->getMaxSpeed();
+        const int _max_power = _custom_types[arg1]->getMaxPower();
+        const int _max_brake = _custom_types[arg1]->getMaxBrake()*factor;
+        const int _mass = _custom_types[arg1]->getMass()*factor;
+
+        _is_template_change = true;
+        ui->spinBoxMass->setValue(_mass);
+        _is_template_change = true;
+        ui->spinBoxForce->setValue(_max_brake);
+        _is_template_change = true;
+        ui->spinBoxPower->setValue(_max_power);
+        _is_template_change = true;
+        ui->spinBoxMaxSpeed->setValue(_max_speed);
+    }
+
 }
 
 void ROSTTBAppWindow::on_spinBoxMU_valueChanged(int arg1)
 {
     on_comboBoxTrainSet_currentTextChanged(ui->comboBoxTrainSet->currentText());
+}
+
+void ROSTTBAppWindow::on_spinBoxMaxSpeed_valueChanged(int arg1)
+{
+    if(!_is_template_change) ui->comboBoxTrainSet->setCurrentIndex(0);
+    _is_template_change = false;
+}
+
+void ROSTTBAppWindow::on_spinBoxMass_valueChanged(int arg1)
+{
+    if(!_is_template_change) ui->comboBoxTrainSet->setCurrentIndex(0);
+    _is_template_change = false;
+}
+
+void ROSTTBAppWindow::on_spinBoxForce_valueChanged(int arg1)
+{
+    if(!_is_template_change) ui->comboBoxTrainSet->setCurrentIndex(0);
+    _is_template_change = false;
+}
+
+void ROSTTBAppWindow::on_spinBoxPower_valueChanged(int arg1)
+{
+    if(!_is_template_change) ui->comboBoxTrainSet->setCurrentIndex(0);
+    _is_template_change = false;
+}
+
+void ROSTTBAppWindow::_read_in_custom_templates()
+{
+    _custom_types = QMap<QString, TrainType*>();
+
+    QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
+    QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
+
+    QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
+    QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "trainset_templates_cache.dat"));
+
+    if(!_cache_file.open(QIODevice::ReadOnly)) {
+        QMessageBox::information(0,QObject::tr("error"), _cache_file.errorString());
+    }
+    QTextStream in(&_cache_file);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList _elements = line.split(";");
+
+        const QString _name = _elements[0].split(":")[1];
+        const int _max_speed = _elements[1].split(":")[1].toInt(),
+                  _mass      = _elements[2].split(":")[1].toInt(),
+                  _force     = _elements[3].split(":")[1].toInt(),
+                  _power     = _elements[4].split(":")[1].toInt();
+
+        _custom_types[_name] = new TrainType(_name, _mass, _power, _max_speed, _force);
+
+        break;
+    }
+
+    _cache_file.close();
+
+    ui->comboBoxTrainSet->clear();
+    QStringList _temp = TrainSet::TrainSet.keys()+_custom_types.keys();
+    QSet<QString> _temp_set(_temp.begin(), _temp.end());
+    _temp = QStringList(_temp_set.begin(), _temp_set.end());
+    std::sort(_temp.begin(), _temp.end());
+    ui->comboBoxTrainSet->addItem("Custom");
+    ui->comboBoxTrainSet->addItems(_temp);
+    ui->comboBoxTrainSet->setCurrentIndex(0);
+}
+
+QStringList ROSTTBAppWindow::_create_custom_template_strings()
+{
+    QStringList _temp = {};
+
+    for(auto templt : _custom_types)
+    {
+        QString _template = join(";", join(":","Name", templt->getClass()),
+                                 join(":", "MaxSpeed", QString::number(templt->getMaxSpeed())),
+                                 join(":", "Mass", QString::number(templt->getMass())),
+                                 join(":", "Brake Force", QString::number(templt->getMaxBrake())),
+                                 join(":", "Power", QString::number(templt->getMaxPower())));
+        _temp.append(_template);
+    }
+
+    return _temp;
+}
+
+void ROSTTBAppWindow::_save_template()
+{
+    QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
+    QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
+
+    QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
+    if(!cache_dir.exists())
+    {
+        qDebug() << "Creating Cache Folder at: " << cache_dir.absolutePath();
+        cache_dir.mkpath(".");
+    }
+    QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "trainset_templates_cache.dat"));
+
+    const int _max_speed = ui->spinBoxMaxSpeed->value(),
+              _mass      = ui->spinBoxMass->value(),
+              _power     = ui->spinBoxPower->value(),
+              _brake     = ui->spinBoxForce->value();
+
+    QStringList _current_templates = _create_custom_template_strings();
+
+    QString _template = join(";", join(":","Name", ui->lineEditTemplateName->text()),
+                             join(":", "MaxSpeed", QString::number(_max_speed)),
+                             join(":", "Mass", QString::number(_mass)),
+                             join(":", "Brake Force", QString::number(_brake)),
+                             join(":", "Power", QString::number(_power)));
+
+    _current_templates.append(_template);
+
+    if ( _cache_file.open(QIODevice::ReadWrite) )
+    {
+        QTextStream stream( &_cache_file );
+
+        for(auto temp : _current_templates) stream << temp << endl;
+    }
+
+    _cache_file.close();
+
+    _read_in_custom_templates();
+}
+
+void ROSTTBAppWindow::on_pushButtonTemplateSave_clicked()
+{
+    ui->labelDescription->setVisible(true);
+    ui->labelInMultiple->setVisible(true);
+    ui->labelServiceRef->setVisible(true);
+    ui->comboBoxTrainSet->setVisible(true);
+    ui->spinBoxMU->setVisible(true);
+    ui->servicerefEdit->setVisible(true);
+    ui->pushButtonTemplateSave->setVisible(false);
+    ui->pushButtonTemplateCancel->setVisible(false);
+    ui->lineEditTemplateName->setVisible(false);
+    ui->descEdit->setVisible(true);
+    ui->labelFromTrainTemplate->setVisible(true);
+    ui->pushButtonCreateTemplate->setVisible(true);
+    ui->labelTemplateName->setVisible(false);
+
+    _save_template();
+}
+
+void ROSTTBAppWindow::on_pushButtonTemplateCancel_clicked()
+{
+    ui->labelDescription->setVisible(true);
+    ui->labelInMultiple->setVisible(true);
+    ui->labelServiceRef->setVisible(true);
+    ui->comboBoxTrainSet->setVisible(true);
+    ui->spinBoxMU->setVisible(true);
+    ui->servicerefEdit->setVisible(true);
+    ui->pushButtonTemplateSave->setVisible(false);
+    ui->pushButtonTemplateCancel->setVisible(false);
+    ui->lineEditTemplateName->setVisible(false);
+    ui->descEdit->setVisible(true);
+    ui->labelFromTrainTemplate->setVisible(true);
+    ui->pushButtonCreateTemplate->setVisible(true);
+    ui->labelTemplateName->setVisible(false);
+
+}
+
+void ROSTTBAppWindow::on_pushButtonCreateTemplate_clicked()
+{
+    ui->labelDescription->setVisible(false);
+    ui->labelInMultiple->setVisible(false);
+    ui->labelServiceRef->setVisible(false);
+    ui->comboBoxTrainSet->setVisible(false);
+    ui->spinBoxMU->setVisible(false);
+    ui->servicerefEdit->setVisible(false);
+    ui->pushButtonTemplateSave->setVisible(true);
+    ui->pushButtonTemplateCancel->setVisible(true);
+    ui->lineEditTemplateName->setVisible(true);
+    ui->descEdit->setVisible(false);
+    ui->labelFromTrainTemplate->setVisible(false);
+    ui->pushButtonCreateTemplate->setVisible(false);
+    ui->labelTemplateName->setVisible(true);
+
 }

@@ -64,11 +64,11 @@
       <string>Start Time</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="labelServiceRef">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>200</y>
+       <y>210</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -262,11 +262,11 @@
       <string>Max Power (kW)</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_9">
+    <widget class="QLabel" name="labelDescription">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>245</y>
+       <y>255</y>
        <width>81</width>
        <height>16</height>
       </rect>
@@ -647,7 +647,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>220</y>
+       <y>230</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -662,7 +662,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>265</y>
+       <y>275</y>
        <width>241</width>
        <height>21</height>
       </rect>
@@ -860,7 +860,7 @@
      <property name="geometry">
       <rect>
        <x>5</x>
-       <y>305</y>
+       <y>315</y>
        <width>191</width>
        <height>32</height>
       </rect>
@@ -871,11 +871,11 @@
       </font>
      </property>
     </widget>
-    <widget class="QLabel" name="label_21">
+    <widget class="QLabel" name="labelFromTrainTemplate">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>290</y>
+       <y>300</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -893,7 +893,7 @@
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>310</y>
+       <y>320</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -910,11 +910,11 @@
       <number>5</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_22">
+    <widget class="QLabel" name="labelInMultiple">
      <property name="geometry">
       <rect>
        <x>200</x>
-       <y>290</y>
+       <y>300</y>
        <width>71</width>
        <height>16</height>
       </rect>
@@ -1186,6 +1186,68 @@
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonCreateTemplate">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>190</y>
+       <width>113</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save Template</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditTemplateName">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>230</y>
+       <width>161</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonTemplateSave">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>260</y>
+       <width>113</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonTemplateCancel">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>260</y>
+       <width>110</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelTemplateName">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Template Name</string>
      </property>
     </widget>
    </widget>

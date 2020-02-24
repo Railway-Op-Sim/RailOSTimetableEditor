@@ -43,6 +43,7 @@
 #include "rosttbgen.hxx"
 #include "station_add.hxx"
 #include "clone_dialog.hxx"
+#include "train_type.hxx"
 #include "TrainListing.hxx"
 
 QT_BEGIN_NAMESPACE
@@ -51,7 +52,7 @@ QT_END_NAMESPACE
 
 /*! @brief      ROS Timetable Editor Main Application Window
     @details    Main window for viewing, creating and editting services within a ROS timetable
-    @version    0.1.5
+    @version    0.1.6
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-24
     @copyright  GNU Public License v3
@@ -188,7 +189,27 @@ private slots:
     //! Toggle # Units Change Spin Box Action
     void on_spinBoxMU_valueChanged(int arg1);
 
+    void on_spinBoxMaxSpeed_valueChanged(int arg1);
+
+    void on_spinBoxMass_valueChanged(int arg1);
+
+    void on_spinBoxForce_valueChanged(int arg1);
+
+    void on_spinBoxPower_valueChanged(int arg1);
+
+    void on_pushButtonTemplateSave_clicked();
+
+    void on_pushButtonTemplateCancel_clicked();
+
+    void on_pushButtonCreateTemplate_clicked();
+
 private:
+    //! Sets whether current train property change is induced by template selection
+    bool _is_template_change = false;
+
+    //! Stores custom templates defined by the user
+    QMap<QString, TrainType*> _custom_types;
+
     //! Station Add Dialogue Class member instance
     Station_add* _station_add = new Station_add(nullptr, this);
 
@@ -282,6 +303,21 @@ private:
     @return void
     */
     void _clone_current();
+
+    /*! @brief Save the train template
+    @return void
+    */
+    void _save_template();
+
+    /*! @brief Retrieve custom train templates
+     @return void
+    */
+    void _read_in_custom_templates();
+
+    /*! @brief Creates string version of templates
+    @return A string list of templates
+    */
+    QStringList _create_custom_template_strings();
 
 };
 #endif // ROSTTBAPPWINDOW_HXX

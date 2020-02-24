@@ -42,11 +42,17 @@ Station_add::Station_add(ROSService* service, QWidget *parent) :
 
 }
 
+void Station_add::clearForm()
+{
+    ui->comboBoxStations->setCurrentIndex(0);
+}
+
 void Station_add::setStations(QSet<QString> stations)
 {
     _station_list = QList<QString>(stations.begin(), stations.end());
     std::sort(_station_list.begin(), _station_list.end());
     ui->comboBoxStations->clear();
+    ui->comboBoxStations->addItem("");
     ui->comboBoxStations->addItems(_station_list);
     ui->timeEditArrival->setTime(_times[0]);
     ui->timeEditDeparture->setTime(_times[0]);
@@ -61,6 +67,11 @@ Station_add::~Station_add()
 
 bool Station_add::setInfo()
 {
+    if(ui->comboBoxStations->currentText() == "")
+    {
+        ui->errorLabel->setText(QObject::tr("Please select a location"));
+        return false;
+    }
     if(_srv_start.msecsTo(ui->timeEditArrival->time()) < 0)
     {
         ui->errorLabel->setText(QObject::tr("Arrival time cannot be before service start"));
@@ -124,6 +135,7 @@ void Station_add::on_buttonBoxAddStation_accepted()
         if(_current_srv->getStations().contains(ui->comboBoxStations->currentText()) || (_current_srv->getStations().size() > 0 && _times == _current_srv->getTimes()[_current_srv->getStations().indexOf(_current_station)]))
         {
             QString _new_station = ui->comboBoxStations->currentText();
+            if(_current_station == "") throw std::runtime_error("OOPS");
             _current_srv->updateStation(_current_station, _times, ui->checkBoxCDT->isChecked(), ui->checkBoxPASS->isChecked(), _cdt_time, _new_station);
             _current_station = _new_station;
 

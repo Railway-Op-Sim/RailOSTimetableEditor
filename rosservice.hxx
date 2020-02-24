@@ -48,7 +48,7 @@ extern QString join(QChar::SpecialCharacter join_symbol, QStringList list);
 
 /*! @brief      ROS Timetable Editor Service Class
     @details    A class to handle all properties of an ROS service
-    @version    0.1.5
+    @version    0.1.6
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-16
     @copyright  GNU Public License v3
