@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ROS Timetable Editor
-   &#160;<span id="projectnumber">0.1.3</span>
+   &#160;<span id="projectnumber">0.1.5</span>
    </div>
   </td>
  </tr>
@@ -282,6 +282,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6b4ff5b764ac6c7357c6dad60912f457"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_service.html#a6b4ff5b764ac6c7357c6dad60912f457">getID</a> () const</td></tr>
 <tr class="memdesc:a6b4ff5b764ac6c7357c6dad60912f457"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fetch service ID.  <a href="class_r_o_s_service.html#a6b4ff5b764ac6c7357c6dad60912f457">More...</a><br /></td></tr>
 <tr class="separator:a6b4ff5b764ac6c7357c6dad60912f457"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87bed5f2538d7b6b61e170dee0400ac9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_service.html#a87bed5f2538d7b6b61e170dee0400ac9">hasLocationStart</a> () const</td></tr>
+<tr class="memdesc:a87bed5f2538d7b6b61e170dee0400ac9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fetch if service starts from stop.  <a href="class_r_o_s_service.html#a87bed5f2538d7b6b61e170dee0400ac9">More...</a><br /></td></tr>
+<tr class="separator:a87bed5f2538d7b6b61e170dee0400ac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a124da7764ba520e5e0d5aa5c747ce5ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_r_o_s_service.html#afdfb9ca8dea3086a992d5977b34f86af">ROSService::ServiceType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_service.html#a124da7764ba520e5e0d5aa5c747ce5ab">getType</a> () const</td></tr>
 <tr class="memdesc:a124da7764ba520e5e0d5aa5c747ce5ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fetch the initialisation type.  <a href="class_r_o_s_service.html#a124da7764ba520e5e0d5aa5c747ce5ab">More...</a><br /></td></tr>
 <tr class="separator:a124da7764ba520e5e0d5aa5c747ce5ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -418,7 +421,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>ROS Timetable Editor Service Class. </p>
-<p>A class to handle all properties of an ROS service </p><dl class="section version"><dt>Version</dt><dd>0.1.3 </dd></dl>
+<p>A class to handle all properties of an ROS service </p><dl class="section version"><dt>Version</dt><dd>0.1.5 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Kristian Zarebski </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>last modified 2020-02-16 </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>GNU Public License v3 </dd></dl>
@@ -1086,7 +1089,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Fetch termination type. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="class_r_o_s_service.html" title="ROS Timetable Editor Service Class.">ROSService</a>:FinishState describing the service state at termination </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00552">552</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00557">557</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>
@@ -1656,7 +1659,37 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Fetch the initialisation type. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="class_r_o_s_service.html#afdfb9ca8dea3086a992d5977b34f86af" title="Service initialisation type.">ROSService::ServiceType</a> which describes the type of service </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00547">547</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00552">552</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+
+</div>
+</div>
+<a id="a87bed5f2538d7b6b61e170dee0400ac9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87bed5f2538d7b6b61e170dee0400ac9">&#9670;&nbsp;</a></span>hasLocationStart()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool ROSService::hasLocationStart </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fetch if service starts from stop. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if service commences from a location </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00542">542</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['update_5foutput_585',['update_output',['../class_r_o_s_t_t_b_app_window.html#a3537ed9054311a1165ad95af17f8e93a',1,'ROSTTBAppWindow']]],
-  ['updatestation_586',['updateStation',['../class_r_o_s_service.html#ab17f5ef5da37190f5561e50f07058005',1,'ROSService']]]
+  ['traintype_586',['TrainType',['../class_train_type.html#a5c7b1b7e5f771836628934b6a020f50c',1,'TrainType::TrainType()'],['../class_train_type.html#a079c686b769d06d4e8d8327c30450598',1,'TrainType::TrainType(const QString &amp;train_class, const int &amp;mass, const int &amp;power, const int &amp;max_speed, const int &amp;max_brake)']]]
 ];

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['ui_389',['ui',['../class_r_o_s_t_t_b_app_window.html#a13cfddb872c9183d10cf58e0c8f5c068',1,'ROSTTBAppWindow::ui()'],['../class_clone_dialog.html#a8a8c5f6b645a515b36bd328cafa0cbf4',1,'CloneDialog::ui()'],['../class_station__add.html#a4d508835d0a6b87cc6f3f114af268925',1,'Station_add::ui()']]],
-  ['update_5foutput_390',['update_output',['../class_r_o_s_t_t_b_app_window.html#a3537ed9054311a1165ad95af17f8e93a',1,'ROSTTBAppWindow']]],
-  ['updatestation_391',['updateStation',['../class_r_o_s_service.html#ab17f5ef5da37190f5561e50f07058005',1,'ROSService']]]
+  ['trainset_388',['TrainSet',['../namespace_train_set.html',1,'']]],
+  ['traintype_389',['TrainType',['../class_train_type.html',1,'TrainType'],['../class_train_type.html#a5c7b1b7e5f771836628934b6a020f50c',1,'TrainType::TrainType()'],['../class_train_type.html#a079c686b769d06d4e8d8327c30450598',1,'TrainType::TrainType(const QString &amp;train_class, const int &amp;mass, const int &amp;power, const int &amp;max_speed, const int &amp;max_brake)']]]
 ];

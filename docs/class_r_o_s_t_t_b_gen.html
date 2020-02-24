@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ROS Timetable Editor
-   &#160;<span id="projectnumber">0.1.3</span>
+   &#160;<span id="projectnumber">0.1.5</span>
    </div>
   </td>
  </tr>
@@ -103,6 +103,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a021e537ee58839cd2c5a6efcc5258e7b"><td class="memItemLeft" align="right" valign="top">QStringList&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_t_t_b_gen.html#a021e537ee58839cd2c5a6efcc5258e7b">createTimetableStrings</a> (<a class="el" href="class_r_o_s_timetable.html">ROSTimetable</a> *timetable)</td></tr>
 <tr class="memdesc:a021e537ee58839cd2c5a6efcc5258e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct string representation.  <a href="class_r_o_s_t_t_b_gen.html#a021e537ee58839cd2c5a6efcc5258e7b">More...</a><br /></td></tr>
 <tr class="separator:a021e537ee58839cd2c5a6efcc5258e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0365b4c2a7cbd7bdb29562217fe37de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_t_t_b_gen.html#ae0365b4c2a7cbd7bdb29562217fe37de">setStations</a> (QSet&lt; QString &gt; stations)</td></tr>
+<tr class="memdesc:ae0365b4c2a7cbd7bdb29562217fe37de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Station List (used to maintain station listing when parser is reset/remade.  <a href="class_r_o_s_t_t_b_gen.html#ae0365b4c2a7cbd7bdb29562217fe37de">More...</a><br /></td></tr>
+<tr class="separator:ae0365b4c2a7cbd7bdb29562217fe37de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -217,7 +220,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>ROS Timetable Editor Parse Class. </p>
-<p>A class to parse existing timetables and generate new ones using current data </p><dl class="section version"><dt>Version</dt><dd>0.1.3 </dd></dl>
+<p>A class to parse existing timetables and generate new ones using current data </p><dl class="section version"><dt>Version</dt><dd>0.1.5 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Kristian Zarebski </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>last modified 2020-02-16 </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>GNU Public License v3 </dd></dl>
@@ -1241,6 +1244,37 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00094">94</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+
+</div>
+</div>
+<a id="ae0365b4c2a7cbd7bdb29562217fe37de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0365b4c2a7cbd7bdb29562217fe37de">&#9670;&nbsp;</a></span>setStations()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ROSTTBGen::setStations </td>
+          <td>(</td>
+          <td class="paramtype">QSet&lt; QString &gt;&#160;</td>
+          <td class="paramname"><em>stations</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the Station List (used to maintain station listing when parser is reset/remade. </p>
+<dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00260">260</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>

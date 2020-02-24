@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ROS Timetable Editor
-   &#160;<span id="projectnumber">0.1.3</span>
+   &#160;<span id="projectnumber">0.1.5</span>
    </div>
   </td>
  </tr>
@@ -130,7 +130,7 @@ $(function() {
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;{</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="class_station__add.html#a38154100e4b7654671de4246d9d6661a">_srv_start</a>.msecsTo(<a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;timeEditArrival-&gt;time()) &lt; 0)</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(<span class="stringliteral">&quot;Arrival time cannot be before service start&quot;</span>);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(QObject::tr(<span class="stringliteral">&quot;Arrival time cannot be before service start&quot;</span>));</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    }</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_station__add.html#a4f1b1228de02d2ef7e84cee0065b432b">_edit_mode</a> &amp;&amp; <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;comboBoxStations-&gt;currentText() != <a class="code" href="class_station__add.html#ad10d851c3db69ecf0d8d26cb29858192">_current_station</a>)</div>
@@ -139,14 +139,14 @@ $(function() {
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        {</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <span class="keywordflow">if</span>((<a class="code" href="class_station__add.html#a6cf7e066d95332770017f3642d3d9a77">_times</a>[0] &gt;= time_pair[0] &amp;&amp; <a class="code" href="class_station__add.html#a6cf7e066d95332770017f3642d3d9a77">_times</a>[0] &lt;= time_pair[1]) || (<a class="code" href="class_station__add.html#a6cf7e066d95332770017f3642d3d9a77">_times</a>[1] &gt;= time_pair[0] &amp;&amp; <a class="code" href="class_station__add.html#a6cf7e066d95332770017f3642d3d9a77">_times</a>[1] &lt;= time_pair[1]))</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(<span class="stringliteral">&quot;Times overlap with current timetable entries&quot;</span>);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(QObject::tr(<span class="stringliteral">&quot;Times overlap with current timetable entries&quot;</span>));</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            }</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        }</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    }</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordflow">if</span>(<a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;timeEditArrival-&gt;time().msecsTo(<a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;timeEditDeparture-&gt;time()) &lt; 0)</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(<span class="stringliteral">&quot;Departure time cannot be before arrival.&quot;</span>);</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(QObject::tr(<span class="stringliteral">&quot;Departure time cannot be before arrival.&quot;</span>));</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(<span class="stringliteral">&quot;&quot;</span>);</div>
@@ -158,7 +158,7 @@ $(function() {
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    {</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keywordflow">if</span>(<a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;timeEditCDT-&gt;time().msecsTo(<a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;timeEditArrival-&gt;time()) &gt; 0)</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        {</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(<span class="stringliteral">&quot;Direction Change Time cannot proceed arrival time&quot;</span>);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            <a class="code" href="class_station__add.html#a4d508835d0a6b87cc6f3f114af268925">ui</a>-&gt;errorLabel-&gt;setText(QObject::tr(<span class="stringliteral">&quot;Direction Change Time cannot proceed arrival time&quot;</span>));</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        }</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
