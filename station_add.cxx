@@ -46,6 +46,7 @@ void Station_add::setStations(QSet<QString> stations)
 {
     _station_list = QList<QString>(stations.begin(), stations.end());
     std::sort(_station_list.begin(), _station_list.end());
+    ui->comboBoxStations->clear();
     ui->comboBoxStations->addItems(_station_list);
     ui->timeEditArrival->setTime(_times[0]);
     ui->timeEditDeparture->setTime(_times[0]);
