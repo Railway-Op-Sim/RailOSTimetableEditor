@@ -189,18 +189,25 @@ private slots:
     //! Toggle # Units Change Spin Box Action
     void on_spinBoxMU_valueChanged(int arg1);
 
+    //! Toggle Max Speed SpinBox Changed Action
     void on_spinBoxMaxSpeed_valueChanged(int arg1);
 
+    //! Toggle Mass SpinBox Changed Action
     void on_spinBoxMass_valueChanged(int arg1);
 
+    //! Toggle Brake Force SpinBox Changed Action
     void on_spinBoxForce_valueChanged(int arg1);
 
+    //! Toggle Power SpinBox Changed Action
     void on_spinBoxPower_valueChanged(int arg1);
 
+    //! Toggle Push Button Save Template Action
     void on_pushButtonTemplateSave_clicked();
 
+    //! Toggle Push Button Cancel Template Action
     void on_pushButtonTemplateCancel_clicked();
 
+    //! Toggle Push Button Template Creator Action
     void on_pushButtonCreateTemplate_clicked();
 
 private:
