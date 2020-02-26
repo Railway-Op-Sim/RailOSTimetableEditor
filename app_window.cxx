@@ -1,4 +1,4 @@
-    //-------------------------------------------------------------------------//
+//-------------------------------------------------------------------------//
 //              ROS Timetable Editor Main Application Window               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
@@ -34,7 +34,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     : QMainWindow()
     , ui(new Ui::ROSTTBAppWindow)
 {
-    _about_window->setVersion("v0.1.8");
+    _about_window->setVersion("v0.1.9");
 
     const int SERV_COL_COUNT = 4, TTB_COL_COUNT = 3;
     ui->setupUi(this);
@@ -487,9 +487,11 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
     QStringList _current_element_stations = _current_service_selection->getStations();
     QList<QList<QTime>> _current_element_times = _current_service_selection->getTimes();
     QMap<QString, QStringList> _join_data = _current_service_selection->getJoinData();
+    QMap<QString, QStringList> _split_data = _current_service_selection->getSplitData();
     QString _join_service = (_join_data.keys().size() > 0) ? _join_data.keys()[0] : "";
+    QString _split_type = (_split_data.keys().size() > 0) ? _split_data.keys()[0] : "";
 
-    bool _join_shown = false;
+    bool _join_shown = false, _split_shown = false;
 
     for(int i{0}; i < _current_element_stations.size(); ++i)
     {
@@ -538,7 +540,7 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
         {
            QStringList _join_item =  QStringList({_join_data[_join_service][1],
                                                      "",
-                                                     "↳", _join_service});
+                                                     "⤹", _join_service});
            ui->tableWidgetService->insertRow(ui->tableWidgetService->rowCount());
            for(int j{0}; j < _join_item.size(); ++j)
            {
@@ -548,6 +550,23 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
            }
 
            _join_shown = true;
+        }
+
+        if(_split_type != "" && _split_data[_split_type][1] == _current_element_stations[i] && !_split_shown)
+        {
+            QStringList _split_item =  QStringList({_split_data[_split_type][2],
+                                                      "",
+                                                      "", (_split_type == "rsp") ? _split_data[_split_type][0]+"↤"+_current_service_selection->getID() :
+                                                            _current_service_selection->getID()+"↦"+_split_data[_split_type][0]});
+            ui->tableWidgetService->insertRow(ui->tableWidgetService->rowCount());
+            for(int j{0}; j < _split_item.size(); ++j)
+            {
+                QTableWidgetItem* _new_time_item = new QTableWidgetItem(_split_item[j], 0);
+                _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+                ui->tableWidgetService->setItem(ui->tableWidgetService->rowCount()-1, j, _new_time_item);
+            }
+
+            _split_shown = true;
         }
 
     }

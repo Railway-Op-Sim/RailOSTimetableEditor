@@ -48,7 +48,7 @@ extern QString join(QChar::SpecialCharacter join_symbol, QStringList list);
 
 /*! @brief      ROS Timetable Editor Service Class
     @details    A class to handle all properties of an ROS service
-    @version    0.1.8
+    @version    0.1.9
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-16
     @copyright  GNU Public License v3
@@ -78,7 +78,7 @@ private:
     QList<bool> _passing_sTrainSet = {};
     //! Array containing whether sTrainSet have direction changes
     QList<bool> _direction_changes = {};
-    //! Array containing a single element (where applicable): {rear/front split, {new service ID, time as string}}
+    //! Array containing a single element (where applicable): {rear/front split, {new service ID, location name, time as string}}
     QMap<QString, QStringList> _split_data = QMap<QString, QStringList>();
     //! Array containing a single element (where applicable): {join service ID, {location name, time}}
     QMap<QString, QStringList> _join_data = QMap<QString, QStringList>();
@@ -495,16 +495,6 @@ public:
     @return void
     */
     void setDirectionChangeAtStop(int index, bool state, QTime time=QTime()) {_direction_changes[index] = state; _cdt_times[index] = time;}
-
-    /*! @brief Change whether a service split occurs at a location
-    @param index Index of location in service
-    @param type Split type either "fsp" or "rsp" for front and rear split respectively
-    @param id Newly formed service ID
-    @param time QTime of when split occurs
-    @return void
-    */
-    void setSplitAtStop(int index, QString type, QString id, QTime time=QTime()) {_split_data = QMap<QString, QStringList>({{type, {id, _stations[index], time.toString("HH:mm")}}});}
-
     /*! @brief Full length summary of service
     @return String of service information
     */

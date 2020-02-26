@@ -402,9 +402,10 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             _service->setDirectionChangeAtStop(i-1, true, QTime::fromString(service[i].split(";")[0], "HH:mm"));
         }
 
-        else if(_service->getStations().size() > i-1 && _isSplit(service[i].split(";")))
+        else if(_isSplit(service[i].split(";")))
         {
-            _service->setSplitAtStop(i-1, service[i].split(";")[1], service[i].split(";")[2], QTime::fromString(service[i].split(";")[0], "HH:mm"));
+            QStringList _components = service[i].split(";");
+            _service->setSplitData(_components[1], _components[2], _service->getStations()[_service->getStations().size()-1], _components[0]);
         }
         else if(_isCallingPoint(service[i].split(";")))
         {

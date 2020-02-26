@@ -34,7 +34,7 @@
 
 /*! @brief      ROS Timetable Editor train Train Class
     @details    Template train definitions for train
-    @version    0.1.8
+    @version    0.1.9
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-18
     @copyright  GNU Public License v3
