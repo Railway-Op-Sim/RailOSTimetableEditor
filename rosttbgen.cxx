@@ -258,6 +258,11 @@ bool ROSTTBGen::_isSplit(QStringList str_list)
     return _isTime(str_list[0]) && (str_list[1] == "fsp" || str_list[1] == "rsp");
 }
 
+bool ROSTTBGen::_isJoin(QStringList str_list)
+{
+    return _isTime(str_list[0]) && str_list[1] == "jbo";
+}
+
 void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 {
     QString _id = "NULL", _description = "NULL";
@@ -385,6 +390,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         _service->setExitTime(_time);
     }
 
+    // Parse Locations
     for(int i{2}; i < service.size()-_final_index; ++i)
     {
         bool _pass_point = false;
@@ -403,15 +409,15 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         else if(_isCallingPoint(service[i].split(";")))
         {
             QStringList _components = service[i].split(";");
-            _service->addStation({QTime::fromString(_components[0], "HH:mm"),
-                                 QTime::fromString(_components[1], "HH:mm")},
-                                 _components[2]);
+            _service->addStation({QTime::fromString(_components[0].replace("W", ""), "HH:mm"),  // 'W' refers to legacy feature in older ROS
+                                 QTime::fromString(_components[0].replace("W", ""), "HH:mm")},  // and referred to warning events, this is now deprecated
+                                 _components[2]);                                               // with intro of action window. Added removal here for legacy timetable support.
         }
 
         else if(_isStartStopPoint(service[i].split(";")))
         {
             QStringList _components = service[i].split(";");
-            _service->addStation({QTime::fromString(_components[0], "HH:mm"),
+            _service->addStation({QTime::fromString(_components[0].replace("W", ""), "HH:mm"),
                                  QTime()},
                                  _components[1]);
         }
@@ -419,10 +425,17 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         else if(_isPass(service[i].split(";")))
         {
             QStringList _components = service[i].split(";");
-            _service->addStation({QTime::fromString(_components[0]), QTime()},
+            _service->addStation({QTime::fromString(_components[0].replace("W", ""), "HH:mm"), QTime()},
                                  _components[2]);
             _pass_point = true;
 
+        }
+
+        else if(_isJoin(service[i].split(";")))
+        {
+            QStringList _components = service[i].split(";");
+            if(_service->getStations().size() < 1) continue;
+            _service->setJoinData(_components[2], _service->getStations()[_service->getStations().size()-1], _components[0].replace("W", ""));
         }
 
         _service->setStopAsPassPoint(_service->getStations().size()-1, _pass_point);
@@ -473,7 +486,6 @@ void ROSTTBGen::_process_data()
     {
         if(_rcd_srv_ids.count(id) > 1)
         {
-            qDebug() << "BLAH";
             QStringList _srv_1 = _services[_rcd_srv_ids.indexOf(id)][0].split(";");
             QStringList _srv_2 = _services[_rcd_srv_ids.indexOf(id, _rcd_srv_ids.indexOf(id)+1)][0].split(";");
             if(_srv_1[0] == _srv_2[0] && _srv_1[1] == _srv_1[1]) // Check if both same definition and same start conditions

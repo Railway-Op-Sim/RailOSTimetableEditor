@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['clonedialog_408',['CloneDialog',['../class_clone_dialog.html',1,'']]]
+  ['about_412',['About',['../class_about.html',1,'']]]
 ];

@@ -34,7 +34,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     : QMainWindow()
     , ui(new Ui::ROSTTBAppWindow)
 {
-    _about_window->setVersion("v0.1.7");
+    _about_window->setVersion("v0.1.8");
 
     const int SERV_COL_COUNT = 4, TTB_COL_COUNT = 3;
     ui->setupUi(this);
@@ -486,6 +486,10 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
 
     QStringList _current_element_stations = _current_service_selection->getStations();
     QList<QList<QTime>> _current_element_times = _current_service_selection->getTimes();
+    QMap<QString, QStringList> _join_data = _current_service_selection->getJoinData();
+    QString _join_service = (_join_data.keys().size() > 0) ? _join_data.keys()[0] : "";
+
+    bool _join_shown = false;
 
     for(int i{0}; i < _current_element_stations.size(); ++i)
     {
@@ -520,7 +524,8 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
             _ns_string = "Pass";
         }
 
-        QStringList _station_item =  {_arrival_time.toString("HH:mm"), _depart_time.toString("HH:mm"), _current_element_stations[i], _ns_string};
+        QStringList _station_item = {_arrival_time.toString("HH:mm"), _depart_time.toString("HH:mm"), _current_element_stations[i], _ns_string};
+
         ui->tableWidgetService->insertRow(ui->tableWidgetService->rowCount());
         for(int j{0}; j < _station_item.size(); ++j)
         {
@@ -528,6 +533,23 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
             _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
             ui->tableWidgetService->setItem(ui->tableWidgetService->rowCount()-1, j, _new_time_item);
         }
+
+        if(_join_service != "" && _join_data[_join_service][0] == _current_element_stations[i] && !_join_shown)
+        {
+           QStringList _join_item =  QStringList({_join_data[_join_service][1],
+                                                     "",
+                                                     "↳", _join_service});
+           ui->tableWidgetService->insertRow(ui->tableWidgetService->rowCount());
+           for(int j{0}; j < _join_item.size(); ++j)
+           {
+               QTableWidgetItem* _new_time_item = new QTableWidgetItem(_join_item[j], 0);
+               _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+               ui->tableWidgetService->setItem(ui->tableWidgetService->rowCount()-1, j, _new_time_item);
+           }
+
+           _join_shown = true;
+        }
+
     }
 
     ui->tableWidgetService->sortItems(0);

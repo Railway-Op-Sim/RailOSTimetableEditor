@@ -268,7 +268,7 @@ public:
     /*! @brief Fetch the join data
     @return QMap<QString, QStringList> of the form {other service id, {station, time as string}}
     */
-    QMap<QString, QStringList> getJoinData() const {return _split_data;}
+    QMap<QString, QStringList> getJoinData() const {return _join_data;}
 
     /*! @brief Set the map ID for the exit location of ther service
     @param id ROS Map ID for exit location

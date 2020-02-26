@@ -148,9 +148,14 @@ class ROSTTBGen
         bool _isRepeat(QStringList str_list);
 
         /*! @brief Check string list is a split declaration
-        @return True if string list describes repetition
+        @return True if string list describes split
         */
         bool _isSplit(QStringList str_list);
+
+        /*! @brief Check string list is a join declaration
+        @return True if string list describes join
+        */
+        bool _isJoin(QStringList str_list);
 
         /*! @brief Process the information for the current service candidate
         @return void

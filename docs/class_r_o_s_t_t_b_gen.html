@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ROS Timetable Editor
-   &#160;<span id="projectnumber">0.1.6</span>
+   &#160;<span id="projectnumber">0.1.8</span>
    </div>
   </td>
  </tr>
@@ -157,6 +157,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:ab246aa85d0116c88b46d6d6b14090485"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_t_t_b_gen.html#ab246aa85d0116c88b46d6d6b14090485">_isSplit</a> (QStringList str_list)</td></tr>
 <tr class="memdesc:ab246aa85d0116c88b46d6d6b14090485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check string list is a split declaration.  <a href="class_r_o_s_t_t_b_gen.html#ab246aa85d0116c88b46d6d6b14090485">More...</a><br /></td></tr>
 <tr class="separator:ab246aa85d0116c88b46d6d6b14090485"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a971b86a7cdbb0efc72b4dfc90c4c6b0c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_t_t_b_gen.html#a971b86a7cdbb0efc72b4dfc90c4c6b0c">_isJoin</a> (QStringList str_list)</td></tr>
+<tr class="memdesc:a971b86a7cdbb0efc72b4dfc90c4c6b0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check string list is a join declaration.  <a href="class_r_o_s_t_t_b_gen.html#a971b86a7cdbb0efc72b4dfc90c4c6b0c">More...</a><br /></td></tr>
+<tr class="separator:a971b86a7cdbb0efc72b4dfc90c4c6b0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff20f0b960c27e1181303dd506880145"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_t_t_b_gen.html#aff20f0b960c27e1181303dd506880145">_process_service_candidate</a> (int int_id, QStringList service)</td></tr>
 <tr class="memdesc:aff20f0b960c27e1181303dd506880145"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the information for the current service candidate.  <a href="class_r_o_s_t_t_b_gen.html#aff20f0b960c27e1181303dd506880145">More...</a><br /></td></tr>
 <tr class="separator:aff20f0b960c27e1181303dd506880145"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,7 +223,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>ROS Timetable Editor Parse Class. </p>
-<p>A class to parse existing timetables and generate new ones using current data </p><dl class="section version"><dt>Version</dt><dd>0.1.6 </dd></dl>
+<p>A class to parse existing timetables and generate new ones using current data </p><dl class="section version"><dt>Version</dt><dd>0.1.7 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Kristian Zarebski </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>last modified 2020-02-16 </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>GNU Public License v3 </dd></dl>
@@ -259,7 +262,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00220">220</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00225">225</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>
@@ -291,7 +294,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Construct station list strings. </p>
 <dl class="section return"><dt>Returns</dt><dd>String list of all calling points </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00524">524</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00589">589</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -322,7 +325,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Fetch service join partner. </p>
 <dl class="section return"><dt>Returns</dt><dd>ROS service ID for partner service </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00588">588</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00653">653</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -543,6 +546,37 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 
 </div>
 </div>
+<a id="a971b86a7cdbb0efc72b4dfc90c4c6b0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a971b86a7cdbb0efc72b4dfc90c4c6b0c">&#9670;&nbsp;</a></span>_isJoin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool ROSTTBGen::_isJoin </td>
+          <td>(</td>
+          <td class="paramtype">QStringList&#160;</td>
+          <td class="paramname"><em>str_list</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check string list is a join declaration. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if string list describes join </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00261">261</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+
+</div>
+</div>
 <a id="a8213d826348b4a0f7da656a4451fc011"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8213d826348b4a0f7da656a4451fc011">&#9670;&nbsp;</a></span>_isPass()</h2>
 
@@ -661,7 +695,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </div><div class="memdoc">
 
 <p>Check string list is a split declaration. </p>
-<dl class="section return"><dt>Returns</dt><dd>True if string list describes repetition </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if string list describes split </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00256">256</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
@@ -816,7 +850,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Construct service repetition statement. </p>
 <dl class="section return"><dt>Returns</dt><dd>String for ROS describing repeat options </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00652">652</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00717">717</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -847,7 +881,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Construct the service definition string. </p>
 <dl class="section return"><dt>Returns</dt><dd>String for ROS to initialise service </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00476">476</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00541">541</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -878,7 +912,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Construct service termination statement. </p>
 <dl class="section return"><dt>Returns</dt><dd>String for ROS to set service termination </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00602">602</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00667">667</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -909,7 +943,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Construct service type statement. </p>
 <dl class="section return"><dt>Returns</dt><dd>String for ROS to set service type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00500">500</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00565">565</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -1001,7 +1035,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Process the current recorded data. </p>
 <dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00437">437</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00450">450</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -1042,7 +1076,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Process the information for the current service candidate. </p>
 <dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00261">261</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00266">266</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -1065,7 +1099,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Construct string representation. </p>
 <dl class="section return"><dt>Returns</dt><dd>List of strings representing lines for output .ttb file </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00657">657</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8cxx_source.html#l00722">722</a> of file <a class="el" href="rosttbgen_8cxx_source.html">rosttbgen.cxx</a>.</p>
 
 </div>
 </div>
@@ -1096,7 +1130,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Retrieve ROS syntax for given finish state. </p>
 <dl class="section return"><dt>Returns</dt><dd>String to represent the finish state </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00245">245</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00250">250</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>
@@ -1126,7 +1160,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Fetch the constructed timetable. </p>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to newly created timetable </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00240">240</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00245">245</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>
@@ -1157,7 +1191,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Retrieve ROS syntax for given service type. </p>
 <dl class="section return"><dt>Returns</dt><dd>String to represent the service type </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00250">250</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00255">255</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>
@@ -1187,7 +1221,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Get list of parsed stations. </p>
 <dl class="section return"><dt>Returns</dt><dd>A set of unique location labels </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00225">225</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00230">230</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>
@@ -1274,7 +1308,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <p>Set the Station List (used to maintain station listing when parser is reset/remade. </p>
 <dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00260">260</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00265">265</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>
@@ -1308,7 +1342,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </div><!-- fragment -->
 <p>Map object to map <a class="el" href="class_r_o_s_service.html#ab0f0f7e8e78fbf3e3190f20a0d90c5cc" title="Service termination type.">ROSService::FinishState</a> onto the ROS syntax. </p>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00201">201</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00206">206</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>
@@ -1340,7 +1374,7 @@ QWidget *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </div><!-- fragment -->
 <p>Map object to map <a class="el" href="class_r_o_s_service.html#afdfb9ca8dea3086a992d5977b34f86af" title="Service initialisation type.">ROSService::ServiceType</a> onto the ROS syntax. </p>
 
-<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00210">210</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosttbgen_8hxx_source.html#l00215">215</a> of file <a class="el" href="rosttbgen_8hxx_source.html">rosttbgen.hxx</a>.</p>
 
 </div>
 </div>
