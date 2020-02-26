@@ -626,6 +626,7 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
         qDebug() << "Creating Cache Folder at: " << cache_dir.absolutePath();
         cache_dir.mkpath(".");
     }
+
     QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat"));
     if ( _cache_file.open(QIODevice::ReadWrite) )
     {
@@ -1340,6 +1341,7 @@ void ROSTTBAppWindow::on_spinBoxPower_valueChanged(int arg1)
 
 void ROSTTBAppWindow::_read_in_custom_templates()
 {
+
     _custom_types = QMap<QString, TrainType*>();
 
     QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
@@ -1347,6 +1349,8 @@ void ROSTTBAppWindow::_read_in_custom_templates()
 
     QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
     QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "trainset_templates_cache.dat"));
+
+    if(!_cache_file.exists()) return;
 
     if(!_cache_file.open(QIODevice::ReadOnly)) {
         QMessageBox::information(0,QObject::tr("error"), _cache_file.errorString());
