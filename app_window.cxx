@@ -579,6 +579,7 @@ void ROSTTBAppWindow::open_file()
     }
     _current_service_selection = _current_timetable->end();
     update_output();
+    _set_form_info();
 }
 
 void ROSTTBAppWindow::_set_initial_open_file()
