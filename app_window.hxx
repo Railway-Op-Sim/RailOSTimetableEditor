@@ -53,7 +53,7 @@ QT_END_NAMESPACE
 
 /*! @brief      ROS Timetable Editor Main Application Window
     @details    Main window for viewing, creating and editting services within a ROS timetable
-    @version    0.1.7
+    @version    0.1.8
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-24
     @copyright  GNU Public License v3
