@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ROS Timetable Editor
-   &#160;<span id="projectnumber">0.1.8</span>
+   &#160;<span id="projectnumber">0.1.9</span>
    </div>
   </td>
  </tr>
@@ -264,9 +264,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a402f2a926635d1dc75c735f9712da4fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_service.html#a402f2a926635d1dc75c735f9712da4fb">setDirectionChangeAtStop</a> (int index, bool state, QTime time=QTime())</td></tr>
 <tr class="memdesc:a402f2a926635d1dc75c735f9712da4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change direction at a stop (by index)  <a href="class_r_o_s_service.html#a402f2a926635d1dc75c735f9712da4fb">More...</a><br /></td></tr>
 <tr class="separator:a402f2a926635d1dc75c735f9712da4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60a00bb6ad3925162363f9bbbf2ba31c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_service.html#a60a00bb6ad3925162363f9bbbf2ba31c">setSplitAtStop</a> (int index, QString type, QString id, QTime time=QTime())</td></tr>
-<tr class="memdesc:a60a00bb6ad3925162363f9bbbf2ba31c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change whether a service split occurs at a location.  <a href="class_r_o_s_service.html#a60a00bb6ad3925162363f9bbbf2ba31c">More...</a><br /></td></tr>
-<tr class="separator:a60a00bb6ad3925162363f9bbbf2ba31c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a899ca0b75101ac9161cfbeb0c7a71fee"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_service.html#a899ca0b75101ac9161cfbeb0c7a71fee">as_string</a> ()</td></tr>
 <tr class="memdesc:a899ca0b75101ac9161cfbeb0c7a71fee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Full length summary of service.  <a href="class_r_o_s_service.html#a899ca0b75101ac9161cfbeb0c7a71fee">More...</a><br /></td></tr>
 <tr class="separator:a899ca0b75101ac9161cfbeb0c7a71fee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -358,7 +355,7 @@ QList&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class=
 <tr class="separator:a43a1974d6f448742419d97300b0668ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ab5140eadb0d0a4122dd5f0b9a17783"><td class="memItemLeft" align="right" valign="top"><a id="a7ab5140eadb0d0a4122dd5f0b9a17783"></a>
 QMap&lt; QString, QStringList &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_service.html#a7ab5140eadb0d0a4122dd5f0b9a17783">_split_data</a> = QMap&lt;QString, QStringList&gt;()</td></tr>
-<tr class="memdesc:a7ab5140eadb0d0a4122dd5f0b9a17783"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array containing a single element (where applicable): {rear/front split, {new service ID, time as string}}. <br /></td></tr>
+<tr class="memdesc:a7ab5140eadb0d0a4122dd5f0b9a17783"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array containing a single element (where applicable): {rear/front split, {new service ID, location name, time as string}}. <br /></td></tr>
 <tr class="separator:a7ab5140eadb0d0a4122dd5f0b9a17783"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86997d60ddd534466b2c57297f55789b"><td class="memItemLeft" align="right" valign="top"><a id="a86997d60ddd534466b2c57297f55789b"></a>
 QMap&lt; QString, QStringList &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_o_s_service.html#a86997d60ddd534466b2c57297f55789b">_join_data</a> = QMap&lt;QString, QStringList&gt;()</td></tr>
@@ -421,7 +418,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>ROS Timetable Editor Service Class. </p>
-<p>A class to handle all properties of an ROS service </p><dl class="section version"><dt>Version</dt><dd>0.1.7 </dd></dl>
+<p>A class to handle all properties of an ROS service </p><dl class="section version"><dt>Version</dt><dd>0.1.9 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Kristian Zarebski </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>last modified 2020-02-16 </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>GNU Public License v3 </dd></dl>
@@ -1089,7 +1086,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Fetch termination type. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="class_r_o_s_service.html" title="ROS Timetable Editor Service Class.">ROSService</a>:FinishState describing the service state at termination </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00557">557</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00547">547</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>
@@ -1119,7 +1116,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Fetch service ID. </p>
 <dl class="section return"><dt>Returns</dt><dd>A string of the ROS service identifier </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00537">537</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00527">527</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>
@@ -1599,7 +1596,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get list of stations. </p>
 <dl class="section return"><dt>Returns</dt><dd>A QStringList of the calling/passing points in the service </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00521">521</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00511">511</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>
@@ -1629,7 +1626,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Returns the time array. </p>
 <dl class="section return"><dt>Returns</dt><dd>QList&lt;QList&lt;QTime&gt;&gt; an array of all the arrival and departure times for each location </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00529">529</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00519">519</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>
@@ -1659,7 +1656,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Fetch the initialisation type. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="class_r_o_s_service.html#afdfb9ca8dea3086a992d5977b34f86af" title="Service initialisation type.">ROSService::ServiceType</a> which describes the type of service </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00552">552</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00542">542</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>
@@ -1689,7 +1686,7 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Fetch if service starts from stop. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if service commences from a location </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00542">542</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
+<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00532">532</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>
@@ -2451,68 +2448,6 @@ QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00196">196</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
-
-</div>
-</div>
-<a id="a60a00bb6ad3925162363f9bbbf2ba31c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60a00bb6ad3925162363f9bbbf2ba31c">&#9670;&nbsp;</a></span>setSplitAtStop()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ROSService::setSplitAtStop </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">QTime&#160;</td>
-          <td class="paramname"><em>time</em> = <code>QTime()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Change whether a service split occurs at a location. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">index</td><td>Index of location in service </td></tr>
-    <tr><td class="paramname">type</td><td>Split type either "fsp" or "rsp" for front and rear split respectively </td></tr>
-    <tr><td class="paramname">id</td><td>Newly formed service ID </td></tr>
-    <tr><td class="paramname">time</td><td>QTime of when split occurs </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>void </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="rosservice_8hxx_source.html#l00506">506</a> of file <a class="el" href="rosservice_8hxx_source.html">rosservice.hxx</a>.</p>
 
 </div>
 </div>
