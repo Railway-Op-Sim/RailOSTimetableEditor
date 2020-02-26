@@ -46,7 +46,7 @@
 
 /*! @brief      ROS Timetable Editor Parse Class
     @details    A class to parse existing timetables and generate new ones using current data
-    @version    0.1.6
+    @version    0.1.7
     @author     Kristian Zarebski
     @date 	    last modified 2020-02-16
     @copyright  GNU Public License v3
