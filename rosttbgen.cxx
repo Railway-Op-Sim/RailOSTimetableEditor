@@ -461,14 +461,67 @@ void ROSTTBGen::_process_data()
 
     _services.push_back(_temp);
 
+    QStringList _rcd_srv_ids;
+    for(auto service : _services) _rcd_srv_ids.append(service[0].split(";")[0]);
+
+    // Handle the Case Where Service IDs contain Duplicates in Read-In File
+    // attempts to resolve this by changing the ID, else it ignores the duplicate
+
+    QList<int> _ignored_indexes; // Indexes of services to ignore (unhandled duplicates)
+
+    for(auto id : _rcd_srv_ids) // Only need to iterate through half the list for dupe check
+    {
+        if(_rcd_srv_ids.count(id) > 1)
+        {
+            qDebug() << "BLAH";
+            QStringList _srv_1 = _services[_rcd_srv_ids.indexOf(id)][0].split(";");
+            QStringList _srv_2 = _services[_rcd_srv_ids.indexOf(id, _rcd_srv_ids.indexOf(id)+1)][0].split(";");
+            if(_srv_1[0] == _srv_2[0] && _srv_1[1] == _srv_1[1]) // Check if both same definition and same start conditions
+            {
+                // Complete Duplicate so ignore
+                QMessageBox::critical(_parent, "Duplicate Service", "Service "+id+" is duplicated! Ignoring Duplicate");
+                // Fetch Second Instance
+                _ignored_indexes.append(_rcd_srv_ids.indexOf(id, _rcd_srv_ids.indexOf(id)+1));
+                _services[_rcd_srv_ids.indexOf(id)][0].replace(id, id.mid(0,2)+"XX"); // Have to rename it so it is not processed twice
+                break;
+            }
+
+            // Handle case of mistype (ID same but definition is different)
+            QMessageBox::critical(_parent, "Duplicate Service", "Service ID "+id+" is duplicated! Attempting ID change");
+            if(id[2].isNumber() && id[3].isNumber())
+            {
+                int _num = id.mid(2,3).toInt();
+                bool _new_id_found = false;
+                while(!_new_id_found)
+                {
+                    _num++;
+                    if(!_rcd_srv_ids.contains(id.mid(0,1)+QString::number(_num)))
+                    {
+                        QMessageBox::information(_parent, "Duplicate Service", "Service "+id+" now "+id.mid(0,2)+QString::number(_num));
+                        _services[_rcd_srv_ids.indexOf(id)][0].replace(id, id.mid(0,2)+QString::number(_num));
+                        _rcd_srv_ids[_rcd_srv_ids.indexOf(id)] = id.mid(0,2)+QString::number(_num);
+                        break;
+                    }
+                    else if (_num == 99)
+                    {
+                        QMessageBox::critical(_parent, "Failed ID Update", "ID Change Failed");
+                        _ignored_indexes.append(_rcd_srv_ids.indexOf(id));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     for(int i{0}; i < _services.size(); ++i)
     {
+        if(_ignored_indexes.contains(i)) continue;  // Ignore unprocessed Duplicates
         _process_service_candidate(i, _services[i]);
     }
 
-    if(_current_timetable->size() != _services.size())
+    if(_current_timetable->size() != _services.size()-_ignored_indexes.size())
     {
-        QMessageBox::critical(_parent, "Failed Service Importing", "Number of services created does not match number in input file");
+        QMessageBox::critical(_parent, "Failed Service Importing", "Number of services created ("+QString::number(_services.size())+") does not match number in input file ("+QString::number(_current_timetable->size())+")");
         return;
     }
 }

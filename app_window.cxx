@@ -1260,7 +1260,23 @@ void ROSTTBAppWindow::on_comboBoxParent_currentTextChanged(const QString &arg1)
 {
     if(_current_timetable->size() < 1 || !_current_timetable->getServices().contains(arg1) || _current_service_selection->getID() == arg1) return;
     const ROSService* _parent = _current_timetable->getServices()[arg1];
-    QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][0];
+    if(!_parent)
+    {
+        qDebug() << "Failed to Retrieve Parent from Services";
+    }
+
+    QTime _parent_last_time;
+
+    if(_parent->getExitTime() != QTime())
+    {
+        _parent_last_time = _parent->getExitTime();
+    }
+    else
+    {
+
+        _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][0];
+    }
+
     ui->starttimeEdit->setTime(_parent_last_time);
     ui->servicerefEdit->setText(_parent->getDaughter());
 }
