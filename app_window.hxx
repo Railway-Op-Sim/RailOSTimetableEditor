@@ -45,6 +45,7 @@
 #include "clone_dialog.hxx"
 #include "train_type.hxx"
 #include "TrainListing.hxx"
+#include "about.hxx"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ROSTTBAppWindow; }
@@ -210,6 +211,9 @@ private slots:
     //! Toggle Push Button Template Creator Action
     void on_pushButtonCreateTemplate_clicked();
 
+    //! Toggle About Menu Action
+    void on_actionAbout_ROSTTBGen_triggered();
+
 private:
     //! Sets whether current train property change is induced by template selection
     bool _is_template_change = false;
@@ -255,6 +259,9 @@ private:
 
     //! Current active service under modification
     ROSService* _current_service_selection = nullptr;
+
+    //! About Dialogue
+    About* _about_window = new About;
 
     /*! @brief Save the current timetable object to file
     @return void

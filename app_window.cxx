@@ -34,6 +34,8 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     : QMainWindow()
     , ui(new Ui::ROSTTBAppWindow)
 {
+    _about_window->setVersion("v0.1.7");
+
     const int SERV_COL_COUNT = 4, TTB_COL_COUNT = 3;
     ui->setupUi(this);
     _tt_model_select = new QItemSelectionModel(ui->tableWidgetTimetable->model());
@@ -1510,4 +1512,9 @@ void ROSTTBAppWindow::on_pushButtonCreateTemplate_clicked()
     ui->pushButtonCreateTemplate->setVisible(false);
     ui->labelTemplateName->setVisible(true);
 
+}
+
+void ROSTTBAppWindow::on_actionAbout_ROSTTBGen_triggered()
+{
+    _about_window->show();
 }

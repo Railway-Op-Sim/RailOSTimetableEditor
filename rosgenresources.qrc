@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>img/rosttbgen_icon.png</file>
+        <file>img/rosttbgen_abouticon.png</file>
+    </qresource>
+</RCC>

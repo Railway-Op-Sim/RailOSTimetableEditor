@@ -23,15 +23,18 @@ win32:RC_ICONS += img/rosttbgen_icon.ico
 
 HEADERS += app_window.hxx \
            TrainListing.hxx \
+           about.hxx \
            clone_dialog.hxx \
            rosservice.hxx \
            rostimetable.hxx \
            rosttbgen.hxx \
            station_add.hxx \
            train_type.hxx
-FORMS += clone_dialog.ui rosttbappwindow.ui station_add.ui
+FORMS += clone_dialog.ui rosttbappwindow.ui station_add.ui \
+    about.ui
 SOURCES += app_window.cxx \
            TrainListing.cxx \
+           about.cxx \
            clone_dialog.cxx \
            main.cxx \
            rosservice.cxx \
@@ -42,3 +45,6 @@ SOURCES += app_window.cxx \
 
 DISTFILES += \
     doxygen/Doxyfile
+
+RESOURCES += \
+    rosgenresources.qrc
