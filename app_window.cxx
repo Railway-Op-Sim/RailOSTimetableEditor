@@ -1369,29 +1369,30 @@ void ROSTTBAppWindow::_read_in_custom_templates()
     QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
     QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "trainset_templates_cache.dat"));
 
-    if(!_cache_file.exists()) return;
+    if(_cache_file.exists())
+    {
 
-    if(!_cache_file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0,QObject::tr("error"), _cache_file.errorString());
+        if(!_cache_file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(0,QObject::tr("error"), _cache_file.errorString());
+        }
+        QTextStream in(&_cache_file);
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            QStringList _elements = line.split(";");
+
+            const QString _name = _elements[0].split(":")[1];
+            const int _max_speed = _elements[1].split(":")[1].toInt(),
+                      _mass      = _elements[2].split(":")[1].toInt(),
+                      _force     = _elements[3].split(":")[1].toInt(),
+                      _power     = _elements[4].split(":")[1].toInt();
+
+            _custom_types[_name] = new TrainType(_name, _mass, _power, _max_speed, _force);
+
+            break;
+        }
+
+        _cache_file.close();
     }
-    QTextStream in(&_cache_file);
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QStringList _elements = line.split(";");
-
-        const QString _name = _elements[0].split(":")[1];
-        const int _max_speed = _elements[1].split(":")[1].toInt(),
-                  _mass      = _elements[2].split(":")[1].toInt(),
-                  _force     = _elements[3].split(":")[1].toInt(),
-                  _power     = _elements[4].split(":")[1].toInt();
-
-        _custom_types[_name] = new TrainType(_name, _mass, _power, _max_speed, _force);
-
-        break;
-    }
-
-    _cache_file.close();
-
     ui->comboBoxTrainSet->clear();
     QStringList _temp = TrainSet::TrainSet.keys()+_custom_types.keys();
     QSet<QString> _temp_set(_temp.begin(), _temp.end());
