@@ -224,6 +224,11 @@ class ROSTTBGen
         */
         ROSTTBGen(QWidget* parent) : _parent(parent) {}
 
+        /*! @brief Check string is a time (public)
+        @return True if string is a valid time
+        */
+        bool checkStringIsTime(QString string) {return _isTime(string);}
+
         /*! @brief Get list of parsed stations
         @return A set of unique location labels
         */

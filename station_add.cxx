@@ -115,16 +115,18 @@ void Station_add::setEditMode(bool on){ui->pushButtonDeleteEntry->setVisible(on)
 
 void Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>& times, const bool isCDT, const bool isPass)
 {
-    ui->checkBoxCDT->setEnabled(isCDT);
-    ui->checkBoxPASS->setEnabled(isPass);
+    ui->checkBoxCDT->setChecked(isCDT);
+    ui->checkBoxPASS->setChecked(isPass);
+    ui->timeEditCDT->setTime((times[2] == QTime()) ? times[1] : times[2]);
     ui->timeEditArrival->setTime(times[0]);
-    ui->timeEditDeparture->setTime(times[1]);
+    ui->timeEditDeparture->setTime((times[1] == QTime()) ? times[0] : times[1]);
     ui->comboBoxStations->setCurrentText(station);
 }
 
 void Station_add::on_buttonBoxAddStation_accepted()
 {
     _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time()};
+    _current_station = ui->comboBoxStations->currentText();
 
     if(setInfo())
     {
@@ -135,7 +137,10 @@ void Station_add::on_buttonBoxAddStation_accepted()
         if(_current_srv->getStations().contains(ui->comboBoxStations->currentText()) || (_current_srv->getStations().size() > 0 && _times == _current_srv->getTimes()[_current_srv->getStations().indexOf(_current_station)]))
         {
             QString _new_station = ui->comboBoxStations->currentText();
-            if(_current_station == "") throw std::runtime_error("OOPS");
+            if(_current_station == "")
+            {
+                qDebug() << "Failed to update entry for station, no station name found";
+            }
             _current_srv->updateStation(_current_station, _times, ui->checkBoxCDT->isChecked(), ui->checkBoxPASS->isChecked(), _cdt_time, _new_station);
             _current_station = _new_station;
 
@@ -147,7 +152,6 @@ void Station_add::on_buttonBoxAddStation_accepted()
 
         else
         {
-            _current_station = ui->comboBoxStations->currentText();
             _current_srv->addStation(_times, _current_station);
             _current_srv->setStopAsPassPoint(_current_srv->getStations().size()-1, ui->checkBoxPASS->isChecked());
             _current_srv->setDirectionChangeAtStop(_current_srv->getStations().size()-1, ui->checkBoxCDT->isChecked(), _cdt_time);
@@ -178,17 +182,60 @@ void Station_add::on_buttonBoxAddStation_accepted()
     {
         this->show();
     }
+
+    _redraw_table();
 }
 
 void Station_add::_redraw_table()
 {
+
     _service_table->setRowCount(0);
 
-    for(int i{0}; i < _current_srv->getStations().size(); ++i)
+    QStringList _current_element_stations = _current_srv->getStations();
+    QList<QList<QTime>> _current_element_times = _current_srv->getTimes();
+    QMap<QString, QStringList> _join_data = _current_srv->getJoinData();
+    QMap<QString, QStringList> _split_data = _current_srv->getSplitData();
+    QString _join_service = (_join_data.keys().size() > 0) ? _join_data.keys()[0] : "";
+    QString _split_type = (_split_data.keys().size() > 0) ? _split_data.keys()[0] : "";
+
+    bool _join_shown = false, _split_shown = false;
+
+    for(int i{0}; i < _current_element_stations.size(); ++i)
     {
-        QTime _arrival_time = _current_srv->getTimes()[i][0],
-              _depart_time  = _current_srv->getTimes()[i][1];
-        QStringList _station_item =  {_arrival_time.toString("HH:mm"), _depart_time.toString("HH:mm"), _current_srv->getStations()[i]};
+        QTime _arrival_time = _current_element_times[i][0],
+              _depart_time  = _current_element_times[i][1];
+        QString _ns_string = "";
+
+        if(_current_srv->getParent() != "" && i == 0)
+        {
+            if(_current_srv->getParent() == _current_srv->getDaughter())
+            {
+                _ns_string =  "←\t"+_current_srv->getParent() + " (Shuttle)";
+            }
+            else
+            {
+                _ns_string = "←\t"+_current_srv->getParent();
+            }
+        }
+
+        if(_current_srv->getCDTPass(_current_element_stations[i])[0])
+        {
+            _ns_string += " ⤸ "+_current_srv->getCDTTimes()[i].toString("HH:mm");
+        }
+
+        if(_current_srv->getDaughter() != "" && i == _current_element_stations.size()-1)
+        {
+            _ns_string += " → "+_current_srv->getDaughter();
+        }
+
+
+        else if(_current_srv->getCDTPass(_current_element_stations[i])[1])
+        {
+            _ns_string = "Pass";
+        }
+
+        QStringList _station_item = {_arrival_time.toString("HH:mm"), _depart_time.toString("HH:mm"), _current_element_stations[i], _ns_string};
+
         _service_table->insertRow(_service_table->rowCount());
         for(int j{0}; j < _station_item.size(); ++j)
         {
@@ -196,7 +243,43 @@ void Station_add::_redraw_table()
             _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
             _service_table->setItem(_service_table->rowCount()-1, j, _new_time_item);
         }
+
+        if(_join_service != "" && _join_data[_join_service][0] == _current_element_stations[i] && !_join_shown)
+        {
+           QStringList _join_item =  QStringList({_join_data[_join_service][1],
+                                                     "",
+                                                     "⤹", _join_service});
+           _service_table->insertRow(_service_table->rowCount());
+           for(int j{0}; j < _join_item.size(); ++j)
+           {
+               QTableWidgetItem* _new_time_item = new QTableWidgetItem(_join_item[j], 0);
+               _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+               _service_table->setItem(_service_table->rowCount()-1, j, _new_time_item);
+           }
+
+           _join_shown = true;
+        }
+
+        if(_split_type != "" && _split_data[_split_type][1] == _current_element_stations[i] && !_split_shown)
+        {
+            QStringList _split_item =  QStringList({_split_data[_split_type][2],
+                                                      "",
+                                                      "", (_split_type == "rsp") ? _split_data[_split_type][0]+"↤"+_current_srv->getID() :
+                                                            _current_srv->getID()+"↦"+_split_data[_split_type][0]});
+            _service_table->insertRow(_service_table->rowCount());
+            for(int j{0}; j < _split_item.size(); ++j)
+            {
+                QTableWidgetItem* _new_time_item = new QTableWidgetItem(_split_item[j], 0);
+                _new_time_item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+                _service_table->setItem(_service_table->rowCount()-1, j, _new_time_item);
+            }
+
+            _split_shown = true;
+        }
+
     }
+
+    _service_table->sortItems(0);
 }
 
 void Station_add::on_buttonBoxAddStation_rejected()

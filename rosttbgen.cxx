@@ -33,6 +33,7 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 {
     _cached_text = "";
     QString in_file = file->getOpenFileName(_parent, QObject::tr("Open Timetable"), directory->absolutePath(), QObject::tr("ROS Timetable Files (*.ttb)"));
+    if(in_file == QString()) return in_file; // In case user presses 'Cancel'
     QFile open_file(in_file);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
     {
@@ -428,7 +429,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             QStringList _components = service[i].split(";");
             _service->addStation({QTime::fromString(_components[0].replace("W", ""), "HH:mm"), QTime()},
                                  _components[2]);
-            _pass_point = true;
+            _service->setStopAsPassPoint(_service->getStations().size()-1, _pass_point);
 
         }
 
@@ -439,10 +440,15 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             _service->setJoinData(_components[2], _service->getStations()[_service->getStations().size()-1], _components[0].replace("W", ""));
         }
 
-        _service->setStopAsPassPoint(_service->getStations().size()-1, _pass_point);
-        bool _cdt = (i < service.size()-2 && _isDirChange(service[i+1].split(";")));
-        _service->setDirectionChangeAtStop(_service->getStations().size()-1, _cdt);
+        else if(_isDirChange(service[i].split(";")))
+        {
+            _service->setDirectionChangeAtStop(_service->getStations().size()-1, true, QTime::fromString(service[i].split(";")[0], "HH:mm"));
+        }
+    }
 
+    if(_isDirChange(service[service.size()-1].split(";")))
+    {
+        _service->setDirectionChangeAtStop(_service->getStations().size()-1, true, QTime::fromString(service[service.size()-1].split(";")[0], "HH:mm"));
     }
 
     _current_timetable->addService(_service);
@@ -613,7 +619,6 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
 
         const QMap<QString, QStringList> _split = service->getSplitData();
 
-
         if(_is_pas)
         {
             _temp.append(join(";", _arrive.toString("HH:mm"), "pas", _name));
@@ -637,7 +642,8 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
         }
         if(_is_cdt)
         {
-            _temp.append(join(";", (_depart != QTime()) ? _depart.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
+            const QTime _cdt_time = service->getCDTTimes()[i];
+            _temp.append(join(";", (_cdt_time != QTime()) ? _cdt_time.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
         }
 
     }
@@ -646,6 +652,18 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
     {
         const QTime _arrive = service->getTimes()[int_final][0];
         _temp.append(join(";", _arrive.toString("HH:mm"), service->getStations()[int_final]));
+    }
+
+    const bool _is_cdt = service->getDirectionChanges()[int_final];
+
+    if(int_final != service->getStations().size() && _is_cdt)
+    {
+        const QTime _arrive = service->getTimes()[int_final][0],
+                      _depart = service->getTimes()[int_final][1];
+        const QTime _cdt_time = service->getCDTTimes()[int_final];
+
+        _temp.append(join(";", (_depart != QTime()) ? _cdt_time.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
+        service->setExitTime(_cdt_time);
     }
 
     return _temp;
@@ -677,7 +695,7 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
     const QTime _exit_time = service->getExitTime();
 
     const QString _exit_type = _exit_types[service->getFinState()];
-    const QString _other = _get_partner(service->getID());
+    const QString _other = (service->getJoinData().keys().size() > 0) ? _get_partner(service->getID()) : "";
 
     QString _new_serv, _prev_serv, _exit_id;
 

@@ -472,6 +472,11 @@ public:
     */
     void updateStation(QString station, QList<QTime> time, bool CDT=false, bool Pass=false, QTime cdt_time=QTime(), QString new_station=QString())
     {
+        if(_stations.indexOf(station) < 0)
+        {
+            qDebug() << "Failed to Retrieve Index for Station '" << station << "'";
+            return;
+        }
         const int index = _stations.indexOf(station);
         _times[index] = time;
         _direction_changes[index] = CDT;

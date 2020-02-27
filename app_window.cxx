@@ -511,15 +511,16 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
             }
         }
 
-        if(_current_service_selection->getDaughter() != "" && i == _current_element_stations.size()-1)
-        {
-            _ns_string = "→\t"+_current_service_selection->getDaughter();
-        }
-
         if(_current_service_selection->getCDTPass(_current_element_stations[i])[0])
         {
-            _ns_string += "Change Direction "+_current_service_selection->getCDTTimes()[i].toString("HH:mm")+"\t";
+            _ns_string += " ⤸ "+_current_service_selection->getCDTTimes()[i].toString("HH:mm");
         }
+
+        if(_current_service_selection->getDaughter() != "" && i == _current_element_stations.size()-1)
+        {
+            _ns_string += " → "+_current_service_selection->getDaughter();
+        }
+
 
         else if(_current_service_selection->getCDTPass(_current_element_stations[i])[1])
         {
@@ -613,6 +614,7 @@ void ROSTTBAppWindow::open_file()
     }
     _reset();
     QString _parsed = _parser->parse_file(_current_file, _ros_timetables);
+    if(_parsed == QString()) return; // User pressed Cancel
     _open_file_str = (_parsed != "NULL")? _parsed : _open_file_str;
     _current_timetable = _parser->getParsedTimetable();
     if(_current_timetable->getServices().size() > 0)
@@ -1191,7 +1193,17 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     const QString _arrive = ui->tableWidgetService->takeItem(row, 0)->text(),
                 _depart = ui->tableWidgetService->takeItem(row, 1)->text();
 
-    _station_add->fwdCurrentSelection(_station_name, {QTime::fromString(_arrive, "HH:mm"), QTime::fromString(_depart, "HH:mm")}, _cdtPass[0], _cdtPass[1]);
+    QStringList _info = ui->tableWidgetService->takeItem(row, 3)->text().split(" ");
+    QTime _cdt_time;
+    for(int i{0}; i < _info.size(); ++i)
+    {
+        if(_info[i].contains("⤸"))
+        {
+            _cdt_time = (_parser->checkStringIsTime(_info[i+1])) ? QTime::fromString(_info[i+1], "HH:mm") : QTime();
+            break;
+        }
+    }
+    _station_add->fwdCurrentSelection(_station_name, {QTime::fromString(_arrive, "HH:mm"), QTime::fromString(_depart, "HH:mm"), _cdt_time}, _cdtPass[0], _cdtPass[1]);
 
     _station_add->show();
     update_output();
