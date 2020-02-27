@@ -674,7 +674,7 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
     }
 
     QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat"));
-    if ( _cache_file.open(QIODevice::ReadWrite) )
+    if ( _cache_file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
     {
         QTextStream stream( &_cache_file );
         stream << _ros_timetables->absolutePath() << endl;
@@ -751,7 +751,9 @@ void ROSTTBAppWindow::_delete_entries()
     }
 
     qDebug() << "Removing service '" << _current_service_selection->getID() << "' from timetable.";
+    const int _before = _current_timetable->size();
     _current_timetable->removeService(_current_service_selection->getID());
+    qDebug() << "Timetable Size Changed from " << _before << " to " << _current_timetable->size();
     _current_service_selection = (_current_timetable->size() == 0) ? nullptr : _current_timetable->end();
     update_output();
 }
@@ -925,12 +927,11 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
     {
         ui->spinBoxMU->setEnabled(false);
         ui->comboBoxTrainSet->setEnabled(false);
-        ui->servicerefEdit->setEnabled(false);
         ui->starttimeEdit->setEnabled(false);
         ui->checkBoxAtStation->setEnabled(false);
         ui->textEditShuttlePart2->clear();
         ui->textEditShuttlePart2->setEnabled(false);
-        ui->servicerefEdit->setEnabled(true);
+        ui->servicerefEdit->setEnabled(false);
         ui->spinBoxMass->clear();
         ui->spinBoxMass->setEnabled(false);
         ui->spinBoxForce->clear();
@@ -953,6 +954,9 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
         ui->comboBoxParent->setEnabled(true);
         ui->textEditParentShuttleRef->clear();
         ui->textEditParentShuttleRef->setEnabled(false);
+
+        QString _current_parent = ui->comboBoxParent->currentText();
+        ui->servicerefEdit->setText(_current_timetable->getServices()[_current_parent]->getDaughter());
     }
 }
 
@@ -1122,10 +1126,10 @@ void ROSTTBAppWindow::_save_file()
     QStringList _ttb = _parser->createTimetableStrings(_current_timetable);
     QString _output = join(QChar::Null, _ttb);
 
-    qDebug() << _open_file_str;
+    qDebug() << "WRITING TO: " <<  _open_file_str;
 
     QFile _file(_open_file_str);
-    if ( _file.open(QIODevice::ReadWrite) )
+    if ( _file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
     {
         QTextStream out(&_file);
         out << _output;
@@ -1501,7 +1505,7 @@ void ROSTTBAppWindow::_save_template()
 
     _current_templates.append(_template);
 
-    if ( _cache_file.open(QIODevice::ReadWrite) )
+    if ( _cache_file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
     {
         QTextStream stream( &_cache_file );
 

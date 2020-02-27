@@ -346,3 +346,11 @@ void Station_add::on_pushButtonDeleteEntry_clicked()
     _redraw_table();
     this->close();
 }
+
+void Station_add::on_checkBoxCDT_stateChanged(int arg1)
+{
+    if(arg1 == 1)
+    {
+        ui->timeEditCDT->setTime(ui->timeEditDeparture->time());
+    }
+}

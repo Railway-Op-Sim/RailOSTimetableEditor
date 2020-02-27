@@ -157,6 +157,7 @@ void CloneDialog::_create_clone()
     QString _srv_id = ui->textEditCloneRef->text();
     _cloned_srv->setID(_srv_id);
     if(_current_srv->getDaughter() != "") _cloned_srv->setDaughter(ui->textEditCloneDaughter->text());
+    if(_current_srv->getParent() != "") _cloned_srv->setParent(_create_new_id(_current_srv->getParent()));
     _current_ttb->addService(_cloned_srv);
     qDebug() << "Created Clone: " << _cloned_srv->summarise();
 }

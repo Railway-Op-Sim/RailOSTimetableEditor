@@ -152,6 +152,8 @@ private slots:
     //! Delete Current Location Button Press Action
     void on_pushButtonDeleteEntry_clicked();
 
+    void on_checkBoxCDT_stateChanged(int arg1);
+
 private:
     //! Current window user interface pointer
     Ui::Station_add *ui;
