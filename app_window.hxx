@@ -284,9 +284,9 @@ private:
     void _clear();
 
     /*! @brief Record the current service form values
-    @return void
+    @return True if input is valid
     */
-    void _record_current_info();
+    bool _record_current_info();
 
     /*! @brief Delete selected entries from the service list
     @return void

@@ -192,10 +192,10 @@ bool ROSTTBAppWindow::checkIDsAreNeighbours(QStringList ids)
        return true;
 }
 
-void ROSTTBAppWindow::_record_current_info()
+bool ROSTTBAppWindow::_record_current_info()
 {
     ui->labelParentOfJoin->setText("");
-    if(!_checkROS()) return;
+    if(!_checkROS()) return false;
     QString _srv_id = ui->servicerefEdit->text();
     const QString _desc = ui->descEdit->text();
     const QTime _start_time = ui->starttimeEdit->time();
@@ -203,7 +203,7 @@ void ROSTTBAppWindow::_record_current_info()
     if(_current_timetable->getStartTime().msecsTo(_start_time) < 0)
     {
         QMessageBox::critical(this, QObject::tr("Invalid Service"), QObject::tr("Service start time must not precede timetable start time."));
-        return;
+        return false;
     }
     const int _max_power   = ui->spinBoxPower->value(),
               _start_speed = ui->spinBoxStartSpeed->value(),
@@ -215,7 +215,7 @@ void ROSTTBAppWindow::_record_current_info()
     if(info_missing)
     {
         QMessageBox::critical(this, QObject::tr("Missing Information"), QObject::tr("Service Identifier or Description Missing"));
-        return;
+        return false;
     }
 
     if(ui->radioButtonStandard->isChecked() || ui->radioButtonShuttleStop->isChecked())
@@ -223,27 +223,27 @@ void ROSTTBAppWindow::_record_current_info()
         if(_max_speed == 0)
         {
             QMessageBox::critical(this, QObject::tr("Invalid Maximum Speed"), QObject::tr("Maximum service speed cannot be 0 kph for Standard Service or Shuttle from Stop."));
-            return;
+            return false;
         }
         if(_max_power == 0)
         {
             QMessageBox::critical(this, QObject::tr("Invalid Maximum Power"), QObject::tr("Maximum service power cannot be 0 kW for Standard Service or Shuttle from Stop."));
-            return;
+            return false;
         }
         if(_mass == 0)
         {
             QMessageBox::critical(this, QObject::tr("Invalid Mass"), QObject::tr("Mass value cannot be 0 te for Standard Service or Shuttle from Stop."));
-            return;
+            return false;
         }
         if(_max_brake == 0)
         {
             QMessageBox::critical(this, QObject::tr("Invalid Maximum Braking Force"), QObject::tr("Maximum brake force cannot be 0 te for Standard Service or Shuttle from Stop."));
-            return;
+            return false;
         }
         if(_start_ids[0] == "" || _start_ids[1] == "")
         {
             QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("IDs for start location rear and front track elements must be provided for a Standard Service or Shuttle from Stop."));
-            return;
+            return false;
         }
 
         for(auto id : _start_ids)
@@ -251,14 +251,14 @@ void ROSTTBAppWindow::_record_current_info()
             if(!checkLocID(id))
             {
                 QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("Location IDs must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number."));
-                return;
+                return false;
             }
         }
 
         if(!checkIDsAreNeighbours(_start_ids))
         {
             QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("Location IDs must be neighbouring map elements."));
-            return;
+            return false;
         }
     }
 
@@ -267,7 +267,7 @@ void ROSTTBAppWindow::_record_current_info()
         if(ui->timeEditTermination->time().secsTo(_current_service_selection->getStartTime()) > 0)
         {
             QMessageBox::critical(this, QObject::tr("Invalid Exit Time"), QObject::tr("Exit time cannot be before start time"));
-            return;
+            return false;
         }
     }
 
@@ -307,12 +307,12 @@ void ROSTTBAppWindow::_record_current_info()
         if(_service_id == "")
         {
             QMessageBox::critical(this, QObject::tr("No Parent Daughter Found"), QObject::tr("Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service."));
-            return;
+            return false;
         }
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
         {
             QMessageBox::critical(this, QObject::tr("Invalid Start Time"), QObject::tr("Daughter service start time cannot be before parent arrival time."));
-            return;
+            return false;
         }
 
         _current_service_selection->setType(ROSService::ServiceType::ShuttleFinishService);
@@ -326,7 +326,7 @@ void ROSTTBAppWindow::_record_current_info()
         if(_shuttle_partner == "")
         {
             QMessageBox::critical(this, QObject::tr("No Partner"), QObject::tr("You must specify an accompanying return service ID."));
-            return;
+            return false;
         }
         _current_service_selection->setDaughter(_shuttle_partner);
         _current_service_selection->setType(ROSService::ServiceType::ShuttleFromStop);
@@ -338,7 +338,7 @@ void ROSTTBAppWindow::_record_current_info()
         if(_shuttle_partner == "")
         {
             QMessageBox::critical(this, QObject::tr("No Partner"), QObject::tr("You must specify an accompanying return service ID."));
-            return;
+            return false;
         }
         _current_service_selection->setDaughter(_shuttle_partner);
         _current_service_selection->setType(ROSService::ServiceType::ShuttleFromFeeder);
@@ -352,18 +352,18 @@ void ROSTTBAppWindow::_record_current_info()
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
         {
             QMessageBox::critical(this, QObject::tr("Invalid Start Time"), QObject::tr("Daughter service start time cannot be before parent end time."));
-            return;
+            return false;
         }
         const QString _service_id = _parent->getDaughter();
         if(_service_id == "")
         {
             QMessageBox::critical(this, QObject::tr("No Parent Daughter Found"), QObject::tr("Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service."));
-            return;
+            return false;
         }
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
         {
             QMessageBox::critical(this, QObject::tr("Invalid Start Time"), QObject::tr("Daughter service start time cannot be before parent arrival time."));
-            return;
+            return false;
         }
 
         if(_current_timetable->getServices()[ui->comboBoxParent->currentText()]->getSplitData() != QMap<QString, QStringList>())
@@ -396,13 +396,13 @@ void ROSTTBAppWindow::_record_current_info()
         if(_exit_id == "")
         {
             QMessageBox::critical(this, QObject::tr("No Exit Location"), QObject::tr("You must provide an exit location ID."));
-            return;
+            return false;
         }
 
         if(!checkLocID(_exit_id))
         {
             QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("Location ID must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number."));
-            return;
+            return false;
         }
 
         _current_service_selection->setExitPoint(_exit_id);
@@ -425,7 +425,7 @@ void ROSTTBAppWindow::_record_current_info()
         {
             QMessageBox::critical(this, QObject::tr("No Parent Found"), QObject::tr("Could not find split reference in existing service matching current service. You must define a forward or rear split "\
                                   "in an existing service first."));
-            return;
+            return false;
         }
 
         ui->labelParentOfJoin->setText(_found_candidate);
@@ -439,7 +439,7 @@ void ROSTTBAppWindow::_record_current_info()
         if(_srv_id == "")
         {
             QMessageBox::critical(this, QObject::tr("Missing Daughter Service"), QObject::tr("You must provide an identifier for the newly formed service."));
-            return;
+            return false;
         }
 
         _current_service_selection->setDaughter(_srv_id);
@@ -452,6 +452,8 @@ void ROSTTBAppWindow::_record_current_info()
     else _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleRemainHere);
 
     update_output();
+
+    return true;
 }
 
 void ROSTTBAppWindow::update_output(ROSService* current_serv)
@@ -723,18 +725,20 @@ void ROSTTBAppWindow::_clear()
     ui->textEditEnterID1->setText("");
     ui->textEditEnterID2->setText("");
     ui->checkBoxAtStation->setChecked(true);
-    ui->serviceFinishServiceEdit->setText("");
-    ui->textEditParentShuttleRef->setText("");
-    ui->descEdit->setText("");
+    ui->serviceFinishServiceEdit->clear();
+    ui->textEditParentShuttleRef->clear();
+    ui->descEdit->clear();
     ui->spinBoxMass->setValue(0);
     ui->spinBoxPower->setValue(0);
 }
 
 void ROSTTBAppWindow::on_pushButtonInsert_clicked()
 {
-    _record_current_info();
-    _station_add->setCurrentService(_current_service_selection);
-    _clear();
+    if(_record_current_info())
+    {
+        _station_add->setCurrentService(_current_service_selection);
+        _clear();
+    }
 }
 
 void ROSTTBAppWindow::_delete_entries()
@@ -957,6 +961,7 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
 
         QString _current_parent = ui->comboBoxParent->currentText();
         ui->servicerefEdit->setText(_current_timetable->getServices()[_current_parent]->getDaughter());
+        ui->starttimeEdit->setTime(_current_timetable->getServices()[_current_parent]->getExitTime());
     }
 }
 
