@@ -483,7 +483,7 @@ public:
         _passing_sTrainSet[index] = Pass;
         _cdt_times[index] = cdt_time;
         _stations[index] = new_station;
-
+        qDebug() << _stations;
     }
 
     /*! @brief Set a given stop (by index) to be a passing point

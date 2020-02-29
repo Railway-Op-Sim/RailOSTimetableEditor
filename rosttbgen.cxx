@@ -648,19 +648,19 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
 
     }
 
-    if(service->getFinState() != ROSService::FinishState::FinishExit)
-    {
-        const QTime _arrive = service->getTimes()[int_final][0];
-        _temp.append(join(";", _arrive.toString("HH:mm"), service->getStations()[int_final]));
+    if(service->getFinState() != ROSService::FinishState::FinishExit && int_final-1 > 0)
+    {     
+        const QTime _arrive = service->getTimes()[int_final-1][0];
+        _temp.append(join(";", _arrive.toString("HH:mm"), service->getStations()[int_final-1]));
     }
 
-    const bool _is_cdt = service->getDirectionChanges()[int_final];
+    const bool _is_cdt = int_final-1 > 0 && service->getDirectionChanges()[int_final-1];
 
     if(int_final != service->getStations().size() && _is_cdt)
     {
-        const QTime _arrive = service->getTimes()[int_final][0],
-                      _depart = service->getTimes()[int_final][1];
-        const QTime _cdt_time = service->getCDTTimes()[int_final];
+        const QTime _arrive = service->getTimes()[int_final-1][0],
+                      _depart = service->getTimes()[int_final-1][1];
+        const QTime _cdt_time = service->getCDTTimes()[int_final-1];
 
         _temp.append(join(";", (_depart != QTime()) ? _cdt_time.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
         service->setExitTime(_cdt_time);
@@ -689,7 +689,8 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
 
     if(service->getExitTime() == QTime())
     {
-        throw std::runtime_error("Failed to retrieve Exit time");
+        QMessageBox::critical(_parent, "Termination Failure", "Failed to Obtain a Termination Time for Service '"+service->getID()+"'.");
+        return QString();
     }
 
     const QTime _exit_time = service->getExitTime();
@@ -744,14 +745,22 @@ QStringList ROSTTBGen::createTimetableStrings(ROSTimetable* timetable)
 
     for(auto service : timetable->getServices())
     {
-        QString _service = join(",", _make_service_definition(service), _make_type_line(service));
-        _service = join(",", _service, join(",", _add_stations(service)));
-        _service = join(",", _service, _make_service_termination(service));
-
-        if(service->getNRepeats() > 0)
+        if(service->getExitTime() == QTime())
         {
-            _service = join(",", _service, _make_repeat_line(service));
+            QMessageBox::warning(_parent, "Incomplete Service", "No exit time specified for service '"+service->getID()+"', this service will be ignored during save. Please add at least two locations or specify a manual termination time.");
+            continue;
         }
+        QString _service = join(",", _make_service_definition(service), _make_type_line(service));
+        const QStringList _call_points = _add_stations(service);
+        if(service->getStations().size() > 0 && _call_points.size() > 0)_service = join(",", _service, join(",", _call_points));
+        QString _term = _make_service_termination(service);
+        if(_term == QString())
+        {
+            QMessageBox::warning(_parent, "Incomplete Service", "Service '"+service->getID()+"' is incomplete and will not be saved.");
+            continue;
+        }
+        _service = join(",", _service, _term);
+        if(service->getNRepeats() > 0) _service = join(",", _service, _make_repeat_line(service));
 
         _elements.push_back(_service);
     }

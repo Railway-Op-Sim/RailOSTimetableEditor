@@ -1129,6 +1129,11 @@ void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
 void ROSTTBAppWindow::_save_file()
 {
     QStringList _ttb = _parser->createTimetableStrings(_current_timetable);
+    if(_ttb.size() < 2)
+    {
+        QMessageBox::critical(this, "Failed Timetable Conversion", "Failed to Write Timetable to File, No Services Detected.");
+        return;
+    }
     QString _output = join(QChar::Null, _ttb);
 
     qDebug() << "WRITING TO: " <<  _open_file_str;
@@ -1189,6 +1194,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     _station_add->setCurrentService(_current_service_selection);
     _station_add->setStations(_parser->getStations());
     const QString _station_name = ui->tableWidgetService->takeItem(row, 2)->text();
+    qDebug() << _station_name;
 
     if(!_parser->getStations().contains(_station_name))
     {

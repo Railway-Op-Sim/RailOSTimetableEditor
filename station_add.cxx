@@ -88,6 +88,7 @@ bool Station_add::setInfo()
             }
         }
     }
+
     if(ui->timeEditArrival->time().msecsTo(ui->timeEditDeparture->time()) < 0)
     {
         ui->errorLabel->setText(QObject::tr("Departure time cannot be before arrival."));
@@ -115,6 +116,8 @@ void Station_add::setEditMode(bool on){ui->pushButtonDeleteEntry->setVisible(on)
 
 void Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>& times, const bool isCDT, const bool isPass)
 {
+    _current_station = station;
+    _times = times;
     ui->checkBoxCDT->setChecked(isCDT);
     ui->checkBoxPASS->setChecked(isPass);
     ui->timeEditCDT->setTime((times[2] == QTime()) ? times[1] : times[2]);
@@ -125,8 +128,6 @@ void Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>
 
 void Station_add::on_buttonBoxAddStation_accepted()
 {
-    _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time()};
-    _current_station = ui->comboBoxStations->currentText();
 
     if(setInfo())
     {
@@ -134,30 +135,24 @@ void Station_add::on_buttonBoxAddStation_accepted()
 
         QTime _cdt_time = (ui->checkBoxCDT->isChecked()) ? ui->timeEditCDT->time() : QTime();
 
-        if(_current_srv->getStations().contains(ui->comboBoxStations->currentText()) || (_current_srv->getStations().size() > 0 && _times == _current_srv->getTimes()[_current_srv->getStations().indexOf(_current_station)]))
+        if(_edit_mode)
         {
-            QString _new_station = ui->comboBoxStations->currentText();
-            if(_current_station == "")
-            {
-                qDebug() << "Failed to update entry for station, no station name found";
-            }
-            _current_srv->updateStation(_current_station, _times, ui->checkBoxCDT->isChecked(), ui->checkBoxPASS->isChecked(), _cdt_time, _new_station);
-            _current_station = _new_station;
-
-            this->close();
-
-            reset_state();
-
+            _current_srv->updateStation(_current_station, {ui->timeEditArrival->time(), ui->timeEditDeparture->time()},
+                                        ui->checkBoxCDT->isChecked(), ui->checkBoxPASS->isChecked(),
+                                        _cdt_time, ui->comboBoxStations->currentText());
+            _current_station = ui->comboBoxStations->currentText();
+            _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time()};
+            _edit_mode = false;
         }
-
         else
         {
+            _current_station = ui->comboBoxStations->currentText();
+            _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time()};
+            qDebug() << "Adding Station: " << _times[0].toString("HH:mm") << ";" << _times[1].toString("HH:mm") << ";" << _current_station;
             _current_srv->addStation(_times, _current_station);
             _current_srv->setStopAsPassPoint(_current_srv->getStations().size()-1, ui->checkBoxPASS->isChecked());
             _current_srv->setDirectionChangeAtStop(_current_srv->getStations().size()-1, ui->checkBoxCDT->isChecked(), _cdt_time);
         }
-
-        _redraw_table();
 
         if(ui->checkBoxSplit->isChecked())
         {
