@@ -67,16 +67,22 @@ Station_add::~Station_add()
 
 bool Station_add::setInfo()
 {
+    if(_times.size() != 3) throw std::runtime_error("NO (4)!");
+
     if(ui->comboBoxStations->currentText() == "")
     {
         ui->errorLabel->setText(QObject::tr("Please select a location"));
         return false;
     }
+    if(_times.size() != 3) throw std::runtime_error("NO (5)!");
+
     if(_srv_start.msecsTo(ui->timeEditArrival->time()) < 0)
     {
         ui->errorLabel->setText(QObject::tr("Arrival time cannot be before service start"));
         return false;
     }
+    if(_times.size() != 3) throw std::runtime_error("NO (6)!");
+
     if(!_edit_mode && ui->comboBoxStations->currentText() != _current_station)
     {
         for(auto time_pair : _current_srv->getTimes())
@@ -88,12 +94,15 @@ bool Station_add::setInfo()
             }
         }
     }
+    if(_times.size() != 3) throw std::runtime_error("NO (7)!");
 
     if(ui->timeEditArrival->time().msecsTo(ui->timeEditDeparture->time()) < 0)
     {
         ui->errorLabel->setText(QObject::tr("Departure time cannot be before arrival."));
         return false;
     }
+    if(_times.size() != 3) throw std::runtime_error("NO (8)!");
+
     ui->errorLabel->setText("");
 
     _times[0] = ui->timeEditArrival->time();
@@ -114,16 +123,23 @@ bool Station_add::setInfo()
 
 void Station_add::setEditMode(bool on){ui->pushButtonDeleteEntry->setVisible(on); _edit_mode = on;}
 
-void Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>& times, const bool isCDT, const bool isPass)
+bool Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>& times, const bool isCDT, const bool isPass)
 {
     _current_station = station;
+    if(times.size() != 3)
+    {
+        return false;
+    }
     _times = times;
+    if(_times.size() != 3) throw std::runtime_error("NO (1)!");
     ui->checkBoxCDT->setChecked(isCDT);
     ui->checkBoxPASS->setChecked(isPass);
     ui->timeEditCDT->setTime((times[2] == QTime()) ? times[1] : times[2]);
     ui->timeEditArrival->setTime(times[0]);
     ui->timeEditDeparture->setTime((times[1] == QTime()) ? times[0] : times[1]);
     ui->comboBoxStations->setCurrentText(station);
+
+    return true;
 }
 
 void Station_add::on_buttonBoxAddStation_accepted()
@@ -141,13 +157,15 @@ void Station_add::on_buttonBoxAddStation_accepted()
                                         ui->checkBoxCDT->isChecked(), ui->checkBoxPASS->isChecked(),
                                         _cdt_time, ui->comboBoxStations->currentText());
             _current_station = ui->comboBoxStations->currentText();
-            _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time()};
+            _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time(), ui->timeEditCDT->time()};
+            if(_times.size() != 3) throw std::runtime_error("NO (2)!");
             _edit_mode = false;
         }
         else
         {
             _current_station = ui->comboBoxStations->currentText();
-            _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time()};
+            _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time(), ui->timeEditCDT->time()};
+            if(_times.size() != 3) throw std::runtime_error("NO (3)!");
             qDebug() << "Adding Station: " << _times[0].toString("HH:mm") << ";" << _times[1].toString("HH:mm") << ";" << _current_station;
             _current_srv->addStation(_times, _current_station);
             _current_srv->setStopAsPassPoint(_current_srv->getStations().size()-1, ui->checkBoxPASS->isChecked());

@@ -819,7 +819,10 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     _station_add->setStations(_parser->getStations());
     _station_add->clearForm();
     _station_add->show();
-    _station_add->fwdPreviousEventTime((_current_service_selection->getTimes().size() > 0) ? _current_service_selection->getTimes()[_current_service_selection->getTimes().size()-1][1] : _current_service_selection->getStartTime());
+    const bool _has_stations = _current_service_selection->getStations().size() > 0;
+    QList<QTime> _times = (_has_stations) ? _current_service_selection->getTimes()[_current_service_selection->getStations().size()] : QList<QTime>({QTime(), QTime()});
+    _times.push_back(QTime());
+    _station_add->fwdPreviousEventTimes(_times);
 
     update_output();
 }
@@ -829,6 +832,7 @@ void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
     _enable_integer_info(true);
     if(checked)
     {
+        ui->serviceFinishServiceEdit->clear();
         ui->spinBoxMU->setEnabled(true);
         ui->comboBoxTrainSet->setEnabled(true);
         ui->servicerefEdit->setEnabled(true);
@@ -860,6 +864,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->serviceFinishServiceEdit->clear();
         ui->spinBoxMU->setEnabled(false);
         ui->comboBoxTrainSet->setEnabled(false);
         ui->servicerefEdit->setEnabled(false);
@@ -898,6 +903,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->serviceFinishServiceEdit->clear();
         ui->spinBoxMU->setEnabled(true);
         ui->comboBoxTrainSet->setEnabled(true);
         ui->servicerefEdit->setEnabled(true);
@@ -929,6 +935,7 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->serviceFinishServiceEdit->clear();
         ui->spinBoxMU->setEnabled(false);
         ui->comboBoxTrainSet->setEnabled(false);
         ui->starttimeEdit->setEnabled(false);
@@ -970,6 +977,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleFinish_toggled(bool checked)
     _enable_integer_info(false);
     if(checked)
     {
+        ui->serviceFinishServiceEdit->clear();
         ui->spinBoxMU->setEnabled(false);
         ui->comboBoxTrainSet->setEnabled(false);
         ui->servicerefEdit->setEnabled(false);
@@ -1034,8 +1042,11 @@ void ROSTTBAppWindow::_set_form_info()
     ui->spinBoxMaxSpeed->setValue(_max_speed);
     ui->spinBoxStartSpeed->setValue(_start_speed);
 
-    ui->textEditEnterID1->setText(_start_ids[0]);
-    ui->textEditEnterID2->setText(_start_ids[1]);
+    // Need to be careful, check array is actually filled before filling form
+    if(_start_ids.size() > 0)ui->textEditEnterID1->setText(_start_ids[0]);
+    else{ui->textEditEnterID1->clear();}
+    if(_start_ids.size() > 1)ui->textEditEnterID2->setText(_start_ids[1]);
+    else{ui->textEditEnterID2->clear();}
     ui->spinBoxRepeats->setValue(_n_repeats);
     ui->spinBoxRefIncrement->setValue(_interval);
     ui->spinBoxRepeatInterval->setValue(_t_interv);
@@ -1218,7 +1229,11 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
             break;
         }
     }
-    _station_add->fwdCurrentSelection(_station_name, {QTime::fromString(_arrive, "HH:mm"), QTime::fromString(_depart, "HH:mm"), _cdt_time}, _cdtPass[0], _cdtPass[1]);
+    if(!_station_add->fwdCurrentSelection(_station_name, {QTime::fromString(_arrive, "HH:mm"), QTime::fromString(_depart, "HH:mm"), _cdt_time}, _cdtPass[0], _cdtPass[1]))
+    {
+        QMessageBox::critical(this, "Invalid Time Array", "Times array should be of size 3, {arrival, depart, cdt}");
+        return;
+    }
 
     _station_add->show();
     update_output();

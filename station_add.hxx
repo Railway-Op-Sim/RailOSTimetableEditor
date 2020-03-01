@@ -115,15 +115,15 @@ public:
     @param times Current selection arrival and departure times
     @param isCDT Whether current location includes a service direction change
     @param isPass Whether current location is a passed location
-    @return void
+    @return true if successful
     */
-    void fwdCurrentSelection(const QString& station, const QList<QTime>& times, bool isCDT, bool isPass);
+    bool fwdCurrentSelection(const QString& station, const QList<QTime>& times, bool isCDT, bool isPass);
 
     /*! @brief Forward time from last timetable event
     @param time Most recent event time from current timetable
     @return void
     */
-    void fwdPreviousEventTime(const QTime& time) {_times = {time};}
+    void fwdPreviousEventTimes(const QList<QTime>& times) {_times = times;}
 
     /*! @brief Clear the form contents
     @return void
@@ -174,7 +174,7 @@ private:
     QString _current_station = "";
 
     //! Arrive and Depart times
-    QList<QTime> _times = {QTime(), QTime()};
+    QList<QTime> _times = {QTime(), QTime(), QTime()};
 
     /*! @brief Redraw the table in the main window
     @return void
