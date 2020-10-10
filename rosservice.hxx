@@ -457,8 +457,16 @@ public:
         _times.push_back(time);
         _stations.push_back(station);
         _passing_sTrainSet.push_back(false);
-        _direction_changes.push_back(false);
-        _cdt_times.push_back(QTime());
+        if(_direction_changes.size() != _stations.size())
+        {
+            _direction_changes.push_back(false);
+            _cdt_times.push_back(QTime());
+
+            if(_direction_changes.size() != _stations.size())
+            {
+                qDebug() << "SHIT!" << endl;
+            }
+        }
     }
 
     /*! @brief Update the current calling point information
@@ -500,6 +508,15 @@ public:
     @return void
     */
     void setDirectionChangeAtStop(int index, bool state, QTime time=QTime()) {_direction_changes[index] = state; _cdt_times[index] = time;}
+
+    /*! @brief Manually append a direction change under the assumption that a station
+        is added immediately after (covers rare case of cdt being first ttb event)
+     @param state True if direction change occurs
+     @param time QTime of the direction change
+     @return void
+    */
+    void appendDirectionChange(bool state, QTime time=QTime()) {_direction_changes.push_back(state); _cdt_times.push_back(time);}
+
     /*! @brief Full length summary of service
     @return String of service information
     */

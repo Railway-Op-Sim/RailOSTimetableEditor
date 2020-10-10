@@ -160,7 +160,7 @@ class ROSTTBGen
         /*! @brief Process the information for the current service candidate
         @return void
         */
-        void _process_service_candidate(int int_id, QStringList service);
+        bool _process_service_candidate(int int_id, QStringList service);
 
         /*! @brief Fetch service join partner
         @return ROS service ID for partner service

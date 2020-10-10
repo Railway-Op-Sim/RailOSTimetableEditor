@@ -154,7 +154,7 @@
       <number>9999</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="start_speed_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -172,7 +172,7 @@
       <string>Start Speed (kph)</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="max_speed_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -1250,6 +1250,38 @@
       <string>Template Name</string>
      </property>
     </widget>
+    <widget class="QRadioButton" name="radioButton_kph">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>50</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>kph</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup_2</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_mph">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>80</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>mph</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup_2</string>
+     </attribute>
+    </widget>
    </widget>
    <widget class="QLabel" name="label_18">
     <property name="geometry">
@@ -1616,5 +1648,6 @@
  <connections/>
  <buttongroups>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

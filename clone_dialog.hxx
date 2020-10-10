@@ -32,6 +32,7 @@
 
 #include <QDialog>
 #include <QTableWidget>
+#include <QMessageBox>
 
 #include "rosservice.hxx"
 #include "rostimetable.hxx"
@@ -111,9 +112,10 @@ private:
     bool _check_new();
 
     /*! @brief Create a clone of the current selection with new time and ID
+    @param clone_others Find Parent and Daughter and clone those too
     @return void
     */
-    void _create_clone();
+    void _create_clone(bool clone_others=false);
 
     /*! @brief Attempt to create a new ID based on the previous
     @return ID as a string

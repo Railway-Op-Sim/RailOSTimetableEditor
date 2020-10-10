@@ -264,7 +264,7 @@ bool ROSTTBGen::_isJoin(QStringList str_list)
     return _isTime(str_list[0]) && str_list[1] == "jbo";
 }
 
-void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
+bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 {
     QString _id = "NULL", _description = "NULL";
     QTime _start_time = QTime();
@@ -290,7 +290,7 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     else
     {
         QMessageBox::critical(_parent, "Import Failure", "Failed to import service "+QString::number(int_id)+" '"+_id+"'");
-        return;
+        return false;
     }
 
     ROSService* _service = new ROSService(int_id, _start_time, _id, _description);
@@ -442,16 +442,32 @@ void ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
         else if(_isDirChange(service[i].split(";")))
         {
-            _service->setDirectionChangeAtStop(_service->getStations().size()-1, true, QTime::fromString(service[i].split(";")[0], "HH:mm"));
+            if(_service->getStations().size() == 0)
+            {
+                _service->appendDirectionChange(true, QTime::fromString(service[i].split(";")[0], "HH:mm"));
+            }
+            else
+            {
+                _service->setDirectionChangeAtStop(_service->getStations().size()-1, true, QTime::fromString(service[i].split(";")[0], "HH:mm"));
+            }
         }
     }
 
     if(_isDirChange(service[service.size()-1].split(";")))
     {
-        _service->setDirectionChangeAtStop(_service->getStations().size()-1, true, QTime::fromString(service[service.size()-1].split(";")[0], "HH:mm"));
+        if(_service->getStations().size() == 0)
+        {
+            _service->appendDirectionChange(true, QTime::fromString(service[service.size()-1].split(";")[0], "HH:mm"));
+        }
+        else
+        {
+            _service->setDirectionChangeAtStop(_service->getStations().size()-1, true, QTime::fromString(service[service.size()-1].split(";")[0], "HH:mm"));
+        }
     }
 
     _current_timetable->addService(_service);
+
+    return true;
 }
 
 void ROSTTBGen::_process_data()
@@ -535,7 +551,7 @@ void ROSTTBGen::_process_data()
     for(int i{0}; i < _services.size(); ++i)
     {
         if(_ignored_indexes.contains(i)) continue;  // Ignore unprocessed Duplicates
-        _process_service_candidate(i, _services[i]);
+        if(!_process_service_candidate(i, _services[i])) return;
     }
 
     if(_current_timetable->size() != _services.size()-_ignored_indexes.size())
@@ -604,6 +620,11 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
     // the first station timetable entry should only contain a single time
     if(service->labelledLocationStart() || service->getType() == ROSService::ServiceType::ShuttleFromFeeder || service->getType() == ROSService::ServiceType::ServiceFromService)
     {
+        if(service->getTimes().size() == 0)
+        {
+            QMessageBox::critical(_parent, "BadAccessTimes", "Attempt to access service times array which is size zero by index");
+            return {};
+        }
         const QTime _depart = service->getTimes()[0][1];
         _temp.append(join(";", _depart.toString("HH:mm"), service->getStations()[0]));
     }
@@ -648,24 +669,29 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
 
     }
 
-    if(service->getFinState() != ROSService::FinishState::FinishExit && int_final-1 > 0)
+    if(service->getFinState() != ROSService::FinishState::FinishExit)
     {     
-        const QTime _arrive = service->getTimes()[int_final-1][0];
-        _temp.append(join(";", _arrive.toString("HH:mm"), service->getStations()[int_final-1]));
+        const QTime _arrive = service->getTimes()[int_final][0];
+        _temp.append(join(";", _arrive.toString("HH:mm"), service->getStations()[int_final]));
+
+
+        const bool _is_cdt = service->getDirectionChanges()[int_final];
+
+        if(_is_cdt)
+        {
+            if(service->getTimes().size() == 0)
+            {
+                QMessageBox::critical(_parent, "BadAccessTimes", "Attempt to access service times array which is size zero by index");
+                return {};
+            }
+            const QTime _arrive = service->getTimes()[int_final][0],
+                          _depart = service->getTimes()[int_final][1];
+            const QTime _cdt_time = service->getCDTTimes()[int_final];
+
+            _temp.append(join(";", (_depart != QTime()) ? _cdt_time.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
+            service->setExitTime(_cdt_time);
+        }
     }
-
-    const bool _is_cdt = int_final-1 > 0 && service->getDirectionChanges()[int_final-1];
-
-    if(int_final != service->getStations().size() && _is_cdt)
-    {
-        const QTime _arrive = service->getTimes()[int_final-1][0],
-                      _depart = service->getTimes()[int_final-1][1];
-        const QTime _cdt_time = service->getCDTTimes()[int_final-1];
-
-        _temp.append(join(";", (_depart != QTime()) ? _cdt_time.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
-        service->setExitTime(_cdt_time);
-    }
-
     return _temp;
 }
 

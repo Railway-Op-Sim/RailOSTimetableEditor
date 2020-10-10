@@ -214,6 +214,10 @@ private slots:
     //! Toggle About Menu Action
     void on_actionAbout_ROSTTBGen_triggered();
 
+    void on_checkBoxAtStation_toggled(bool checked);
+
+    void on_radioButton_kph_toggled(bool checked);
+
 private:
     //! Sets whether current train property change is induced by template selection
     bool _is_template_change = false;
@@ -262,6 +266,11 @@ private:
 
     //! About Dialogue
     About* _about_window = new About;
+
+    /*! @brief Convert speed from mph to kph
+    @return int
+    */
+    int _mph_to_kph(const int speed);
 
     /*! @brief Save the current timetable object to file
     @return void

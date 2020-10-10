@@ -66,16 +66,20 @@ QString join(QChar::SpecialCharacter join_symbol, QStringList list)
 void ROSService::shiftStationTimes(const int n_secs, QString &station)
 {
     const int index = _stations.indexOf(station);
-    if(index < 0) return;
+    if(index < 0)
+    {
+        qDebug() << "Failed to find index of '" << station << "' cannot update time";
+        return;
+    }
     _times[index][0] = _times[index][0].addSecs(n_secs);
     _times[index][1] = _times[index][1].addSecs(n_secs);
 }
 
 void ROSService::shiftServiceTimes(const int n_secs)
 {
-    if(_parent_service != "") return;
-    _enter_map_time = _enter_map_time.addSecs(n_secs);
-    if(_exit_map_time != QTime()) _exit_map_time = _exit_map_time.addSecs(n_secs);
+    //if(_parent_service != "") return;
+    setEntryTime(_enter_map_time.addSecs(n_secs));
+    if(_exit_map_time != QTime()) setExitTime(_exit_map_time.addSecs(n_secs));
     for(auto s : _stations) shiftStationTimes(n_secs, s);
     for(int i{0}; i < _cdt_times.size(); ++i) if(_cdt_times[i] != QTime()) _cdt_times[i] = _cdt_times[i].addSecs(n_secs);
 }

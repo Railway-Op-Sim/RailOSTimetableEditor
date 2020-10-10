@@ -117,6 +117,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
 
     ui->radioButtonStandard->setEnabled(true);
     ui->radioButtonStandard->toggle();
+    ui->radioButton_kph->toggle();
 
 }
 
@@ -210,6 +211,7 @@ bool ROSTTBAppWindow::_record_current_info()
               _mass        = ui->spinBoxMass->value(),
               _max_brake   = ui->spinBoxForce->value(),
               _max_speed   = ui->spinBoxMaxSpeed->value();
+
     const QStringList _start_ids = {ui->textEditEnterID1->text(), ui->textEditEnterID2->text()};
     const bool info_missing = _srv_id == "" || _desc == "";
     if(info_missing)
@@ -273,7 +275,8 @@ bool ROSTTBAppWindow::_record_current_info()
 
     if(!_current_timetable->getServices().contains(_srv_id))
     {
-        _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, _start_speed, _max_speed, _mass, _max_brake, _max_power);
+        qDebug() << _mph_to_kph(_start_speed) << endl;
+        _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, _mph_to_kph(_start_speed), _mph_to_kph(_max_speed), _mass, _max_brake, _max_power);
         _current_service_selection = _current_timetable->end();
     }
 
@@ -281,8 +284,8 @@ bool ROSTTBAppWindow::_record_current_info()
     {
         _current_service_selection->setEntryTime(_start_time);
         _current_service_selection->setDescription(_desc);
-        _current_service_selection->setStartSpeed(_start_speed);
-        _current_service_selection->setMaxSpeed(_max_speed);
+        _current_service_selection->setStartSpeed(_mph_to_kph(_start_speed));
+        _current_service_selection->setMaxSpeed(_mph_to_kph(_max_speed));
         _current_service_selection->setMaxBrake(_max_brake);
         _current_service_selection->setPower(_max_power);
     }
@@ -1011,6 +1014,11 @@ void ROSTTBAppWindow::on_radioButtonShuttleFinish_toggled(bool checked)
     }
 }
 
+int ROSTTBAppWindow::_mph_to_kph(const int speed)
+{
+    return (ui->radioButton_kph->isChecked()) ? speed : int(1.609344*speed);
+}
+
 void ROSTTBAppWindow::_set_form_info()
 {
 
@@ -1022,7 +1030,6 @@ void ROSTTBAppWindow::_set_form_info()
 
     const ROSService::ServiceType _type = _current_service_selection->getType();
     const ROSService::FinishState _exit_as = _current_service_selection->getFinState();
-
 
     const int _max_power   = _current_service_selection->getPower(),
               _start_speed = _current_service_selection->getStartSpeed(),
@@ -1357,10 +1364,12 @@ void ROSTTBAppWindow::on_comboBoxParent_currentTextChanged(const QString &arg1)
     {
         _parent_last_time = _parent->getExitTime();
     }
-    else
+    else if(_parent->getTimes().size() > 0)
     {
-
         _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][0];
+    }
+    else{
+        return;
     }
 
     ui->starttimeEdit->setTime(_parent_last_time);
@@ -1601,4 +1610,19 @@ void ROSTTBAppWindow::on_pushButtonCreateTemplate_clicked()
 void ROSTTBAppWindow::on_actionAbout_ROSTTBGen_triggered()
 {
     _about_window->show();
+}
+
+void ROSTTBAppWindow::on_checkBoxAtStation_toggled(bool checked)
+{
+    if(checked)
+    {
+        // Cannot start a service from a station with non-zero start speed
+        ui->spinBoxStartSpeed->setValue(0);
+    }
+}
+
+void ROSTTBAppWindow::on_radioButton_kph_toggled(bool checked)
+{
+    ui->start_speed_label->setText(ui->radioButton_kph->isChecked() ? "Start Speed (kph)" : "Start Speed (mph)");
+    ui->max_speed_label->setText(ui->radioButton_kph->isChecked() ? "Max Speed (kph)" : "Max Speed (mph)");
 }
