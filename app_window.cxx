@@ -822,9 +822,16 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     _station_add->setStations(_parser->getStations());
     _station_add->clearForm();
     _station_add->show();
-    const bool _has_stations = _current_service_selection->getStations().size() > 0;
-    QList<QTime> _times = (_has_stations) ? _current_service_selection->getTimes()[_current_service_selection->getStations().size()] : QList<QTime>({QTime(), QTime()});
-    _times.push_back(QTime());
+    QList<QTime> _times;
+    if(_current_service_selection->getTimes().size() > 0)
+    {
+        _times = _current_service_selection->getTimes()[_current_service_selection->getTimes().size()-1];
+    }
+    else
+    {
+        _times = QList<QTime>({QTime(), QTime(), QTime()});
+    }
+
     _station_add->fwdPreviousEventTimes(_times);
 
     update_output();

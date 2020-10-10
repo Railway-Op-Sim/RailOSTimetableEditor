@@ -34,6 +34,7 @@
 #include <QSet>
 #include <QTime>
 #include <QTableWidget>
+#include <QMessageBox>
 
 #include "rosservice.hxx"
 

@@ -67,21 +67,28 @@ Station_add::~Station_add()
 
 bool Station_add::setInfo()
 {
-    if(_times.size() != 3) throw std::runtime_error("NO (4)!");
+    if(_times.size() != 3)
+    {
+        QMessageBox::critical(this, QObject::tr("Invalid Times Array Size"), "Expected to read a time array of size 3,\ngot size "+QString::number(_times.size()));
+        return false;
+    }
 
     if(ui->comboBoxStations->currentText() == "")
     {
         ui->errorLabel->setText(QObject::tr("Please select a location"));
         return false;
     }
-    if(_times.size() != 3) throw std::runtime_error("NO (5)!");
 
     if(_srv_start.msecsTo(ui->timeEditArrival->time()) < 0)
     {
         ui->errorLabel->setText(QObject::tr("Arrival time cannot be before service start"));
         return false;
     }
-    if(_times.size() != 3) throw std::runtime_error("NO (6)!");
+
+    ui->errorLabel->setText("");
+
+    _times[0] = ui->timeEditArrival->time();
+    _times[1] = ui->timeEditDeparture->time();
 
     if(!_edit_mode && ui->comboBoxStations->currentText() != _current_station)
     {
@@ -89,24 +96,18 @@ bool Station_add::setInfo()
         {
             if((_times[0] >= time_pair[0] && _times[0] <= time_pair[1]) || (_times[1] >= time_pair[0] && _times[1] <= time_pair[1]))
             {
+                qDebug() << _times << "\t" << time_pair << endl;
                 ui->errorLabel->setText(QObject::tr("Times overlap with current timetable entries"));
                 return false;
             }
         }
     }
-    if(_times.size() != 3) throw std::runtime_error("NO (7)!");
 
     if(ui->timeEditArrival->time().msecsTo(ui->timeEditDeparture->time()) < 0)
     {
         ui->errorLabel->setText(QObject::tr("Departure time cannot be before arrival."));
         return false;
     }
-    if(_times.size() != 3) throw std::runtime_error("NO (8)!");
-
-    ui->errorLabel->setText("");
-
-    _times[0] = ui->timeEditArrival->time();
-    _times[1] = ui->timeEditDeparture->time();
 
     if(ui->checkBoxCDT->isChecked())
     {
@@ -126,12 +127,12 @@ void Station_add::setEditMode(bool on){ui->pushButtonDeleteEntry->setVisible(on)
 bool Station_add::fwdCurrentSelection(const QString& station, const QList<QTime>& times, const bool isCDT, const bool isPass)
 {
     _current_station = station;
-    if(times.size() != 3)
+    if(_times.size() != 3)
     {
+        QMessageBox::critical(this, QObject::tr("Invalid Times Array Size"), "Expected to read a time array of size 3,\ngot size "+QString::number(_times.size()));
         return false;
     }
     _times = times;
-    if(_times.size() != 3) throw std::runtime_error("NO (1)!");
     ui->checkBoxCDT->setChecked(isCDT);
     ui->checkBoxPASS->setChecked(isPass);
     ui->timeEditCDT->setTime((times[2] == QTime()) ? times[1] : times[2]);
