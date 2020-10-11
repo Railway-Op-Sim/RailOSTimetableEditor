@@ -112,10 +112,9 @@ private:
     bool _check_new();
 
     /*! @brief Create a clone of the current selection with new time and ID
-    @param clone_others Find Parent and Daughter and clone those too
     @return void
     */
-    void _create_clone(bool clone_others=false);
+    void _create_clone();
 
     /*! @brief Attempt to create a new ID based on the previous
     @return ID as a string

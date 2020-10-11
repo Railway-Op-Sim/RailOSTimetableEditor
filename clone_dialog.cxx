@@ -132,7 +132,7 @@ void CloneDialog::on_buttonBoxClone_accepted()
     if(_check_new())
     {
         this->close();
-        _create_clone(true);
+        _create_clone();
         _ttb_table->clear();
         _ttb_table->setRowCount(0);
         for(int i{0}; i < _current_ttb->size(); ++i)
@@ -156,37 +156,13 @@ void CloneDialog::on_buttonBoxClone_rejected()
     this->close();
 }
 
-void CloneDialog::_create_clone(bool clone_others)
+void CloneDialog::_create_clone()
 {
     const int _temporal_diff = _current_srv->getStartTime().secsTo(ui->timeEditCloneStart->time());
     _cloned_srv = new ROSService(*_current_srv);
     _cloned_srv->shiftServiceTimes(_temporal_diff);
     QString _srv_id = ui->textEditCloneRef->text();
     _cloned_srv->setID(_srv_id);
-    QList<QString> _to_clone = {};
-    if(_current_srv->getParent() != "" && clone_others)
-    {
-        ROSService* _main_service = _current_srv;
-        QString _top_level = "";
-        ROSService* srv = (*_current_ttb)[_current_srv->getParent()];
-        while(srv->getParent() != "" && _to_clone.indexOf(srv->getParent()) == -1)
-        {
-            srv = (*_current_ttb)[srv->getParent()];
-            _to_clone.push_back(srv->getID());
-        }
-
-        _to_clone = {};
-
-        while(srv->getDaughter() != "" && _to_clone.indexOf(srv->getDaughter()) == -1)
-        {
-            _to_clone.push_back(srv->getID());
-            srv = (*_current_ttb)[srv->getDaughter()];
-            _current_srv = srv;
-            _create_clone();
-        }
-
-        _current_srv = _main_service;
-    }
 
     if(_current_srv->getDaughter() != "") _cloned_srv->setDaughter(ui->textEditCloneDaughter->text());
     if(_current_srv->getParent() != "") _cloned_srv->setParent(_create_new_id(_current_srv->getParent()));

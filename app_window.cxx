@@ -578,7 +578,7 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
     }
 
     ui->tableWidgetService->sortItems(0);
-    ui->tableWidgetTimetable->sortItems(0);
+    //ui->tableWidgetTimetable->sortItems(0);
 
     _station_add->setServiceTable(ui->tableWidgetService);
     _populate_feederboxes();
@@ -1144,9 +1144,9 @@ void ROSTTBAppWindow::_set_form_info()
 void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
 {
     if(ui->tableWidgetTimetable->rowCount() < 1) return;
-    _current_service_selection = _current_timetable->operator[](ui->tableWidgetTimetable->takeItem(row, 1)->text());
-    qDebug() << "Selected: " << _current_service_selection->summarise();
-    update_output();
+    ROSService* _selection = _current_timetable->operator[](ui->tableWidgetTimetable->takeItem(row, 1)->text());
+    qDebug() << "Selected: " << _selection->summarise();
+    update_output(_selection);
     ui->tableWidgetTimetable->selectRow(row);
     _set_form_info();
 }

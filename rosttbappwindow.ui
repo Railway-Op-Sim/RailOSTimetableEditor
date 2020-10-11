@@ -1333,6 +1333,12 @@
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="alternatingRowColors">
+     <bool>true</bool>
+    </property>
+    <property name="sortingEnabled">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QTableWidget" name="tableWidgetTimetable">
     <property name="geometry">
@@ -1347,6 +1353,12 @@
      <font>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="alternatingRowColors">
+     <bool>true</bool>
+    </property>
+    <property name="sortingEnabled">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QTimeEdit" name="timeEditTTBStart">
@@ -1647,7 +1659,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
