@@ -52,9 +52,15 @@ QString CloneDialog::_create_new_id(const QString& current_id)
         if(current_id[2].isNumber())
         {
             int _end_num = current_id.right(2).toInt()+1;
-            while(_current_service_list.contains(current_id.left(2)+QString::number(_end_num)))
+            QString _end_num_str = current_id.left(2);
+            _end_num_str += (_end_num < 10) ? "0" : "";
+            _end_num_str += QString::number(_end_num);
+            while(_current_service_list.contains(_end_num_str))
             {
                 _end_num++;
+                _end_num_str = current_id.left(2);
+                _end_num_str += (_end_num < 10) ? "0" : "";
+                _end_num_str += QString::number(_end_num);
                 if(_end_num > 99) return _new_id;
             }
 
