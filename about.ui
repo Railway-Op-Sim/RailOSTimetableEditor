@@ -62,7 +62,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Copyright © 2020 Kristian Zarebski</string>
+    <string>Copyright © 2021 Kristian Zarebski</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
@@ -80,7 +80,7 @@
     </font>
    </property>
    <property name="text">
-    <string>GUI and User Interface made using Qt Open Source Edition v5.14</string>
+    <string>GUI and User Interface made using Qt Open Source Edition v5.15</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_5">

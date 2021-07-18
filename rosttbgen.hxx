@@ -2,11 +2,11 @@
 //         ROS Timetable Editor File Parser Class Definition               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
-// timetable editor constructed using the Qt v5.14 framework.              //
+// timetable editor constructed using the Qt v5.15 framework.              //
 // for Railway Operation Simulator, a railway signalling simulation        //
 // by Albert Ball, Copyright (c) 2010 [original development].              //
 //                                                                         //
-// Copyright (C) 2020 Kristian Zarebski                                    //
+// Copyright (C) 2021 Kristian Zarebski                                    //
 //                                                                         //
 // This program is free software: you can redistribute it and/or modify    //
 // it under the terms of the GNU General Public License as published by    //
@@ -48,7 +48,7 @@
     @details    A class to parse existing timetables and generate new ones using current data
     @version    0.1.9
     @author     Kristian Zarebski
-    @date 	    last modified 2020-02-16
+    @date 	    last modified 2021-02-16
     @copyright  GNU Public License v3
 */
 class ROSTTBGen
@@ -59,6 +59,9 @@ class ROSTTBGen
 
         //! Container for parse list of stations
         QSet<QString> _stations_list= {};
+
+        //! Container for parsed cordinates
+        QMap<QString, QList<int>> _coordinates;
 
         //! Current timetable to be modified
         ROSTimetable* _current_timetable = new ROSTimetable;
@@ -202,6 +205,16 @@ class ROSTTBGen
         */
         QString _make_repeat_line(ROSService* service);
 
+        /*! @brief Parse the station list from an input ROS .rly file
+        @return name of the current route
+        */
+        QSet<QString> _parse_rly_stations(QString route_file);
+
+        /*! @brief Parse railway station coordinates from .rly file
+        @return map of coordinates for each station
+        */
+        QMap<QString, QList<int>> _parse_rly_coordinates(const QString railways_dir);
+
         //! Map object to map ROSService::FinishState onto the ROS syntax
         QMap<ROSService::FinishState, QString> _exit_types = {{ROSService::FinishState::FinishExit, "Fer"},
                                                               {ROSService::FinishState::FinishFormNew, "Fns"},
@@ -235,13 +248,10 @@ class ROSTTBGen
         QSet<QString> getStations(){return _stations_list;}
 
         /*! @brief Parse the data from an input ROS .ttb file
-        @return void
+        @return file contents
         */
         QString parse_file(const QFileDialog* dialog, const QDir* directory);
 
-        /*! @brief Parse the station list from an input ROS .rly file
-        @return void
-        */
         QString parse_rly(const QString railways_dir);
 
         /*! @brief Fetch the constructed timetable

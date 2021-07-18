@@ -2,11 +2,11 @@
 //         ROS Timetable Editor Clone Service Application Window           //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
-// timetable editor constructed using the Qt v5.14 framework.              //
+// timetable editor constructed using the Qt v5.15 framework.              //
 // for Railway Operation Simulator, a railway signalling simulation        //
 // by Albert Ball, Copyright (c) 2010 [original development].              //
 //                                                                         //
-// Copyright (C) 2020 Kristian Zarebski                                    //
+// Copyright (C) 2021 Kristian Zarebski                                    //
 //                                                                         //
 // This program is free software: you can redistribute it and/or modify    //
 // it under the terms of the GNU General Public License as published by    //
@@ -51,7 +51,7 @@ QString CloneDialog::_create_new_id(const QString& current_id)
     {
         if(current_id[2].isNumber())
         {
-            int _end_num = current_id.right(2).toInt()+1;
+            int _end_num = current_id.rightRef(2).toInt()+1;
             QString _end_num_str = current_id.left(2);
             _end_num_str += (_end_num < 10) ? "0" : "";
             _end_num_str += QString::number(_end_num);
@@ -70,7 +70,7 @@ QString CloneDialog::_create_new_id(const QString& current_id)
 
         else
         {
-            int _end_num = current_id.right(1).toInt()+1;
+            int _end_num = current_id.rightRef(1).toInt()+1;
             while(_current_service_list.contains(current_id.left(3)+QString::number(_end_num)))
             {
                 _end_num++;

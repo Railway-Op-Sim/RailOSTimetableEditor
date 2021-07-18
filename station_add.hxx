@@ -2,11 +2,11 @@
 //             ROS Timetable Editor Location Add Window                    //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
-// timetable editor constructed using the Qt v5.14 framework.              //
+// timetable editor constructed using the Qt v5.15 framework.              //
 // for Railway Operation Simulator, a railway signalling simulation        //
 // by Albert Ball, Copyright (c) 2010 [original development].              //
 //                                                                         //
-// Copyright (C) 2020 Kristian Zarebski                                    //
+// Copyright (C) 2021 Kristian Zarebski                                    //
 //                                                                         //
 // This program is free software: you can redistribute it and/or modify    //
 // it under the terms of the GNU General Public License as published by    //
@@ -46,7 +46,7 @@ class Station_add;
     @details    Pop-up window for adding a new location to an existing service
     @version    0.1.9
     @author     Kristian Zarebski
-    @date 	    last modified 2020-02-16
+    @date 	    last modified 2021-02-16
     @copyright  GNU Public License v3
 */
 class Station_add : public QDialog

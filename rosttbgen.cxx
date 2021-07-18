@@ -2,11 +2,11 @@
 //         ROS Timetable Editor File Parser Class Definition               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
-// timetable editor constructed using the Qt v5.14 framework.              //
+// timetable editor constructed using the Qt v5.15 framework.              //
 // for Railway Operation Simulator, a railway signalling simulation        //
 // by Albert Ball, Copyright (c) 2010 [original development].              //
 //                                                                         //
-// Copyright (C) 2020 Kristian Zarebski                                    //
+// Copyright (C) 2021 Kristian Zarebski                                    //
 //                                                                         //
 // This program is free software: you can redistribute it and/or modify    //
 // it under the terms of the GNU General Public License as published by    //
@@ -95,12 +95,30 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 QString ROSTTBGen::parse_rly(const QString railways_dir)
 {
     QFileDialog* _route_diag = new QFileDialog;
+    qDebug() << railways_dir << endl;
     QString _current_route = _route_diag->getOpenFileName(_parent,  QObject::tr("Open Route"), railways_dir,
                                    QObject::tr("ROS Railway Files (*.rly)"));
-    QStringList _stations = {};
+
     QFile open_file(_current_route);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
-        return "NULL";
+            return "NULL";
+
+    open_file.close();
+
+    _parse_rly_stations(_current_route);
+    _parse_rly_coordinates(_current_route);
+
+
+    return _current_route;
+}
+
+QSet<QString> ROSTTBGen::_parse_rly_stations(QString route_file)
+{
+
+    QStringList _stations = {};
+    QFile open_file(route_file);
+    if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
+        return {};
 
     QTextStream in(&open_file);
     QString previous = "";
@@ -118,11 +136,53 @@ QString ROSTTBGen::parse_rly(const QString railways_dir)
         }
         ++counter;
     }
-    _stations_list = QSet<QString>(_stations.begin(), _stations.end());
+    _stations_list = _stations.toSet();
 
     open_file.close();
 
-    return _current_route;
+    return _stations_list;
+}
+
+QMap<QString, QList<int>> ROSTTBGen::_parse_rly_coordinates(const QString route_file)
+{
+    QFile open_file(route_file);
+    if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
+        return {};
+
+    QTextStream in(&open_file);
+
+    QStringList _file_lines = {};
+
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        _file_lines.append(line);
+    }
+
+    for(int i{0}; i < _file_lines.size()-1; ++i)
+    {
+        if(_stations_list.contains(_file_lines[i]) && _file_lines[i+1].contains("**"))
+        {
+            if(!_coordinates.contains(_file_lines[i].replace(QChar::Null, "")))
+            {
+                _coordinates[_file_lines[i].replace("\x00", "")] = QList<int>();
+            }
+
+            if(_file_lines[i-1] != "\x00\n" || _file_lines[i-10] != QString("******")+QChar::Null+QString("\n"))
+            {
+                continue;
+            }
+
+            try {
+                _coordinates[_file_lines[i].replace("\x00", "")].append({std::stoi(_file_lines[i-7].toStdString()), std::stoi(_file_lines[i-6].toStdString())});
+            }  catch (std::invalid_argument) {
+                continue;
+            }
+        }
+    }
+
+    qDebug() << _coordinates;
+
+    return _coordinates;
 }
 
 bool ROSTTBGen::_isTime(QString string)
@@ -158,7 +218,7 @@ bool ROSTTBGen::_isPass(QStringList str_list)
 bool ROSTTBGen::_isStart(QStringList str_list)
 {
     QStringList _types = _start_types.values();
-    for(auto type : _types)
+    for(auto& type : _types)
     {
         if(str_list.contains(type)) return true;
     }

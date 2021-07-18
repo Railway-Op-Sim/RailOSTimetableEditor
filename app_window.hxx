@@ -2,11 +2,11 @@
 //              ROS Timetable Editor Main Application Window               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
-// timetable editor constructed using the Qt v5.14 framework.              //
+// timetable editor constructed using the Qt v5.15 framework.              //
 // for Railway Operation Simulator, a railway signalling simulation        //
 // by Albert Ball, Copyright (c) 2010 [original development].              //
 //                                                                         //
-// Copyright (C) 2020 Kristian Zarebski                                    //
+// Copyright (C) 2021 Kristian Zarebski                                    //
 //                                                                         //
 // This program is free software: you can redistribute it and/or modify    //
 // it under the terms of the GNU General Public License as published by    //
@@ -55,7 +55,7 @@ QT_END_NAMESPACE
     @details    Main window for viewing, creating and editting services within a ROS timetable
     @version    0.1.9
     @author     Kristian Zarebski
-    @date 	    last modified 2020-02-24
+    @date 	    last modified 2021-02-24
     @copyright  GNU Public License v3
 */
 class ROSTTBAppWindow : public QMainWindow
@@ -218,7 +218,11 @@ private slots:
 
     void on_radioButton_kph_toggled(bool checked);
 
+    void on_actionExit_triggered();
+
 private:
+    QChar _qt_path_sep = '/';
+
     //! Sets whether current train property change is induced by template selection
     bool _is_template_change = false;
 
@@ -233,6 +237,9 @@ private:
 
     //! Location of ROS Timetables
     QDir* _ros_timetables = nullptr;
+
+    //! Location of ROS Railways
+    QDir* _ros_railways = nullptr;
 
     //! User Interface Class member instance
     Ui::ROSTTBAppWindow *ui;
@@ -302,11 +309,6 @@ private:
     */
     void _delete_entries();
 
-    /*! @brief Set the initial file to edit
-    @return void
-    */
-    void _set_initial_open_file();
-
     /*! @brief Enable/Disable the speed, weight, power property editors in the window
     @return void
     */
@@ -341,6 +343,8 @@ private:
     @return A string list of templates
     */
     QStringList _create_custom_template_strings();
+
+    void _make_paths(QString ros_path);
 
 };
 #endif // ROSTTBAPPWINDOW_HXX

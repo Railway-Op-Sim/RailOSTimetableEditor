@@ -2,11 +2,11 @@
 //             ROS Timetable Editor Location Add Window                    //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
-// timetable editor constructed using the Qt v5.14 framework.              //
+// timetable editor constructed using the Qt v5.15 framework.              //
 // for Railway Operation Simulator, a railway signalling simulation        //
 // by Albert Ball, Copyright (c) 2010 [original development].              //
 //                                                                         //
-// Copyright (C) 2020 Kristian Zarebski                                    //
+// Copyright (C) 2021 Kristian Zarebski                                    //
 //                                                                         //
 // This program is free software: you can redistribute it and/or modify    //
 // it under the terms of the GNU General Public License as published by    //
@@ -49,7 +49,7 @@ void Station_add::clearForm()
 
 void Station_add::setStations(QSet<QString> stations)
 {
-    _station_list = QList<QString>(stations.begin(), stations.end());
+    _station_list = stations.toList();
     std::sort(_station_list.begin(), _station_list.end());
     ui->comboBoxStations->clear();
     ui->comboBoxStations->addItem("");

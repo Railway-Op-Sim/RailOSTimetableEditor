@@ -2,11 +2,11 @@
 //              ROS Timetable Editor Main Application Window               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
-// timetable editor constructed using the Qt v5.14 framework.              //
+// timetable editor constructed using the Qt v5.15 framework.              //
 // for Railway Operation Simulator, a railway signalling simulation        //
 // by Albert Ball, Copyright (c) 2010 [original development].              //
 //                                                                         //
-// Copyright (C) 2020 Kristian Zarebski                                    //
+// Copyright (C) 2021 Kristian Zarebski                                    //
 //                                                                         //
 // This program is free software: you can redistribute it and/or modify    //
 // it under the terms of the GNU General Public License as published by    //
@@ -98,19 +98,20 @@ ROSTTBAppWindow::ROSTTBAppWindow()
 
     if(_cache_file.exists())
     {
-        qDebug() << "Reading ROS Location from cache";
+        qDebug() << "Reading ROS Location from cache: " << _cache_file.fileName();
         if(!_cache_file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(0,QObject::tr("error"), _cache_file.errorString());
+            QMessageBox::information(0, QObject::tr("error"), _cache_file.errorString());
         }
         QTextStream in(&_cache_file);
+
+        QString _ros_loc;
         while (!in.atEnd()) {
-            QString line = in.readLine();
-            _ros_timetables = new QDir(line);
-            ui->ROSStatus->setText(line);
-            ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
-            break;
+            _ros_loc = in.readLine();
         }
-        _set_initial_open_file();
+        ui->ROSStatus->setText(_ros_loc);
+        ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
+
+        _make_paths(_ros_loc);
     }
 
     _cache_file.close();
@@ -632,22 +633,12 @@ void ROSTTBAppWindow::open_file()
     _set_form_info();
 }
 
-void ROSTTBAppWindow::_set_initial_open_file()
+void ROSTTBAppWindow::_make_paths(QString ros_path)
 {
-    QString _split_str = (QSysInfo::productType() == "windows") ? "\\" : "/";
-    _open_file_str = _ros_timetables->path()+_split_str+_current_timetable->getFileName();
-}
-
-void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
-{
-    QString _file_name = _current_file->getOpenFileName(this, tr("Open File"), QDir::currentPath(),
-                                                        tr("ROS Executable (*.exe *.app)"));
-    if(_file_name == QString()) return;
-
-    QStringList _dot_split = _file_name.split(".");
+    QStringList _dot_split = ros_path.split(".");
     QString _type = _dot_split[_dot_split.size()-1];
-    QString _split_str = (QSysInfo::productType() == "windows") ? "\\" : "/";
-    QStringList _locations = _file_name.split(_split_str);
+    QStringList _locations = ros_path.split(_qt_path_sep);
+    qDebug() << ros_path << endl;
     if(_type == "app")
     {
       _locations.append("Contents");
@@ -660,12 +651,27 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
     {
         _locations.pop_back();
     }
-    QString _directory = (QSysInfo::productType() == "windows") ? "Program timetables" : "Program\\ timetables";
-    _locations.append(_directory);
-    _ros_timetables = new QDir(_locations.join(_split_str));
+    QString _ttb_dir = (QSysInfo::productType() == "windows") ? "Program timetables" : "Program\\ timetables";
+    QString _rly_dir = "Railways";
+
+    QStringList _rly_parts(_locations);
+    QStringList _ttb_parts(_locations);
+
+    _ttb_parts.append(_ttb_dir);
+    _rly_parts.append(_rly_dir);
+
+    _ros_timetables = new QDir(_ttb_parts.join(_qt_path_sep));
+    _ros_railways = new QDir(_rly_parts.join(_qt_path_sep));
+}
+
+void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
+{
+    QString _file_name = _current_file->getOpenFileName(this, tr("Open File"), QDir::currentPath(),
+                                                        tr("ROS Executable (*.exe *.app)"));
+    if(_file_name == QString()) return;
+
     ui->ROSStatus->setText(_file_name);
     ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
-    _set_initial_open_file();
 
     QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
     QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
@@ -679,10 +685,12 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
     }
 
     QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat"));
+
+    qDebug() << "Writing cache to : " << join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat") << endl;
     if ( _cache_file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
     {
         QTextStream stream( &_cache_file );
-        stream << _ros_timetables->absolutePath() << endl;
+        stream << _file_name << endl;
     }
     _cache_file.close();
 }
@@ -790,15 +798,9 @@ void ROSTTBAppWindow::_populate_feederboxes()
 
 void ROSTTBAppWindow::on_pushButtonRoute_clicked()
 {
-    QString _split_str = (QSysInfo::productType() == "windows") ? "\\" : "/";
-    QStringList _parts = _open_file_str.split(_split_str);
-    _parts.pop_back();
-    _parts.pop_back();
-    _parts.push_back("Railways");
-    QString _railways_dir = _parts.join(_split_str);
-    QString _parsed = _parser->parse_rly(_railways_dir);
+    QString _parsed = _parser->parse_rly(_ros_railways->path());
     _current_route = (_parsed != "NULL") ? _parsed : _current_route;
-    _parts = _current_route.split(_split_str);
+    QStringList _parts = _current_route.split(_qt_path_sep);
     ui->SelectedRoute->setText(_parts[_parts.size()-1]);
     ui->SelectedRoute->setStyleSheet("QLabel { color : green; }");
 
@@ -1494,8 +1496,8 @@ void ROSTTBAppWindow::_read_in_custom_templates()
     }
     ui->comboBoxTrainSet->clear();
     QStringList _temp = TrainSet::TrainSet.keys()+_custom_types.keys();
-    QSet<QString> _temp_set(_temp.begin(), _temp.end());
-    _temp = QStringList(_temp_set.begin(), _temp_set.end());
+    QSet<QString> _temp_set = _temp.toSet();
+    _temp = _temp_set.toList();
     std::sort(_temp.begin(), _temp.end());
     ui->comboBoxTrainSet->addItem("Custom");
     ui->comboBoxTrainSet->addItems(_temp);
@@ -1623,7 +1625,7 @@ void ROSTTBAppWindow::on_checkBoxAtStation_toggled(bool checked)
 {
     if(checked)
     {
-        // Cannot start a service from a station with non-zero start speed
+        // Cannot start a service from a station with non-zer   o start speed
         ui->spinBoxStartSpeed->setValue(0);
     }
 }
@@ -1633,3 +1635,9 @@ void ROSTTBAppWindow::on_radioButton_kph_toggled(bool checked)
     ui->start_speed_label->setText(ui->radioButton_kph->isChecked() ? "Start Speed (kph)" : "Start Speed (mph)");
     ui->max_speed_label->setText(ui->radioButton_kph->isChecked() ? "Max Speed (kph)" : "Max Speed (mph)");
 }
+
+void ROSTTBAppWindow::on_actionExit_triggered()
+{
+    QApplication::exit();
+}
+
