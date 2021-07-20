@@ -461,11 +461,6 @@ public:
         {
             _direction_changes.push_back(false);
             _cdt_times.push_back(QTime());
-
-            if(_direction_changes.size() != _stations.size())
-            {
-                qDebug() << "SHIT!" << endl;
-            }
         }
     }
 
@@ -491,7 +486,6 @@ public:
         _passing_sTrainSet[index] = Pass;
         _cdt_times[index] = cdt_time;
         _stations[index] = new_station;
-        qDebug() << _stations;
     }
 
     /*! @brief Set a given stop (by index) to be a passing point

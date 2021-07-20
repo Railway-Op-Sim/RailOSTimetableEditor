@@ -95,7 +95,7 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 QString ROSTTBGen::parse_rly(const QString railways_dir)
 {
     QFileDialog* _route_diag = new QFileDialog;
-    qDebug() << railways_dir << endl;
+
     QString _current_route = _route_diag->getOpenFileName(_parent,  QObject::tr("Open Route"), railways_dir,
                                    QObject::tr("ROS Railway Files (*.rly)"));
 
@@ -143,44 +143,45 @@ QSet<QString> ROSTTBGen::_parse_rly_stations(QString route_file)
     return _stations_list;
 }
 
-QMap<QString, QList<int>> ROSTTBGen::_parse_rly_coordinates(const QString route_file)
+QMap<QString, QList<QList<int>>> ROSTTBGen::_parse_rly_coordinates(const QString route_file)
 {
     QFile open_file(route_file);
+
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
         return {};
 
     QTextStream in(&open_file);
 
-    QStringList _file_lines = {};
+    QStringList _file_lines;
 
     while (!in.atEnd()) {
         QString line = in.readLine();
-        _file_lines.append(line);
+        _file_lines.push_back(line);
     }
 
     for(int i{0}; i < _file_lines.size()-1; ++i)
     {
-        if(_stations_list.contains(_file_lines[i]) && _file_lines[i+1].contains("**"))
+        if(_stations_list.contains(_file_lines[i].replace(QChar::Null, "")) && _file_lines[i+1].contains("**"))
         {
-            if(!_coordinates.contains(_file_lines[i].replace(QChar::Null, "")))
-            {
-                _coordinates[_file_lines[i].replace("\x00", "")] = QList<int>();
-            }
+            qDebug() << (_file_lines[i-1] != QString("\n")) << " " << (_file_lines[i-10] != QString("******")+QChar::Null+QString("\n")) << endl;
 
-            if(_file_lines[i-1] != "\x00\n" || _file_lines[i-10] != QString("******")+QChar::Null+QString("\n"))
+            if(!_file_lines[i-1].isEmpty() || _file_lines[i-10] != "******")
             {
                 continue;
             }
 
+            if(!_coordinates.contains(_file_lines[i].replace(QChar::Null, "")))
+            {
+                _coordinates[_file_lines[i].replace(QChar::Null, "")] = QList<QList<int>>();
+            }
+
             try {
-                _coordinates[_file_lines[i].replace("\x00", "")].append({std::stoi(_file_lines[i-7].toStdString()), std::stoi(_file_lines[i-6].toStdString())});
+                _coordinates[_file_lines[i].replace(QChar::Null, "")].push_back(QList<int>({std::stoi(_file_lines[i-7].toStdString()), std::stoi(_file_lines[i-6].toStdString())}));
             }  catch (std::invalid_argument) {
                 continue;
             }
         }
     }
-
-    qDebug() << _coordinates;
 
     return _coordinates;
 }
@@ -585,7 +586,7 @@ void ROSTTBGen::_process_data()
             QMessageBox::critical(_parent, "Duplicate Service", "Service ID "+id+" is duplicated! Attempting ID change");
             if(id[2].isNumber() && id[3].isNumber())
             {
-                int _num = id.mid(2,3).toInt();
+                int _num = id.midRef(2,3).toInt();
                 bool _new_id_found = false;
                 while(!_new_id_found)
                 {

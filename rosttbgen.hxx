@@ -61,7 +61,7 @@ class ROSTTBGen
         QSet<QString> _stations_list= {};
 
         //! Container for parsed cordinates
-        QMap<QString, QList<int>> _coordinates;
+        QMap<QString, QList<QList<int>>> _coordinates;
 
         //! Current timetable to be modified
         ROSTimetable* _current_timetable = new ROSTimetable;
@@ -213,7 +213,7 @@ class ROSTTBGen
         /*! @brief Parse railway station coordinates from .rly file
         @return map of coordinates for each station
         */
-        QMap<QString, QList<int>> _parse_rly_coordinates(const QString railways_dir);
+        QMap<QString, QList<QList<int>>> _parse_rly_coordinates(const QString railways_dir);
 
         //! Map object to map ROSService::FinishState onto the ROS syntax
         QMap<ROSService::FinishState, QString> _exit_types = {{ROSService::FinishState::FinishExit, "Fer"},

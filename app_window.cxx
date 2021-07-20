@@ -1221,7 +1221,6 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     _station_add->setCurrentService(_current_service_selection);
     _station_add->setStations(_parser->getStations());
     const QString _station_name = ui->tableWidgetService->takeItem(row, 2)->text();
-    qDebug() << _station_name;
 
     if(!_parser->getStations().contains(_station_name))
     {
