@@ -194,7 +194,7 @@ void Station_add::on_buttonBoxAddStation_accepted()
 
     else
     {
-        this->show();
+        this->setVisible(true);
     }
 
     _redraw_table();

@@ -55,6 +55,8 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->pushButtonTemplateSave->setVisible(false);
     ui->pushButtonTemplateCancel->setVisible(false);
     ui->labelTemplateName->setVisible(false);
+    ui->labelTrackIDFront->setVisible(false);
+    ui->labelTrackIDRear->setVisible(false);
     ui->labelStartTime->setText(_current_timetable->getStartTime().toString("HH:mm"));
     for(int i{0}; i < TTB_COL_COUNT; ++i) ui->tableWidgetTimetable->setColumnWidth(i, _ttb_column_widths[i]);
     for(int i{0}; i < SERV_COL_COUNT; ++i) ui->tableWidgetService->setColumnWidth(i, _srv_column_widths[i]);
@@ -80,7 +82,9 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->textEditShuttlePart2->setMaxLength(4);
     ui->textEditParentShuttleRef->setMaxLength(4);
     _station_add->setServiceTable(ui->tableWidgetService);
-
+    ui->checkBoxAtStation->setChecked(true);
+    ui->comboBoxTrackIDs->setEnabled(false);
+    ui->comboBoxTrackIDStations->setEnabled(false);
     QFont font = qApp->font();
     font.setPixelSize(12);
     qApp->setFont(font);
@@ -213,7 +217,24 @@ bool ROSTTBAppWindow::_record_current_info()
               _max_brake   = ui->spinBoxForce->value(),
               _max_speed   = ui->spinBoxMaxSpeed->value();
 
-    const QStringList _start_ids = {ui->textEditEnterID1->text(), ui->textEditEnterID2->text()};
+    QStringList _start_ids;
+
+    if(!ui->checkBoxAtStation->isChecked())
+    {
+        _start_ids.push_back(ui->textEditEnterID1->text());
+        _start_ids.push_back(ui->textEditEnterID2->text());
+    }
+    else
+    {
+        const int _index = ui->comboBoxTrackIDs->findText(ui->comboBoxTrackIDs->currentText());
+        const QStringList _coord_strs = _current_coords[_index].toList();
+        _start_ids.push_back(_coord_strs[0]);
+        _start_ids.push_back(_coord_strs[1]);
+    }
+
+    qDebug() << _start_ids << endl;
+
+
     const bool info_missing = _srv_id == "" || _desc == "";
     if(info_missing)
     {
@@ -803,7 +824,10 @@ void ROSTTBAppWindow::on_pushButtonRoute_clicked()
     QStringList _parts = _current_route.split(_qt_path_sep);
     ui->SelectedRoute->setText(_parts[_parts.size()-1]);
     ui->SelectedRoute->setStyleSheet("QLabel { color : green; }");
-
+    QStringList _stations = _parser->getStations().toList();
+    _stations.sort();
+    ui->comboBoxTrackIDStations->addItems(_stations);
+    ui->comboBoxTrackIDStations->setEnabled(true);
 }
 
 void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
@@ -823,7 +847,7 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     _station_add->setCurrentService(_current_service_selection);
     _station_add->setStations(_parser->getStations());
     _station_add->clearForm();
-    _station_add->show();
+    _station_add->setVisible(true);
     QList<QTime> _times;
     if(_current_service_selection->getTimes().size() > 0)
     {
@@ -1059,10 +1083,14 @@ void ROSTTBAppWindow::_set_form_info()
     ui->spinBoxStartSpeed->setValue(_start_speed);
 
     // Need to be careful, check array is actually filled before filling form
-    if(_start_ids.size() > 0)ui->textEditEnterID1->setText(_start_ids[0]);
-    else{ui->textEditEnterID1->clear();}
-    if(_start_ids.size() > 1)ui->textEditEnterID2->setText(_start_ids[1]);
-    else{ui->textEditEnterID2->clear();}
+    if(!ui->checkBoxAtStation->isChecked())
+    {
+        if(_start_ids.size() > 0)ui->textEditEnterID1->setText(_start_ids[0]);
+        else{ui->textEditEnterID1->clear();}
+        if(_start_ids.size() > 1)ui->textEditEnterID2->setText(_start_ids[1]);
+        else{ui->textEditEnterID2->clear();}
+    }
+
     ui->spinBoxRepeats->setValue(_n_repeats);
     ui->spinBoxRefIncrement->setValue(_interval);
     ui->spinBoxRepeatInterval->setValue(_t_interv);
@@ -1250,7 +1278,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
         return;
     }
 
-    _station_add->show();
+    _station_add->setVisible(true);
     update_output();
 }
 
@@ -1342,7 +1370,7 @@ void ROSTTBAppWindow::_clone_current()
     for(auto s : _current_timetable->getServices()) _service_ids.push_back(s->getID());
     _clone_srv->fwdServicesList(_service_ids);
     _clone_srv->setInitialValues();
-    _clone_srv->show();
+    _clone_srv->setVisible(true);
 }
 
 void ROSTTBAppWindow::on_pushButtonClone_clicked()
@@ -1617,26 +1645,72 @@ void ROSTTBAppWindow::on_pushButtonCreateTemplate_clicked()
 
 void ROSTTBAppWindow::on_actionAbout_ROSTTBGen_triggered()
 {
-    _about_window->show();
+    _about_window->setVisible(true);
 }
 
 void ROSTTBAppWindow::on_checkBoxAtStation_toggled(bool checked)
 {
-    if(checked)
-    {
-        // Cannot start a service from a station with non-zer   o start speed
-        ui->spinBoxStartSpeed->setValue(0);
-    }
+    // Cannot start a service from a station with non-zero start speed
+    if(checked) ui->spinBoxStartSpeed->setValue(0);
+    ui->labelTrackIDs->setVisible(checked);
+    ui->labelTrackIDstations->setVisible(checked);
+    ui->comboBoxTrackIDs->setVisible(checked);
+    ui->comboBoxTrackIDStations->setVisible(checked);
+    ui->labelTrackIDRear->setVisible(!checked);
+    ui->labelTrackIDFront->setVisible(!checked);
 }
 
 void ROSTTBAppWindow::on_radioButton_kph_toggled(bool checked)
 {
-    ui->start_speed_label->setText(ui->radioButton_kph->isChecked() ? "Start Speed (kph)" : "Start Speed (mph)");
-    ui->max_speed_label->setText(ui->radioButton_kph->isChecked() ? "Max Speed (kph)" : "Max Speed (mph)");
+    ui->start_speed_label->setText(checked ? "Start Speed (kph)" : "Start Speed (mph)");
+    ui->max_speed_label->setText(checked ? "Max Speed (kph)" : "Max Speed (mph)");
 }
 
 void ROSTTBAppWindow::on_actionExit_triggered()
 {
     QApplication::exit();
+}
+
+
+void ROSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QString &arg1)
+{
+    if(!arg1.isEmpty())
+    {
+        ui->comboBoxTrackIDs->setEnabled(true);
+        const QMap<QString, QList<QList<int>>> _coords = _parser->getCoordinates();
+        ui->comboBoxTrackIDs->clear();
+        QStringList _coords_for_loc = {};
+
+        for(auto& coord_set_1 : _coords[arg1])
+        {
+            const int x_1 = coord_set_1[0];
+            const int y_1 = coord_set_1[1];
+
+            for(auto& coord_set_2 : _coords[arg1])
+            {
+                const int x_2 = coord_set_2[0];
+                const int y_2 = coord_set_2[1];
+
+                if(x_1 == x_2 && y_1 == y_2) continue;
+
+                if(abs(x_1-x_2) == 1 || abs(y_1-y_2) == 1)
+                {
+                    _coords_for_loc.append(
+                                "("+QString::fromStdString(std::to_string(coord_set_1[0]))+","+QString::fromStdString(std::to_string(coord_set_1[1]))+") " +
+                                "("+QString::fromStdString(std::to_string(coord_set_2[0]))+","+QString::fromStdString(std::to_string(coord_set_2[1]))+")"
+                    );
+                    _current_coords.push_back({
+                        QString::fromStdString(std::to_string(coord_set_1[0])).replace("-", "N")+"-"+QString::fromStdString(std::to_string(coord_set_1[1])).replace("-", "N"),
+                        QString::fromStdString(std::to_string(coord_set_2[0])).replace("-", "N")+"-"+QString::fromStdString(std::to_string(coord_set_2[1])).replace("-", "N")
+                    });
+                }
+            }
+        }
+        ui->comboBoxTrackIDs->addItems(_coords_for_loc);
+    }
+    else
+    {
+        ui->comboBoxTrackIDs->setEnabled(false);
+    }
 }
 

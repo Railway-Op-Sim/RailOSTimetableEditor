@@ -51,7 +51,7 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 
         bool _start_time_found = false;
 
-        for(auto part : _parts)
+        for(auto& part : _parts)
         {
             if(part.contains(";"))
             {
@@ -94,9 +94,7 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 
 QString ROSTTBGen::parse_rly(const QString railways_dir)
 {
-    QFileDialog* _route_diag = new QFileDialog;
-
-    QString _current_route = _route_diag->getOpenFileName(_parent,  QObject::tr("Open Route"), railways_dir,
+    QString _current_route = QFileDialog::getOpenFileName(_parent,  QObject::tr("Open Route"), railways_dir,
                                    QObject::tr("ROS Railway Files (*.rly)"));
 
     QFile open_file(_current_route);
@@ -257,7 +255,7 @@ ROSService::FinishState ROSTTBGen::_parseExit(QStringList str_list)
 bool ROSTTBGen::_isEnd(QStringList str_list)
 {
     QStringList _types = _exit_types.values();
-    for(auto type : _types)
+    for(auto& type : _types)
     {
         if(str_list.contains(type)) return true;
     }
@@ -419,27 +417,69 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     ROSService::FinishState _fin_state = _parseExit(_components);
     _service->setFinishState(_fin_state);
 
+    // If the number of components does not match the expected number for the given
+    // service termination type, do not attempt to retrieve termination info
+    const QString _service_name = _service->getID();
+    const QString _glob_msg = QString("Invalid termination statement for service ")+_service_name+". ";
+
     switch(_fin_state)
     {
         case ROSService::FinishState::FinishRemainHere:
             break;
         case ROSService::FinishState::FinishExit:
+            if(_components.size() != 3)
+            {
+                const QString _err_msg = _glob_msg + "Expected \"HH:MM;Fer;Exit ID\" for type \"Finish Exit Railway\"";
+                QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
+                break;
+            }
+
             _service->setExitPoint(_components[2]);
             break;
         case ROSService::FinishState::FinishFormNew:
+            if(_components.size() != 3)
+            {
+                const QString _err_msg = _glob_msg + "Expected \"HH:MM;Fns;Service ref\" for type \"Finish Form New\"";
+                QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
+                break;
+            }
             _service->setDaughter(_components[2]);
             break;
         case ROSService::FinishState::FinishJoinOther:
+            if(_components.size() != 3)
+            {
+                const QString _err_msg = _glob_msg + "Expected \"HH:MM;Fjo;Service ref\" for type \"Finish Join Other\"";
+                QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
+                break;
+            }
             _service->setDaughter(_components[2]);
             break;
         case ROSService::FinishState::FinishShuttleFormNew:
+            if(_components.size() != 4)
+            {
+                const QString _err_msg = _glob_msg + "Expected \"HH:MM;Fns-sh;Shuttle ref;Finish ref\" for type \"Finish Shuttle Form New\"";
+                QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
+                break;
+            }
             _service->setParent(_components[2]);
             _service->setDaughter(_components[3]);
             break;
         case ROSService::FinishState::FinishShuttleRemainHere:
+            if(_components.size() != 3)
+            {
+                const QString _err_msg = _glob_msg + "Expected \"HH:MM;Frh-sh;Shuttle ref\" for type \"Finish Shuttle Remain Here\"";
+                QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
+                break;
+            }
             _service->setParent(_components[2]);
             break;
         case ROSService::FinishState::FinishSingleShuttleFeeder:
+            if(_components.size() != 3)
+            {
+                const QString _err_msg = _glob_msg + "Expected \"HH:MM;F-nshs;Shuttle ref\" for type \"Finish Single Shuttle Feeder\"";
+                QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
+                break;
+            }
             _service->setDaughter(_components[2]);
             break;
         default:
@@ -448,6 +488,11 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
     if(_fin_state != ROSService::FinishState::FinishRemainHere)
     {
+        if(_components.size() != 1)
+        {
+            const QString _err_msg = _glob_msg + "Expected \"Frh\" for type \"Finish Remain Here\"";
+            QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
+        }
         QTime _time = QTime::fromString(_components[0], "HH:mm");
         _service->setExitTime(_time);
     }
@@ -467,7 +512,8 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         else if(_isSplit(service[i].split(";")))
         {
             QStringList _components = service[i].split(";");
-            _service->setSplitData(_components[1], _components[2], _service->getStations()[_service->getStations().size()-1], _components[0]);
+            const QStringList _stations = _service->getStations();
+            _service->setSplitData(_components[1], _components[2], _stations[_service->getStations().size()-1], _components[0]);
         }
         else if(_isCallingPoint(service[i].split(";")))
         {
@@ -497,8 +543,9 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         else if(_isJoin(service[i].split(";")))
         {
             QStringList _components = service[i].split(";");
-            if(_service->getStations().size() < 1) continue;
-            _service->setJoinData(_components[2], _service->getStations()[_service->getStations().size()-1], _components[0].replace("W", ""));
+            const QStringList _stations = _service->getStations();
+            if(_stations.size() < 1) continue;
+            _service->setJoinData(_components[2], _stations[_stations.size()-1], _components[0].replace("W", ""));
         }
 
         else if(_isDirChange(service[i].split(";")))
@@ -651,12 +698,14 @@ QString ROSTTBGen::_make_type_line(ROSService* service)
     const QString _start_time = service->getStartTime().toString("HH:mm"),
                   _start_type = _start_types[service->getType()];
 
+    const QStringList _start_point = service->getStartPoint();
+
     switch(service->getType())
     {
         case ROSService::ServiceType::Service:
-            return join(";", _start_time, _start_type, service->getStartPoint()[0]+" "+service->getStartPoint()[1]);
+            return join(";", _start_time, _start_type, _start_point[0]+" "+_start_point[1]);
         case ROSService::ServiceType::ShuttleFromStop:
-            return join(";", _start_time, _start_type, service->getStartPoint()[0], service->getStartPoint()[1], service->getDaughter());
+            return join(";", _start_time, _start_type, _start_point[0], _start_point[1], service->getDaughter());
         case ROSService::ServiceType::ServiceFromSplit:
             return join(";",_start_time, _start_type, service->getParent());
         case ROSService::ServiceType::ShuttleFromFeeder:
@@ -666,7 +715,7 @@ QString ROSTTBGen::_make_type_line(ROSService* service)
         case ROSService::ServiceType::ShuttleFinishService:
             return join(";", _start_time, _start_type, service->getParent());
         default:
-                return "NULL";
+            return "NULL";
     }
 }
 
@@ -677,6 +726,13 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
     const int int_start = (service->labelledLocationStart()) ? 1 : 0;
     const int int_final = (service->getFinState() == ROSService::FinishState::FinishExit) ? service->getStations().size() : service->getStations().size()-1;
 
+    const QList<QList<QTime>> _times =  service->getTimes();
+    const QStringList _stations = service->getStations();
+    const QList<bool> _passes = service->getPassList();
+    const QMap<QString, QStringList> _joins = service->getJoinData();
+    const QList<bool> _dirs = service->getDirectionChanges();
+    const QList<QTime> _cdt_times = service->getCDTTimes();
+
     // Check if service is service starts from a location or if it is started from another service as this will mean
     // the first station timetable entry should only contain a single time
     if(service->labelledLocationStart() || service->getType() == ROSService::ServiceType::ShuttleFromFeeder || service->getType() == ROSService::ServiceType::ServiceFromService)
@@ -686,18 +742,18 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
             QMessageBox::critical(_parent, "BadAccessTimes", "Attempt to access service times array which is size zero by index");
             return {};
         }
-        const QTime _depart = service->getTimes()[0][1];
-        _temp.append(join(";", _depart.toString("HH:mm"), service->getStations()[0]));
+        const QTime _depart = _times[0][1];
+        _temp.append(join(";", _depart.toString("HH:mm"), _stations[0]));
     }
 
     for(int i{int_start}; i < int_final; ++i)
     {
-        const QTime _arrive = service->getTimes()[i][0],
-              _depart = service->getTimes()[i][1];
-        const QString _name = service->getStations()[i];
-        const bool _is_pas = service->getPassList()[i],
-             _is_cdt = service->getDirectionChanges()[i],
-             _is_join = (service->getJoinData().size() > 0 && _name == service->getJoinData()[service->getJoinData().keys()[0]][0]);
+        const QTime _arrive = _times[i][0],
+              _depart = _times[i][1];
+        const QString _name = _stations[i];
+        const bool _is_pas = _passes[i],
+        _is_cdt = _dirs[i],
+        _is_join = _joins.size() > 0 && _name == _joins[_joins.keys()[0]][0];
 
         const QMap<QString, QStringList> _split = service->getSplitData();
 
@@ -710,7 +766,7 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
             _temp.append(join(";", (_depart != QTime()) ? _arrive.toString("HH:mm")+";"+_depart.toString("HH:mm") : _arrive.toString("HH:mm"), _name));
         }
 
-        if(_split.size() > 0 && _split[_split.keys()[0]][1] == service->getStations()[i])
+        if(_split.size() > 0 && _split[_split.keys()[0]][1] == _stations[i])
         {
             const QString _type = _split.keys()[0];
             const QStringList _data = _split[_type];
@@ -718,13 +774,12 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
         }
         if(_is_join)
         {
-            const QMap<QString, QStringList> _join_dat = service->getJoinData();
-            const QString _id = _join_dat.keys()[0], _time = _join_dat[_id][1];
+            const QString _id = _joins.keys()[0], _time = _joins[_id][1];
             _temp.append(join(";", _time, "jbo", _id));
         }
         if(_is_cdt)
         {
-            const QTime _cdt_time = service->getCDTTimes()[i];
+            const QTime _cdt_time = _cdt_times[i];
             _temp.append(join(";", (_cdt_time != QTime()) ? _cdt_time.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
         }
 
@@ -732,22 +787,22 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
 
     if(service->getFinState() != ROSService::FinishState::FinishExit)
     {     
-        const QTime _arrive = service->getTimes()[int_final][0];
-        _temp.append(join(";", _arrive.toString("HH:mm"), service->getStations()[int_final]));
+        const QTime _arrive = _times[int_final][0];
+        _temp.append(join(";", _arrive.toString("HH:mm"), _stations[int_final]));
 
 
-        const bool _is_cdt = service->getDirectionChanges()[int_final];
+        const bool _is_cdt = _dirs[int_final];
 
         if(_is_cdt)
         {
-            if(service->getTimes().size() == 0)
+            if(_times.size() == 0)
             {
                 QMessageBox::critical(_parent, "BadAccessTimes", "Attempt to access service times array which is size zero by index");
                 return {};
             }
-            const QTime _arrive = service->getTimes()[int_final][0],
-                          _depart = service->getTimes()[int_final][1];
-            const QTime _cdt_time = service->getCDTTimes()[int_final];
+            const QTime _arrive = _times[int_final][0],
+                          _depart = _times[int_final][1];
+            const QTime _cdt_time = _cdt_times[int_final];
 
             _temp.append(join(";", (_depart != QTime()) ? _cdt_time.toString("HH:mm") : _arrive.toString("HH:mm"), "cdt"));
             service->setExitTime(_cdt_time);
@@ -795,7 +850,11 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             break;
         case ROSService::FinishState::FinishFormNew:
              _new_serv = service->getDaughter();
-             if(_new_serv == "") throw std::runtime_error("Could not retrieve daughter service");
+             if(_new_serv == "")
+             {
+                 QMessageBox::critical(_parent, QObject::tr("Invalid child service"), QObject::tr("Could not retrieve daughter service"));
+                 return "";
+             }
              qDebug() << join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
             return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
             break;

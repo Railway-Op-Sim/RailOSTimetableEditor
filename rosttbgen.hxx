@@ -46,9 +46,9 @@
 
 /*! @brief      ROS Timetable Editor Parse Class
     @details    A class to parse existing timetables and generate new ones using current data
-    @version    0.1.9
+    @version    0.2.0
     @author     Kristian Zarebski
-    @date 	    last modified 2021-02-16
+    @date 	    last modified 2021-07-21
     @copyright  GNU Public License v3
 */
 class ROSTTBGen
@@ -246,6 +246,11 @@ class ROSTTBGen
         @return A set of unique location labels
         */
         QSet<QString> getStations(){return _stations_list;}
+
+        /*! @brief Get list of parsed coordinates
+        @return map of coordinates
+        */
+        QMap<QString, QList<QList<int>>> getCoordinates(){return _coordinates;}
 
         /*! @brief Parse the data from an input ROS .ttb file
         @return file contents

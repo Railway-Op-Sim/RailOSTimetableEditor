@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setAttribute(Qt::AA_Use96Dpi);
     ROSTTBAppWindow w;
-    w.show();
+    w.setVisible(true);
     a.setWindowIcon(QIcon("./img/rosttbgen_icon.png"));
     return a.exec();
 }

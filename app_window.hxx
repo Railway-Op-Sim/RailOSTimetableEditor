@@ -220,6 +220,8 @@ private slots:
 
     void on_actionExit_triggered();
 
+    void on_comboBoxTrackIDStations_currentTextChanged(const QString &arg1);
+
 private:
     QChar _qt_path_sep = '/';
 
@@ -231,6 +233,9 @@ private:
 
     //! Station Add Dialogue Class member instance
     Station_add* _station_add = new Station_add(nullptr, this);
+
+    //! Current specified coordinate set
+    QList<QSet<QString>> _current_coords;
 
     //! Clone Service Dialogue Class member instance
     CloneDialog* _clone_srv = new CloneDialog(this);
@@ -344,6 +349,9 @@ private:
     */
     QStringList _create_custom_template_strings();
 
+    /*! @brief Construct paths relative to ROS binary
+    @return void
+    */
     void _make_paths(QString ros_path);
 
 };
