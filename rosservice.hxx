@@ -35,6 +35,8 @@
 #include <QMap>
 #include <QDebug>
 
+#include "utilities.hxx"
+
 //! Join function for combining up to 8 QStrings using a connector symbol
 extern QString join(QString join_symbol, QString a, QString b, QString c="NULL",
                     QString d="NULL", QString e="NULL", QString f="NULL",
@@ -48,7 +50,7 @@ extern QString join(QChar::SpecialCharacter join_symbol, QStringList list);
 
 /*! @brief      ROS Timetable Editor Service Class
     @details    A class to handle all properties of an ROS service
-    @version    0.1.9
+    @version    0.2.0-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-02-16
     @copyright  GNU Public License v3

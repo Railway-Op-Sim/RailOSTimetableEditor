@@ -34,7 +34,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     : QMainWindow()
     , ui(new Ui::ROSTTBAppWindow)
 {
-    _about_window->setVersion("v0.1.9");
+    _about_window->setVersion(VERSION);
 
     const int SERV_COL_COUNT = 4, TTB_COL_COUNT = 3;
     ui->setupUi(this);
@@ -75,7 +75,6 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     ui->radioButtonShuttleFeeder->setEnabled(false);
     ui->radioButtonShuttleFinish->setEnabled(false);
     ui->radioButtonFrh->setChecked(true);
-    _read_in_custom_templates();
     ui->comboBoxTrainSet->setCurrentIndex(0);
     ui->servicerefEdit->setMaxLength(4);
     ui->serviceFinishServiceEdit->setMaxLength(4);
@@ -89,16 +88,16 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     font.setPixelSize(12);
     qApp->setFont(font);
 
-    QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
-    QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
+    _cache_dir = new QDir(join(_qt_path_sep, QStandardPaths::writableLocation(QStandardPaths::HomeLocation), "Documents", "ROSTTBEditor", "cache"));
 
-    QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
-    if(!cache_dir.exists())
+    _read_in_custom_templates();
+
+    if(!_cache_dir->exists())
     {
-        qDebug() << "Creating Cache Folder at: " << cache_dir.absolutePath();
-        cache_dir.mkpath(".");
+        qDebug() << "Creating Cache Folder at: " << _cache_dir->absolutePath();
+        _cache_dir->mkpath(".");
     }
-    QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat"));
+    QFile _cache_file(join("/", _cache_dir->absolutePath(), "ros_location_cache.dat"));
 
     if(_cache_file.exists())
     {
@@ -694,26 +693,22 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
     ui->ROSStatus->setText(_file_name);
     ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
 
-    QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
-    QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
-
-    QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
-
-    if(!cache_dir.exists())
+    if(!_cache_dir->exists())
     {
-        qDebug() << "Creating Cache Folder at: " << cache_dir.absolutePath();
-        cache_dir.mkpath(".");
+        qDebug() << "Creating Cache Folder at: " << _cache_dir->absolutePath();
+        _cache_dir->mkpath(".");
     }
 
-    QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat"));
+    QFile _cache_file(join(_qt_path_sep, _cache_dir->absolutePath(), "ros_location_cache.dat"));
 
-    qDebug() << "Writing cache to : " << join(join_sym, cache_dir.absolutePath(), "ros_location_cache.dat") << endl;
+    qDebug() << "Writing cache to : " << join(_qt_path_sep, _cache_dir->absolutePath(), "ros_location_cache.dat") << endl;
     if ( _cache_file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
     {
         QTextStream stream( &_cache_file );
         stream << _file_name << endl;
     }
     _cache_file.close();
+    _make_paths(_file_name);
 }
 
 void ROSTTBAppWindow::_reset()
@@ -1491,11 +1486,7 @@ void ROSTTBAppWindow::_read_in_custom_templates()
 
     _custom_types = QMap<QString, TrainType*>();
 
-    QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
-    QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
-
-    QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
-    QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "trainset_templates_cache.dat"));
+    QFile _cache_file(join(_qt_path_sep, _cache_dir->absolutePath(), "trainset_templates_cache.dat"));
 
     if(_cache_file.exists())
     {
@@ -1550,16 +1541,12 @@ QStringList ROSTTBAppWindow::_create_custom_template_strings()
 
 void ROSTTBAppWindow::_save_template()
 {
-    QString home_loc = (QSysInfo::productType() == "windows") ? qEnvironmentVariable("%systemdrive%%homepath%") : qEnvironmentVariable("HOME");
-    QString join_sym = (QSysInfo::productType() == "windows") ? "\\" : "/";
-
-    QDir cache_dir(join(join_sym, home_loc,"Documents", "ROSTTBEditor", "cache"));
-    if(!cache_dir.exists())
+    if(!_cache_dir->exists())
     {
-        qDebug() << "Creating Cache Folder at: " << cache_dir.absolutePath();
-        cache_dir.mkpath(".");
+        qDebug() << "Creating Cache Folder at: " << _cache_dir->absolutePath();
+        _cache_dir->mkpath(".");
     }
-    QFile _cache_file(join(join_sym, cache_dir.absolutePath(), "trainset_templates_cache.dat"));
+    QFile _cache_file(join(_qt_path_sep, _cache_dir->absolutePath(), "trainset_templates_cache.dat"));
 
     const int _max_speed = ui->spinBoxMaxSpeed->value(),
               _mass      = ui->spinBoxMass->value(),

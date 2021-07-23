@@ -39,6 +39,7 @@
 #include <QTableWidgetItem>
 #include <QHeaderView>
 #include <QtGlobal>
+#include <QStandardPaths>
 
 #include "rosttbgen.hxx"
 #include "station_add.hxx"
@@ -46,6 +47,7 @@
 #include "train_type.hxx"
 #include "TrainListing.hxx"
 #include "about.hxx"
+#include "utilities.hxx"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ROSTTBAppWindow; }
@@ -53,7 +55,7 @@ QT_END_NAMESPACE
 
 /*! @brief      ROS Timetable Editor Main Application Window
     @details    Main window for viewing, creating and editting services within a ROS timetable
-    @version    0.1.9
+    @version    0.2.0-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-02-24
     @copyright  GNU Public License v3
@@ -95,6 +97,11 @@ public:
     @return Pointer to ROSTTBGen instance
     */
     ROSTTBGen* getParser(){return _parser;}
+
+    /*! @brief Get cache directory
+    @return directory of ROSTTB cache
+    */
+    QDir* getCacheDir(){return _cache_dir;}
 
 private slots:
     //! Open File Menu Action
@@ -223,7 +230,7 @@ private slots:
     void on_comboBoxTrackIDStations_currentTextChanged(const QString &arg1);
 
 private:
-    QChar _qt_path_sep = '/';
+    const QString _qt_path_sep = "/";
 
     //! Sets whether current train property change is induced by template selection
     bool _is_template_change = false;
@@ -240,6 +247,9 @@ private:
     //! Clone Service Dialogue Class member instance
     CloneDialog* _clone_srv = new CloneDialog(this);
 
+    //! Cache directory
+    QDir* _cache_dir = nullptr;
+
     //! Location of ROS Timetables
     QDir* _ros_timetables = nullptr;
 
@@ -247,10 +257,10 @@ private:
     QDir* _ros_railways = nullptr;
 
     //! User Interface Class member instance
-    Ui::ROSTTBAppWindow *ui;
+    Ui::ROSTTBAppWindow *ui = nullptr;
 
     //! Selection model for timetable table widget
-    QItemSelectionModel* _tt_model_select;
+    QItemSelectionModel* _tt_model_select = nullptr;
 
     //! Current open/active file
     QFileDialog* _current_file = new QFileDialog(this);

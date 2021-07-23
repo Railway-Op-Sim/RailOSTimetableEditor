@@ -29,7 +29,8 @@ HEADERS += app_window.hxx \
            rostimetable.hxx \
            rosttbgen.hxx \
            station_add.hxx \
-           train_type.hxx
+           train_type.hxx \
+           utilities.hxx
 FORMS += clone_dialog.ui rosttbappwindow.ui station_add.ui \
     about.ui
 SOURCES += app_window.cxx \
@@ -41,7 +42,8 @@ SOURCES += app_window.cxx \
            rostimetable.cxx \
            rosttbgen.cxx \
            station_add.cxx \
-           train_type.cxx
+           train_type.cxx \
+           utilities.cxx
 
 DISTFILES += \
     doxygen/Doxyfile

@@ -43,7 +43,7 @@ class CloneDialog;
 
 /*! @brief      ROS Timetable Editor Service Clone Window
     @details    Pop-up window for cloning an existing service
-    @version    0.1.9
+    @version    0.2.0-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-02-16
     @copyright  GNU Public License v3
@@ -89,7 +89,7 @@ private slots:
 
 private:
     //! User Interface Class member instance
-    Ui::CloneDialog *ui;
+    Ui::CloneDialog *ui = nullptr;
 
     //! Pointer to current active timetable for edit
     ROSTimetable* _current_ttb = nullptr;

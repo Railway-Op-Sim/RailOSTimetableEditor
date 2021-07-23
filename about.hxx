@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+const QString VERSION="0.2.0-alpha";
+
 namespace Ui {
 class About;
 }

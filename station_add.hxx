@@ -44,7 +44,7 @@ class Station_add;
 
 /*! @brief      ROS Timetable Editor Location Addition Window
     @details    Pop-up window for adding a new location to an existing service
-    @version    0.1.9
+    @version    0.2.0-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-02-16
     @copyright  GNU Public License v3

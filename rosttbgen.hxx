@@ -43,10 +43,11 @@
 
 #include "rostimetable.hxx"
 #include "rosservice.hxx"
+#include "utilities.hxx"
 
 /*! @brief      ROS Timetable Editor Parse Class
     @details    A class to parse existing timetables and generate new ones using current data
-    @version    0.2.0
+    @version    0.2.0-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-07-21
     @copyright  GNU Public License v3
@@ -73,7 +74,7 @@ class ROSTTBGen
         QStringList _comments = {};
 
         //! Pointer to the parent application window object
-        QWidget* _parent;
+        QWidget* _parent = nullptr;
 
         /*! @brief Process the current recorded data
         @return void
