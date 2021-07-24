@@ -229,6 +229,8 @@ private slots:
 
     void on_comboBoxTrackIDStations_currentTextChanged(const QString &arg1);
 
+    void on_actionAdd_Consist_triggered();
+
 private:
     const QString _qt_path_sep = "/";
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1024</width>
-    <height>768</height>
+    <height>778</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>350</y>
       <width>1001</width>
-      <height>371</height>
+      <height>370</height>
      </rect>
     </property>
     <property name="font">
@@ -68,7 +68,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>210</y>
+       <y>281</y>
        <width>121</width>
        <height>16</height>
       </rect>
@@ -266,7 +266,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>255</y>
+       <y>323</y>
        <width>81</width>
        <height>16</height>
       </rect>
@@ -647,7 +647,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>230</y>
+       <y>300</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -662,7 +662,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>275</y>
+       <y>343</y>
        <width>241</width>
        <height>21</height>
       </rect>
@@ -859,8 +859,8 @@
     <widget class="QComboBox" name="comboBoxTrainSet">
      <property name="geometry">
       <rect>
-       <x>5</x>
-       <y>315</y>
+       <x>10</x>
+       <y>215</y>
        <width>191</width>
        <height>32</height>
       </rect>
@@ -875,7 +875,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>300</y>
+       <y>194</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -893,7 +893,7 @@
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>320</y>
+       <y>220</y>
        <width>42</width>
        <height>22</height>
       </rect>
@@ -914,7 +914,7 @@
      <property name="geometry">
       <rect>
        <x>200</x>
-       <y>300</y>
+       <y>200</y>
        <width>71</width>
        <height>16</height>
       </rect>
@@ -1150,7 +1150,7 @@
        <x>260</x>
        <y>10</y>
        <width>21</width>
-       <height>311</height>
+       <height>351</height>
       </rect>
      </property>
      <property name="font">
@@ -1183,10 +1183,10 @@
     <widget class="QPushButton" name="pushButtonCreateTemplate">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>190</y>
+       <x>10</x>
+       <y>250</y>
        <width>113</width>
-       <height>32</height>
+       <height>29</height>
       </rect>
      </property>
      <property name="font">
@@ -1195,7 +1195,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Save Template</string>
+      <string>Save Template As</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEditTemplateName">
@@ -1204,7 +1204,7 @@
        <x>10</x>
        <y>230</y>
        <width>161</width>
-       <height>21</height>
+       <height>20</height>
       </rect>
      </property>
      <property name="font">
@@ -1216,10 +1216,10 @@
     <widget class="QPushButton" name="pushButtonTemplateSave">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>130</x>
        <y>260</y>
        <width>113</width>
-       <height>32</height>
+       <height>29</height>
       </rect>
      </property>
      <property name="font">
@@ -1234,10 +1234,10 @@
     <widget class="QPushButton" name="pushButtonTemplateCancel">
      <property name="geometry">
       <rect>
-       <x>5</x>
+       <x>10</x>
        <y>260</y>
        <width>110</width>
-       <height>32</height>
+       <height>29</height>
       </rect>
      </property>
      <property name="font">
@@ -1253,9 +1253,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>200</y>
+       <y>196</y>
        <width>101</width>
-       <height>16</height>
+       <height>13</height>
       </rect>
      </property>
      <property name="font">
@@ -1381,6 +1381,32 @@
      </property>
      <property name="text">
       <string>Track IDs</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>47</width>
+       <height>14</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelDirection">
+     <property name="geometry">
+      <rect>
+       <x>600</x>
+       <y>10</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>
@@ -1667,8 +1693,15 @@
     <addaction name="actionAbout_ROSTTBGen"/>
     <addaction name="actionDocumentation"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionAdd_Consist"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNew">
@@ -1704,6 +1737,11 @@
   <action name="actionDocumentation">
    <property name="text">
     <string>Documentation</string>
+   </property>
+  </action>
+  <action name="actionAdd_Consist">
+   <property name="text">
+    <string>Add Consist</string>
    </property>
   </action>
  </widget>

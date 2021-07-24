@@ -39,6 +39,8 @@ Station_add::Station_add(ROSService* service, QWidget *parent) :
     ui->errorLabel->setStyleSheet("QLabel { color : red; }");
     ui->checkBoxCDT->setChecked(false);
     ui->timeEditCDT->setEnabled(false);
+    ui->radioButtonSplitForward->setEnabled(false);
+    ui->radioButtonSplitReverse->setEnabled(false);
 
 }
 
@@ -96,7 +98,6 @@ bool Station_add::setInfo()
         {
             if((_times[0] >= time_pair[0] && _times[0] <= time_pair[1]) || (_times[1] >= time_pair[0] && _times[1] <= time_pair[1]))
             {
-                qDebug() << _times << "\t" << time_pair << endl;
                 ui->errorLabel->setText(QObject::tr("Times overlap with current timetable entries"));
                 return false;
             }

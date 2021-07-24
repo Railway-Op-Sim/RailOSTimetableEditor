@@ -231,9 +231,6 @@ bool ROSTTBAppWindow::_record_current_info()
         _start_ids.push_back(_coord_strs[1]);
     }
 
-    qDebug() << _start_ids << endl;
-
-
     const bool info_missing = _srv_id == "" || _desc == "";
     if(info_missing)
     {
@@ -658,7 +655,7 @@ void ROSTTBAppWindow::_make_paths(QString ros_path)
     QStringList _dot_split = ros_path.split(".");
     QString _type = _dot_split[_dot_split.size()-1];
     QStringList _locations = ros_path.split(_qt_path_sep);
-    qDebug() << ros_path << endl;
+
     if(_type == "app")
     {
       _locations.append("Contents");
@@ -1186,7 +1183,7 @@ void ROSTTBAppWindow::_save_file()
     }
     QString _output = join(QChar::Null, _ttb);
 
-    qDebug() << "WRITING TO: " <<  _open_file_str;
+    qDebug() << "Writing timetable output to: " <<  _open_file_str;
 
     QFile _file(_open_file_str);
     if ( _file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
@@ -1643,6 +1640,7 @@ void ROSTTBAppWindow::on_checkBoxAtStation_toggled(bool checked)
     ui->labelTrackIDstations->setVisible(checked);
     ui->comboBoxTrackIDs->setVisible(checked);
     ui->comboBoxTrackIDStations->setVisible(checked);
+    ui->labelDirection->setVisible(!checked);
     ui->labelTrackIDRear->setVisible(!checked);
     ui->labelTrackIDFront->setVisible(!checked);
 }
@@ -1680,7 +1678,10 @@ void ROSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QStrin
 
                 if(x_1 == x_2 && y_1 == y_2) continue;
 
-                if(abs(x_1-x_2) == 1 || abs(y_1-y_2) == 1)
+                bool is_valid = (abs(x_1-x_2) == 1 && y_1 == y_2);
+                is_valid = is_valid || (abs(y_1-y_2) == 1 && x_1 == x_2);
+
+                if(is_valid)
                 {
                     _coords_for_loc.append(
                                 "("+QString::fromStdString(std::to_string(coord_set_1[0]))+","+QString::fromStdString(std::to_string(coord_set_1[1]))+") " +
@@ -1699,5 +1700,11 @@ void ROSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QStrin
     {
         ui->comboBoxTrackIDs->setEnabled(false);
     }
+}
+
+
+void ROSTTBAppWindow::on_actionAdd_Consist_triggered()
+{
+
 }
 

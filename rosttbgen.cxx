@@ -248,7 +248,6 @@ ROSService::FinishState ROSTTBGen::_parseExit(QStringList str_list)
             return _types[i];
         }
     }
-
     return ROSService::FinishState::FinishExit;
 }
 
@@ -425,6 +424,12 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     switch(_fin_state)
     {
         case ROSService::FinishState::FinishRemainHere:
+            if(_components.size() != 1)
+            {
+                const QString _err_msg = _glob_msg + "Expected \"Frh\" for type \"Finish Remain Here\"";
+                QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
+                break;
+            }
             break;
         case ROSService::FinishState::FinishExit:
             if(_components.size() != 3)
@@ -488,11 +493,6 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
     if(_fin_state != ROSService::FinishState::FinishRemainHere)
     {
-        if(_components.size() != 1)
-        {
-            const QString _err_msg = _glob_msg + "Expected \"Frh\" for type \"Finish Remain Here\"";
-            QMessageBox::critical(_parent, QObject::tr("Invalid service termination"), QObject::tr(_err_msg.toStdString().c_str()));
-        }
         QTime _time = QTime::fromString(_components[0], "HH:mm");
         _service->setExitTime(_time);
     }
@@ -855,7 +855,6 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
                  QMessageBox::critical(_parent, QObject::tr("Invalid child service"), QObject::tr("Could not retrieve daughter service"));
                  return "";
              }
-             qDebug() << join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
             return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
             break;
         case ROSService::FinishState::FinishJoinOther:
