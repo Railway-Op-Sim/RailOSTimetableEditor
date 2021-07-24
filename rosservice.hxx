@@ -69,7 +69,7 @@ private:
     //! ROS map location IDs for entrance
     QStringList _enter_ids = {"", ""};
     //! ROS map exit location ID
-    QString _exit_id = "";
+    QStringList _exit_ids = {};
     //! Times for direction changes
     QList<QTime> _cdt_times = {};
     //! ROS service ID for newly formed service
@@ -276,7 +276,7 @@ public:
     @param id ROS Map ID for exit location
     @return void
     */
-    void setExitPoint(const QString& id) {_exit_id = id;}
+    void setExitPoints(const QStringList& ids) {_exit_ids = ids;}
 
     /*! @brief Set the map IDs (rear, front) for the entrance location
     @param ids An array of size 2 containing rear element ID and front element ID
@@ -377,7 +377,7 @@ public:
     /*! @brief Fetch the location ID for the service exit (where appropriate)
     @return QString of the exit location ID
     */
-    QString getExitID() const {return _exit_id;}
+    QStringList getExitIDs() const {return _exit_ids;}
 
     /*! @brief Fetch the number of service repeats
     @return Integer number of repeats

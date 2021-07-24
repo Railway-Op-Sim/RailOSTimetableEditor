@@ -589,8 +589,8 @@
     <widget class="QLabel" name="label_20">
      <property name="geometry">
       <rect>
-       <x>870</x>
-       <y>10</y>
+       <x>868</x>
+       <y>4</y>
        <width>101</width>
        <height>20</height>
       </rect>
@@ -601,7 +601,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Exit Location ID</string>
+      <string>Exit Location IDs</string>
      </property>
     </widget>
     <widget class="QLabel" name="labelParentOfJoin">
@@ -722,7 +722,7 @@
      <property name="geometry">
       <rect>
        <x>860</x>
-       <y>30</y>
+       <y>40</y>
        <width>113</width>
        <height>21</height>
       </rect>
@@ -1035,7 +1035,7 @@
       <rect>
        <x>860</x>
        <y>270</y>
-       <width>42</width>
+       <width>51</width>
        <height>22</height>
       </rect>
      </property>
@@ -1050,7 +1050,7 @@
       <rect>
        <x>860</x>
        <y>245</y>
-       <width>42</width>
+       <width>51</width>
        <height>20</height>
       </rect>
      </property>
@@ -1058,6 +1058,9 @@
       <font>
        <pointsize>10</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>999</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_11">
@@ -1101,7 +1104,7 @@
       <rect>
        <x>860</x>
        <y>220</y>
-       <width>42</width>
+       <width>51</width>
        <height>20</height>
       </rect>
      </property>
@@ -1407,6 +1410,19 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>860</x>
+       <y>20</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>(comma separated)</string>
      </property>
     </widget>
    </widget>

@@ -18,6 +18,7 @@ QString join(QString join_symbol, QString a, QString b, QString c, QString d, QS
 
 QString join(QString join_symbol, QStringList list)
 {
+    if(list.size() < 1) return "";
     QString _temp = list[0];
 
     for(int i{1}; i < list.size(); ++i) _temp += join_symbol+list[i];
@@ -27,6 +28,7 @@ QString join(QString join_symbol, QStringList list)
 
 QString join(QChar::SpecialCharacter join_symbol, QStringList list)
 {
+    if(list.size() < 1) return "";
     QString _temp = list[0];
 
     for(int i{1}; i < list.size(); ++i) _temp += join_symbol+list[i];

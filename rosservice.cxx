@@ -138,7 +138,7 @@ QString ROSService::_finalize()
     switch(_finish_as)
     {
         case ROSService::FinishState::FinishExit:
-            out_string = join(";", _times[_times.size()-1][0].toString(), "Fer", _exit_id);
+            out_string = join(";", _times[_times.size()-1][0].toString(), "Fer", join(" ", _exit_ids));
             break;
         case ROSService::FinishState::FinishFormNew:
             out_string = join(";", _times[_times.size()-1][0].toString(), "Fns", _daughter_id);

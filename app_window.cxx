@@ -412,20 +412,30 @@ bool ROSTTBAppWindow::_record_current_info()
 
     if(ui->radioButtonFer->isChecked())
     {
-        const QString _exit_id = ui->serviceExitEdit->text();
-        if(_exit_id == "")
+        QStringList _exit_ids = ui->serviceExitEdit->text().split(",");
+
+        // Strip any white space
+        for(int i{0}; i < _exit_ids.size(); ++i)
         {
-            QMessageBox::critical(this, QObject::tr("No Exit Location"), QObject::tr("You must provide an exit location ID."));
+            _exit_ids[i] = _exit_ids[i].replace(" ", "");
+        }
+
+        if(_exit_ids.empty())
+        {
+            QMessageBox::critical(this, QObject::tr("No Exit Location"), QObject::tr("You must provide an exit location IDs."));
             return false;
         }
 
-        if(!checkLocID(_exit_id))
+        for(auto& id : _exit_ids)
         {
-            QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("Location ID must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number."));
-            return false;
+            if(!checkLocID(id))
+            {
+                QMessageBox::critical(this, QObject::tr("Invalid Start Position"), QObject::tr("Exit location IDs must have the form 'A-B' where each of A and B can be either a number or a letter followed by a number."));
+                return false;
+            }
         }
 
-        _current_service_selection->setExitPoint(_exit_id);
+        _current_service_selection->setExitPoints(_exit_ids);
         _current_service_selection->setFinishState(ROSService::FinishState::FinishExit);
     }
 
@@ -629,6 +639,7 @@ void ROSTTBAppWindow::on_actionSave_As_triggered()
 
 void ROSTTBAppWindow::open_file()
 {
+    ui->checkBoxAtStation->setChecked(false);
     if(!_ros_timetables)
     {
         QMessageBox::critical(this, QObject::tr("Invalid Application Address"), QObject::tr("You need to first set the location of the Railway Operation Simulator executable."));
@@ -1050,8 +1061,9 @@ void ROSTTBAppWindow::_set_form_info()
     const QString _serv_id = _current_service_selection->getID(),
           _description = _current_service_selection->getDescription(),
           _feeder_ref  = _current_service_selection->getParent(),
-          _daughter_ref = _current_service_selection->getDaughter(),
-          _exit_loc = _current_service_selection->getExitID();
+          _daughter_ref = _current_service_selection->getDaughter();
+
+    const QStringList _exit_locs = _current_service_selection->getExitIDs();
 
     const ROSService::ServiceType _type = _current_service_selection->getType();
     const ROSService::FinishState _exit_as = _current_service_selection->getFinState();
@@ -1131,7 +1143,7 @@ void ROSTTBAppWindow::_set_form_info()
             break;
         case ROSService::FinishState::FinishExit:
             ui->checkBoxManualTimeEdit->setChecked(true);
-            ui->serviceExitEdit->setText(_exit_loc);
+            ui->serviceExitEdit->setText(join(",", _exit_locs));
             ui->radioButtonFer->setChecked(true);
             break;
         case ROSService::FinishState::FinishFormNew:

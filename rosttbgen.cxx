@@ -323,10 +323,11 @@ bool ROSTTBGen::_isJoin(QStringList str_list)
 bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 {
     QString _id = "NULL", _description = "NULL";
+    QStringList _components;
     QTime _start_time = QTime();
     if(_isServiceDefinition(service[0].split(";")))
     {
-        QStringList _components = service[0].split(";");
+        _components = service[0].split(";");
         _id = _components[0];
         _description = _components[1];
     }
@@ -353,7 +354,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
     if(_isServiceDefinition(service[0].split(";")))
     {
-        QStringList _components = service[0].split(";");
+        _components = service[0].split(";");
         _service->setStartSpeed(_components[2].toInt());
         _service->setMaxSpeed(_components[3].toInt());
         _service->setMass(_components[4].toInt());
@@ -363,7 +364,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
     if(_isStart(service[1].split(";")))
     {
-        QStringList _components = service[1].split(";");
+         _components = service[1].split(";");
 
         ROSService::ServiceType _type = _parseType(_components[1].split(";"));
         _service->setType(_type);
@@ -399,7 +400,6 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     }
 
     int _final_index = 1;
-    QStringList _components;
 
     if(_isRepeat(service[service.size()-1].split(";")))
     {
@@ -437,7 +437,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
                 break;
             }
 
-            _service->setExitPoint(_components[2]);
+            _service->setExitPoints(_components[2].split(" "));
             break;
         case ROSService::FinishState::FinishFormNew:
             if(_components.size() != 3)
@@ -838,13 +838,14 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
     const QString _exit_type = _exit_types[service->getFinState()];
     const QString _other = (service->getJoinData().keys().size() > 0) ? _get_partner(service->getID()) : "";
 
-    QString _new_serv, _prev_serv, _exit_id;
+    QString _new_serv, _prev_serv;
+    QStringList _exit_ids;
 
     switch(service->getFinState())
     {
         case ROSService::FinishState::FinishExit:
-            _exit_id = service->getExitID();
-            return join(";", _exit_time.toString("HH:mm"), _exit_type, _exit_id);
+            _exit_ids = service->getExitIDs();
+            return join(";", _exit_time.toString("HH:mm"), _exit_type, join(" ", _exit_ids));
             break;
         case ROSService::FinishState::FinishFormNew:
              _new_serv = service->getDaughter();
