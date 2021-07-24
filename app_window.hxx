@@ -229,7 +229,7 @@ private slots:
 
     void on_comboBoxTrackIDStations_currentTextChanged(const QString &arg1);
 
-    void on_actionAdd_Consist_triggered();
+    void on_comboBoxTrackIDs_currentIndexChanged(int index);
 
 private:
     const QString _qt_path_sep = "/";
@@ -269,6 +269,9 @@ private:
 
     //! String address of current open file
     QString _open_file_str = "";
+
+    //! Direction arrows for coordinates
+    QStringList _arrows = {};
 
     //! String address of current open route
     QString _current_route = "";
@@ -365,6 +368,8 @@ private:
     @return void
     */
     void _make_paths(QString ros_path);
+
+    void _populate_coordinates(QString location);
 
 };
 #endif // ROSTTBAPPWINDOW_HXX

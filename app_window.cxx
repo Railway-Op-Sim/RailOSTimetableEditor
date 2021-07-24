@@ -293,7 +293,6 @@ bool ROSTTBAppWindow::_record_current_info()
 
     if(!_current_timetable->getServices().contains(_srv_id))
     {
-        qDebug() << _mph_to_kph(_start_speed) << endl;
         _current_timetable->addService(_current_timetable->size(), _start_time, _srv_id, _desc, _mph_to_kph(_start_speed), _mph_to_kph(_max_speed), _mass, _max_brake, _max_power);
         _current_service_selection = _current_timetable->end();
     }
@@ -820,6 +819,7 @@ void ROSTTBAppWindow::on_pushButtonRoute_clicked()
     _stations.sort();
     ui->comboBoxTrackIDStations->addItems(_stations);
     ui->comboBoxTrackIDStations->setEnabled(true);
+    _populate_coordinates(ui->comboBoxTrackIDStations->currentText());
 }
 
 void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
@@ -1640,7 +1640,7 @@ void ROSTTBAppWindow::on_checkBoxAtStation_toggled(bool checked)
     ui->labelTrackIDstations->setVisible(checked);
     ui->comboBoxTrackIDs->setVisible(checked);
     ui->comboBoxTrackIDStations->setVisible(checked);
-    ui->labelDirection->setVisible(!checked);
+    ui->labelDirection->setVisible(checked);
     ui->labelTrackIDRear->setVisible(!checked);
     ui->labelTrackIDFront->setVisible(!checked);
 }
@@ -1656,45 +1656,59 @@ void ROSTTBAppWindow::on_actionExit_triggered()
     QApplication::exit();
 }
 
+void ROSTTBAppWindow::_populate_coordinates(QString location)
+{
+    const QMap<QString, QList<QList<int>>> _coords = _parser->getCoordinates();
+    QStringList _coords_for_loc = {};
+    _arrows.clear();
+
+    for(auto& coord_set_1 : _coords[location].toSet())
+    {
+        const int x_1 = coord_set_1[0];
+        const int y_1 = coord_set_1[1];
+
+        for(auto& coord_set_2 : _coords[location].toSet())
+        {
+            const int x_2 = coord_set_2[0];
+            const int y_2 = coord_set_2[1];
+
+            if(x_1 == x_2 && y_1 == y_2) continue;
+
+            bool is_up = x_1 == x_2 && y_2 - y_1 == 1;
+            bool is_down = x_1 == x_2 && y_1 - y_2 == 1;
+            bool is_left = x_1 - x_2 == 1 && y_1 == y_2;
+            bool is_right = x_2 - x_1 == 1 && y_1 == y_2;
+
+            bool is_valid = is_up || is_down || is_left || is_right;
+
+            if(!is_valid) continue;
+
+            const QString _str_repr = "("+QString::fromStdString(std::to_string(coord_set_1[0]))+","+QString::fromStdString(std::to_string(coord_set_1[1]))+") " +
+                    "("+QString::fromStdString(std::to_string(coord_set_2[0]))+","+QString::fromStdString(std::to_string(coord_set_2[1]))+")";
+            if(_coords_for_loc.contains(_str_repr)) continue;
+            _coords_for_loc.push_back(_str_repr);
+            _current_coords.push_back({
+                QString::fromStdString(std::to_string(coord_set_1[0])).replace("-", "N")+"-"+QString::fromStdString(std::to_string(coord_set_1[1])).replace("-", "N"),
+                QString::fromStdString(std::to_string(coord_set_2[0])).replace("-", "N")+"-"+QString::fromStdString(std::to_string(coord_set_2[1])).replace("-", "N")
+            });
+
+            if(is_up) _arrows.push_back("↑");
+            if(is_down) _arrows.push_back("↓");
+            if(is_left) _arrows.push_back("←");
+            if(is_right) _arrows.push_back("→");
+        }
+    }
+    ui->comboBoxTrackIDs->clear();
+    ui->comboBoxTrackIDs->addItems(_coords_for_loc);
+}
 
 void ROSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QString &arg1)
 {
     if(!arg1.isEmpty())
     {
         ui->comboBoxTrackIDs->setEnabled(true);
-        const QMap<QString, QList<QList<int>>> _coords = _parser->getCoordinates();
         ui->comboBoxTrackIDs->clear();
-        QStringList _coords_for_loc = {};
-
-        for(auto& coord_set_1 : _coords[arg1])
-        {
-            const int x_1 = coord_set_1[0];
-            const int y_1 = coord_set_1[1];
-
-            for(auto& coord_set_2 : _coords[arg1])
-            {
-                const int x_2 = coord_set_2[0];
-                const int y_2 = coord_set_2[1];
-
-                if(x_1 == x_2 && y_1 == y_2) continue;
-
-                bool is_valid = (abs(x_1-x_2) == 1 && y_1 == y_2);
-                is_valid = is_valid || (abs(y_1-y_2) == 1 && x_1 == x_2);
-
-                if(is_valid)
-                {
-                    _coords_for_loc.append(
-                                "("+QString::fromStdString(std::to_string(coord_set_1[0]))+","+QString::fromStdString(std::to_string(coord_set_1[1]))+") " +
-                                "("+QString::fromStdString(std::to_string(coord_set_2[0]))+","+QString::fromStdString(std::to_string(coord_set_2[1]))+")"
-                    );
-                    _current_coords.push_back({
-                        QString::fromStdString(std::to_string(coord_set_1[0])).replace("-", "N")+"-"+QString::fromStdString(std::to_string(coord_set_1[1])).replace("-", "N"),
-                        QString::fromStdString(std::to_string(coord_set_2[0])).replace("-", "N")+"-"+QString::fromStdString(std::to_string(coord_set_2[1])).replace("-", "N")
-                    });
-                }
-            }
-        }
-        ui->comboBoxTrackIDs->addItems(_coords_for_loc);
+        _populate_coordinates(arg1);
     }
     else
     {
@@ -1703,8 +1717,7 @@ void ROSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QStrin
 }
 
 
-void ROSTTBAppWindow::on_actionAdd_Consist_triggered()
+void ROSTTBAppWindow::on_comboBoxTrackIDs_currentIndexChanged(int index)
 {
-
+    if(_arrows.size() > 0 && index >= 0 && index < _arrows.size()) ui->labelDirection->setText(_arrows[index]);
 }
-

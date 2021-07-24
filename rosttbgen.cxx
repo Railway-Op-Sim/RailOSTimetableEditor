@@ -161,8 +161,6 @@ QMap<QString, QList<QList<int>>> ROSTTBGen::_parse_rly_coordinates(const QString
     {
         if(_stations_list.contains(_file_lines[i].replace(QChar::Null, "")) && _file_lines[i+1].contains("**"))
         {
-            qDebug() << (_file_lines[i-1] != QString("\n")) << " " << (_file_lines[i-10] != QString("******")+QChar::Null+QString("\n")) << endl;
-
             if(!_file_lines[i-1].isEmpty() || _file_lines[i-10] != "******")
             {
                 continue;
