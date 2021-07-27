@@ -47,5 +47,3 @@ theme:
 
 plugins:
   - search
-  - git-revision-date:
-      enabled_if_env: CI
