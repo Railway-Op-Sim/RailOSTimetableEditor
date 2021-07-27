@@ -1,4 +1,7 @@
 site_name: Railway Operation Simulator Timetable Editor
+repo_name: Railway-Op-Sim/ROSTimetableEditor
+repo_url: https://github.com/Railway-Op-Sim/ROSTimetableEditor
+copyright: Copyright &copy; 2016 - 2021 Kristian Zarebski
 nav:
   - Home: index.md
   - Installation: install.md
@@ -19,3 +22,30 @@ nav:
       - Contribution Guidelines: contrib.md
 theme:
   name: material
+  logo: img/site_icon.png
+  favicon: img/favicon.ico
+  features:
+    - search.suggest
+    - search.share
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mod
+  icon:
+    repo: fontawesome/brands/github
+        
+    
+
+plugins:
+  - search
+  - git-revision-date:
+      enabled_if_env: CI
