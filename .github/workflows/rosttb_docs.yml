@@ -12,7 +12,7 @@ jobs:
       - name: Checkout docs
         uses: actions/checkout@v2
       - name: Install Plugins
-        script: python -m pip install mkdocs-material
+        run: python -m pip install mkdocs-material
       - name: Deploy Documentation
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
