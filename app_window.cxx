@@ -604,8 +604,7 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
 
     }
 
-    ui->tableWidgetService->sortItems(0);
-    //ui->tableWidgetTimetable->sortItems(0);
+    //ui->tableWidgetService->sortItems(0);
 
     _station_add->setServiceTable(ui->tableWidgetService);
     _populate_feederboxes();
@@ -1252,7 +1251,14 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     _station_add->setEditMode(true);
     _station_add->setCurrentService(_current_service_selection);
     _station_add->setStations(_parser->getStations());
-    const QString _station_name = ui->tableWidgetService->takeItem(row, 2)->text();
+    const QTableWidgetItem* _table_cell = ui->tableWidgetService->takeItem(row, 2);
+    if(!_table_cell)
+    {
+        QMessageBox::warning(this, QObject::tr("Empty cell."), QObject::tr("Failed to retrieve station info for entry."));
+        return;
+    }
+
+    const QString _station_name = _table_cell->text();
 
     if(!_parser->getStations().contains(_station_name))
     {
@@ -1266,20 +1272,25 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     const QString _arrive = ui->tableWidgetService->takeItem(row, 0)->text(),
                 _depart = ui->tableWidgetService->takeItem(row, 1)->text();
 
-    QStringList _info = ui->tableWidgetService->takeItem(row, 3)->text().split(" ");
-    QTime _cdt_time;
-    for(int i{0}; i < _info.size(); ++i)
+    const QTableWidgetItem* _info_cell = ui->tableWidgetService->takeItem(row, 3);
+
+    if(_info_cell)
     {
-        if(_info[i].contains("⤸"))
+        QStringList _info = _info_cell->text().split(" ");
+        QTime _cdt_time;
+        for(int i{0}; i < _info.size(); ++i)
         {
-            _cdt_time = (_parser->checkStringIsTime(_info[i+1])) ? QTime::fromString(_info[i+1], "HH:mm") : QTime();
-            break;
+            if(_info[i].contains("⤸"))
+            {
+                _cdt_time = (_parser->checkStringIsTime(_info[i+1])) ? QTime::fromString(_info[i+1], "HH:mm") : QTime();
+                break;
+            }
         }
-    }
-    if(!_station_add->fwdCurrentSelection(_station_name, {QTime::fromString(_arrive, "HH:mm"), QTime::fromString(_depart, "HH:mm"), _cdt_time}, _cdtPass[0], _cdtPass[1]))
-    {
-        QMessageBox::critical(this, "Invalid Time Array", "Times array should be of size 3, {arrival, depart, cdt}");
-        return;
+        if(!_station_add->fwdCurrentSelection(_station_name, {QTime::fromString(_arrive, "HH:mm"), QTime::fromString(_depart, "HH:mm"), _cdt_time}, _cdtPass[0], _cdtPass[1]))
+        {
+            QMessageBox::critical(this, "Invalid Time Array", "Times array should be of size 3, {arrival, depart, cdt}");
+            return;
+        }
     }
 
     _station_add->setVisible(true);

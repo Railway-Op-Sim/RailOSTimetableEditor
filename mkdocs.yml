@@ -1,0 +1,20 @@
+site_name: Railway Operation Simulator Timetable Editor
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - Quickstart: quickstart.md
+  - Reference:
+    - Opening a Route: route.md
+    - Global Options: global.md
+    - The Consist Editor: consists.md
+    - Creating and Modifying Services:
+      - Introduction: service.md
+      - Service Types: start_types.md
+      - Start Locations: start_loc.md
+      - Adding Calling Points: call_point.md
+  - Developers:
+      - Route Parsing: rly_parse.md
+      - Timetable Parsing: ttb_parse.md
+      - Contribution Guidelines: contrib.md
+theme:
+  name: material

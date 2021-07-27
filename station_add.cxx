@@ -71,6 +71,7 @@ bool Station_add::setInfo()
 {
     if(_times.size() != 3)
     {
+        qDebug() << _times << endl;
         QMessageBox::critical(this, QObject::tr("Invalid Times Array Size"), "Expected to read a time array of size 3,\ngot size "+QString::number(_times.size()));
         return false;
     }
@@ -160,14 +161,12 @@ void Station_add::on_buttonBoxAddStation_accepted()
                                         _cdt_time, ui->comboBoxStations->currentText());
             _current_station = ui->comboBoxStations->currentText();
             _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time(), ui->timeEditCDT->time()};
-            if(_times.size() != 3) throw std::runtime_error("NO (2)!");
             _edit_mode = false;
         }
         else
         {
             _current_station = ui->comboBoxStations->currentText();
             _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time(), ui->timeEditCDT->time()};
-            if(_times.size() != 3) throw std::runtime_error("NO (3)!");
             qDebug() << "Adding Station: " << _times[0].toString("HH:mm") << ";" << _times[1].toString("HH:mm") << ";" << _current_station;
             _current_srv->addStation(_times, _current_station);
             _current_srv->setStopAsPassPoint(_current_srv->getStations().size()-1, ui->checkBoxPASS->isChecked());
