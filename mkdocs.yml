@@ -13,6 +13,7 @@ nav:
       - Start Locations: start_loc.md
       - Adding Calling Points: call_point.md
   - Developers:
+      - Compilation and Deployment: qt.md
       - Route Parsing: rly_parse.md
       - Timetable Parsing: ttb_parse.md
       - Contribution Guidelines: contrib.md
