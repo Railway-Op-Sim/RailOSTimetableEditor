@@ -423,19 +423,19 @@ public:
     @param type A valid ROSService::ServiceType describing the initialisation state
     @return void
     */
-    void setType(ROSService::ServiceType type) {_service_type = type;}
+    void setType(const ROSService::ServiceType& type) {_service_type = type;}
 
     /*! @brief Set the service termination category
     @param fin_state A valid ROSService::FinishState describing the service conclusion
     @return void
     */
-    void setFinishState(ROSService::FinishState fin_state);
+    void setFinishState(const ROSService::FinishState& fin_state);
 
     /*! @brief Set the ID of the parent of the current service
     @param parent_service ROS service identifier for the parent
     @return void
     */
-    void setParent(QString parent_service)
+    void setParent(const QString& parent_service)
     {
         _parent_service = parent_service;
     }
@@ -444,7 +444,7 @@ public:
      @param daughter_service ROS service identifier for the daughter
      @return void
     */
-    void setDaughter(QString daughter_service)
+    void setDaughter(const QString& daughter_service)
     {
         _daughter_id = daughter_service;
     }

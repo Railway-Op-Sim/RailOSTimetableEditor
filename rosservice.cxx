@@ -169,7 +169,7 @@ QString ROSService::as_string()
     return _out;
 }
 
-void ROSService::setFinishState(ROSService::FinishState fin_state)
+void ROSService::setFinishState(const ROSService::FinishState& fin_state)
 {
     _finish_as = fin_state;
 }

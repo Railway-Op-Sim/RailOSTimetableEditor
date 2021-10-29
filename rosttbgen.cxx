@@ -669,17 +669,18 @@ void ROSTTBGen::_process_data()
 
 QString ROSTTBGen::_make_service_definition(ROSService* service)
 {
-    const QString _id = service->getID(), _desc = service->getDescription(),
-                  _start_speed = QString::number(service->getStartSpeed()),
-                  _max_speed = QString::number(service->getMaxSpeed()),
-                  _mass = QString::number(service->getMass()),
-                  _brake = QString::number(service->getMaxBrake()),
-                  _power = QString::number(service->getPower());
+    const QString _id = service->getID(), _desc = service->getDescription();
 
     QString _output;
 
     if(service->getType() == ROSService::ServiceType::Service || service->getType() == ROSService::ServiceType::ShuttleFromStop)
     {
+        const QString _start_speed = QString::number(service->getStartSpeed()),
+                      _max_speed = QString::number(service->getMaxSpeed()),
+                      _mass = QString::number(service->getMass()),
+                      _brake = QString::number(service->getMaxBrake()),
+                      _power = QString::number(service->getPower());
+
         _output = join(";", _id, _desc, _start_speed, _max_speed, _mass, _brake, _power);
     }
 
@@ -697,20 +698,46 @@ QString ROSTTBGen::_make_type_line(ROSService* service)
                   _start_type = _start_types[service->getType()];
 
     const QStringList _start_point = service->getStartPoint();
+    const QString _daughter_id = service->getDaughter();
+    const QString _parent_id = service->getParent();
 
     switch(service->getType())
     {
         case ROSService::ServiceType::Service:
             return join(";", _start_time, _start_type, _start_point[0]+" "+_start_point[1]);
         case ROSService::ServiceType::ShuttleFromStop:
-            return join(";", _start_time, _start_type, _start_point[0], _start_point[1], service->getDaughter());
+            if(_daughter_id.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, "Daughter Retrieval Failure", "Failed to retrieve daughter service for "+service->getID());
+            }
+            return join(";", _start_time, _start_type, _start_point[0]+" "+_start_point[1], _daughter_id);
         case ROSService::ServiceType::ServiceFromSplit:
-            return join(";",_start_time, _start_type, service->getParent());
+            if(_parent_id.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
+            }
+            return join(";",_start_time, _start_type, _parent_id);
         case ROSService::ServiceType::ShuttleFromFeeder:
-            return join(";", _start_time, _start_type, service->getDaughter(), service->getParent());
+            if(_parent_id.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
+            }
+            if(_daughter_id.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, "Daughter Retrieval Failure", "Failed to retrieve daughter service for "+service->getID());
+            }
+            return join(";", _start_time, _start_type, _daughter_id, _parent_id);
         case ROSService::ServiceType::ServiceFromService:
+            if(_parent_id.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
+            }
             return join(";", _start_time, _start_type, service->getParent());
         case ROSService::ServiceType::ShuttleFinishService:
+            if(_parent_id.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
+            }
             return join(";", _start_time, _start_type, service->getParent());
         default:
             return "NULL";
@@ -849,7 +876,7 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             break;
         case ROSService::FinishState::FinishFormNew:
              _new_serv = service->getDaughter();
-             if(_new_serv == "")
+             if(_new_serv.toStdString().empty())
              {
                  QMessageBox::critical(_parent, QObject::tr("Invalid child service"), QObject::tr("Could not retrieve daughter service"));
                  return "";
@@ -861,15 +888,38 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             break;
         case ROSService::FinishState::FinishShuttleFormNew:
             _prev_serv = service->getParent();
+
             _new_serv = service->getDaughter();
+
+            if(_new_serv.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, QObject::tr("Invalid child service"), QObject::tr("Could not retrieve daughter service"));
+                return "";
+            }
+
+            if(_prev_serv.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, QObject::tr("Invalid parent service"), QObject::tr("Could not retrieve parent service"));
+                return "";
+            }
             return join(";", _exit_time.toString("HH:mm"), _prev_serv, _new_serv);
             break;
         case ROSService::FinishState::FinishShuttleRemainHere:
             _prev_serv = service->getParent();
+            if(_prev_serv.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, QObject::tr("Invalid parent service"), QObject::tr("Could not retrieve parent service"));
+                return "";
+            }
             return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
             break;
         case ROSService::FinishState::FinishSingleShuttleFeeder:
             _prev_serv = service->getParent();
+            if(_prev_serv.toStdString().empty())
+            {
+                QMessageBox::critical(_parent, QObject::tr("Invalid parent service"), QObject::tr("Could not retrieve parent service"));
+                return "";
+            }
             return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
             break;
         default:
@@ -894,6 +944,7 @@ QStringList ROSTTBGen::createTimetableStrings(ROSTimetable* timetable)
             QMessageBox::warning(_parent, "Incomplete Service", "No exit time specified for service '"+service->getID()+"', this service will be ignored during save. Please add at least two locations or specify a manual termination time.");
             continue;
         }
+
         QString _service = join(",", _make_service_definition(service), _make_type_line(service));
         const QStringList _call_points = _add_stations(service);
         if(service->getStations().size() > 0 && _call_points.size() > 0)_service = join(",", _service, join(",", _call_points));

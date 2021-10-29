@@ -37,6 +37,7 @@
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <cmath>
 #include <QHeaderView>
 #include <QtGlobal>
 #include <QStandardPaths>
@@ -298,6 +299,11 @@ private:
     @return int
     */
     int _mph_to_kph(const int speed);
+
+    /*! @brief Convert speed from kph to mph
+    @return int
+    */
+    int _kph_to_mph(const int speed);
 
     /*! @brief Save the current timetable object to file
     @return void

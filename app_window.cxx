@@ -266,7 +266,7 @@ bool ROSTTBAppWindow::_record_current_info()
             return false;
         }
 
-        for(auto id : _start_ids)
+        for(const auto& id : _start_ids)
         {
             if(!checkLocID(id))
             {
@@ -318,6 +318,8 @@ bool ROSTTBAppWindow::_record_current_info()
         _current_service_selection->setExitTime(ui->timeEditTermination->time());
     }
 
+    // -------------------------------------- Service Start Type Selection ------------------------------------------------ //
+
     if(ui->radioButtonShuttleFinish->isChecked())
     {
         const ROSService* _parent = _current_timetable->getServices()[ui->comboBoxFeeder->currentText()];
@@ -343,7 +345,7 @@ bool ROSTTBAppWindow::_record_current_info()
     }
     else if(ui->radioButtonShuttleStop->isChecked())
     {
-        if(_shuttle_partner == "")
+        if(_shuttle_partner.toStdString().empty())
         {
             QMessageBox::critical(this, QObject::tr("No Partner"), QObject::tr("You must specify an accompanying return service ID."));
             return false;
@@ -355,7 +357,7 @@ bool ROSTTBAppWindow::_record_current_info()
     }
     else if(ui->radioButtonShuttleFeeder->isChecked())
     {
-        if(_shuttle_partner == "")
+        if(_shuttle_partner.toStdString().empty())
         {
             QMessageBox::critical(this, QObject::tr("No Partner"), QObject::tr("You must specify an accompanying return service ID."));
             return false;
@@ -375,7 +377,7 @@ bool ROSTTBAppWindow::_record_current_info()
             return false;
         }
         const QString _service_id = _parent->getDaughter();
-        if(_service_id == "")
+        if(_service_id.toStdString().empty())
         {
             QMessageBox::critical(this, QObject::tr("No Parent Daughter Found"), QObject::tr("Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service."));
             return false;
@@ -410,6 +412,10 @@ bool ROSTTBAppWindow::_record_current_info()
         _current_service_selection->setEntryPoint(_start_ids);
     }
 
+    // -------------------------------------------------------------------------------------------------------------------- //
+
+    // -------------------------------------- Service Finish Type Selection ----------------------------------------------- //
+
     if(ui->radioButtonFer->isChecked())
     {
         QStringList _exit_ids = ui->serviceExitEdit->text().split(",");
@@ -426,7 +432,7 @@ bool ROSTTBAppWindow::_record_current_info()
             return false;
         }
 
-        for(auto& id : _exit_ids)
+        for(const auto& id : _exit_ids)
         {
             if(!checkLocID(id))
             {
@@ -451,7 +457,7 @@ bool ROSTTBAppWindow::_record_current_info()
             }
         }
 
-        if(_found_candidate == "NULL")
+        if(_found_candidate == QString("NULL"))
         {
             QMessageBox::critical(this, QObject::tr("No Parent Found"), QObject::tr("Could not find split reference in existing service matching current service. You must define a forward or rear split "\
                                   "in an existing service first."));
@@ -466,7 +472,7 @@ bool ROSTTBAppWindow::_record_current_info()
     {
         QString _srv_id = ui->serviceFinishServiceEdit->text();
 
-        if(_srv_id == "")
+        if(_srv_id.toStdString().empty())
         {
             QMessageBox::critical(this, QObject::tr("Missing Daughter Service"), QObject::tr("You must provide an identifier for the newly formed service."));
             return false;
@@ -479,7 +485,10 @@ bool ROSTTBAppWindow::_record_current_info()
     }
 
     else if(ui->radioButtonFrh->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishRemainHere);
+    else if(ui->radioButtonFrsrh->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleRemainHere);
     else _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleRemainHere);
+
+    // -------------------------------------------------------------------------------------------------------------------- //
 
     update_output();
 
@@ -1054,6 +1063,11 @@ int ROSTTBAppWindow::_mph_to_kph(const int speed)
     return (ui->radioButton_kph->isChecked()) ? speed : int(1.609344*speed);
 }
 
+int ROSTTBAppWindow::_kph_to_mph(const int speed)
+{
+    return (ui->radioButton_kph->isChecked()) ? speed : int(speed/1.609344);
+}
+
 void ROSTTBAppWindow::_set_form_info()
 {
 
@@ -1548,7 +1562,7 @@ QStringList ROSTTBAppWindow::_create_custom_template_strings()
 
     for(auto templt : _custom_types)
     {
-        QString _template = join(";", join(":","Name", templt->getClass()),
+        QString _template = join(";", join(":", "Name", templt->getClass()),
                                  join(":", "MaxSpeed", QString::number(templt->getMaxSpeed())),
                                  join(":", "Mass", QString::number(templt->getMass())),
                                  join(":", "Brake Force", QString::number(templt->getMaxBrake())),
@@ -1587,7 +1601,7 @@ void ROSTTBAppWindow::_save_template()
     {
         QTextStream stream( &_cache_file );
 
-        for(auto temp : _current_templates) stream << temp << endl;
+        for(auto temp : _current_templates) stream << temp << Qt::endl;
     }
 
     _cache_file.close();
@@ -1672,6 +1686,8 @@ void ROSTTBAppWindow::on_radioButton_kph_toggled(bool checked)
 {
     ui->start_speed_label->setText(checked ? "Start Speed (kph)" : "Start Speed (mph)");
     ui->max_speed_label->setText(checked ? "Max Speed (kph)" : "Max Speed (mph)");
+    ui->spinBoxMaxSpeed->setValue(checked ? std::round(ui->spinBoxMaxSpeed->value()*1.609344) : std::round(ui->spinBoxMaxSpeed->value()/1.609344));
+    ui->spinBoxStartSpeed->setValue(checked ? std::round(ui->spinBoxStartSpeed->value()*1.609344) : std::round(ui->spinBoxStartSpeed->value()/1.609344));
 }
 
 void ROSTTBAppWindow::on_actionExit_triggered()
@@ -1685,12 +1701,12 @@ void ROSTTBAppWindow::_populate_coordinates(QString location)
     QStringList _coords_for_loc = {};
     _arrows.clear();
 
-    for(auto& coord_set_1 : _coords[location].toSet())
+    for(auto& coord_set_1 : QSet<QList<int>>(_coords[location].begin(), _coords[location].end()))
     {
         const int x_1 = coord_set_1[0];
         const int y_1 = coord_set_1[1];
 
-        for(auto& coord_set_2 : _coords[location].toSet())
+        for(auto& coord_set_2 : QSet<QList<int>>(_coords[location].begin(), _coords[location].end()))
         {
             const int x_2 = coord_set_2[0];
             const int y_2 = coord_set_2[1];
@@ -1744,3 +1760,4 @@ void ROSTTBAppWindow::on_comboBoxTrackIDs_currentIndexChanged(int index)
 {
     if(_arrows.size() > 0 && index >= 0 && index < _arrows.size()) ui->labelDirection->setText(_arrows[index]);
 }
+
