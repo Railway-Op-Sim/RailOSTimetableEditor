@@ -54,6 +54,9 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class ROSTTBAppWindow; }
 QT_END_NAMESPACE
 
+const QString main_window_title = "ROS Timetable Editor";
+
+
 /*! @brief      ROS Timetable Editor Main Application Window
     @details    Main window for viewing, creating and editting services within a ROS timetable
     @version    0.2.0-alpha

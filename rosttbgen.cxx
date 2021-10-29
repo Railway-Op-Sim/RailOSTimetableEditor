@@ -32,7 +32,7 @@
 QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
 {
     _cached_text = "";
-    QString in_file = file->getOpenFileName(_parent, QObject::tr("Open Timetable"), directory->absolutePath(), QObject::tr("ROS Timetable Files (*.ttb)"));
+    QString in_file = file->getOpenFileName(_parent, QObject::tr("Open Timetable"), directory->absolutePath(), QObject::tr("ROS Timetable Files (*.ttb);;"));
     if(in_file == QString()) return in_file; // In case user presses 'Cancel'
     QFile open_file(in_file);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))

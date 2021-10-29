@@ -666,6 +666,7 @@ void ROSTTBAppWindow::open_file()
     _current_service_selection = _current_timetable->end();
     update_output();
     _set_form_info();
+    this->setWindowTitle(main_window_title+": "+_open_file_str);
 }
 
 void ROSTTBAppWindow::_make_paths(QString ros_path)
@@ -1196,6 +1197,7 @@ void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
     update_output(_selection);
     ui->tableWidgetTimetable->selectRow(row);
     _set_form_info();
+    this->setWindowTitle(main_window_title+": "+_open_file_str);
 }
 
 void ROSTTBAppWindow::_save_file()
@@ -1222,6 +1224,10 @@ void ROSTTBAppWindow::_save_file()
 
 void ROSTTBAppWindow::on_actionSave_triggered()
 {
+    if(_open_file_str.toStdString().empty())
+    {
+        _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), tr("Timetable (*.ttb)") );
+    }
     _save_file();
 }
 
