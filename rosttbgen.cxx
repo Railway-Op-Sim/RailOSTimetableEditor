@@ -706,35 +706,35 @@ QString ROSTTBGen::_make_type_line(ROSService* service)
         case ROSService::ServiceType::Service:
             return join(";", _start_time, _start_type, _start_point[0]+" "+_start_point[1]);
         case ROSService::ServiceType::ShuttleFromStop:
-            if(_daughter_id.toStdString().empty())
+            if(_daughter_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Daughter Retrieval Failure", "Failed to retrieve daughter service for "+service->getID());
             }
             return join(";", _start_time, _start_type, _start_point[0]+" "+_start_point[1], _daughter_id);
         case ROSService::ServiceType::ServiceFromSplit:
-            if(_parent_id.toStdString().empty())
+            if(_parent_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
             }
             return join(";",_start_time, _start_type, _parent_id);
         case ROSService::ServiceType::ShuttleFromFeeder:
-            if(_parent_id.toStdString().empty())
+            if(_parent_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
             }
-            if(_daughter_id.toStdString().empty())
+            if(_daughter_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Daughter Retrieval Failure", "Failed to retrieve daughter service for "+service->getID());
             }
             return join(";", _start_time, _start_type, _daughter_id, _parent_id);
         case ROSService::ServiceType::ServiceFromService:
-            if(_parent_id.toStdString().empty())
+            if(_parent_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
             }
             return join(";", _start_time, _start_type, service->getParent());
         case ROSService::ServiceType::ShuttleFinishService:
-            if(_parent_id.toStdString().empty())
+            if(_parent_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
             }
@@ -876,7 +876,7 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             break;
         case ROSService::FinishState::FinishFormNew:
              _new_serv = service->getDaughter();
-             if(_new_serv.toStdString().empty())
+             if(_new_serv.isEmpty())
              {
                  QMessageBox::critical(_parent, QObject::tr("Invalid child service"), QObject::tr("Could not retrieve daughter service"));
                  return "";
@@ -891,13 +891,13 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
 
             _new_serv = service->getDaughter();
 
-            if(_new_serv.toStdString().empty())
+            if(_new_serv.isEmpty())
             {
                 QMessageBox::critical(_parent, QObject::tr("Invalid child service"), QObject::tr("Could not retrieve daughter service"));
                 return "";
             }
 
-            if(_prev_serv.toStdString().empty())
+            if(_prev_serv.isEmpty())
             {
                 QMessageBox::critical(_parent, QObject::tr("Invalid parent service"), QObject::tr("Could not retrieve parent service"));
                 return "";
@@ -906,7 +906,7 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             break;
         case ROSService::FinishState::FinishShuttleRemainHere:
             _prev_serv = service->getParent();
-            if(_prev_serv.toStdString().empty())
+            if(_prev_serv.isEmpty())
             {
                 QMessageBox::critical(_parent, QObject::tr("Invalid parent service"), QObject::tr("Could not retrieve parent service"));
                 return "";
@@ -915,7 +915,7 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             break;
         case ROSService::FinishState::FinishSingleShuttleFeeder:
             _prev_serv = service->getParent();
-            if(_prev_serv.toStdString().empty())
+            if(_prev_serv.isEmpty())
             {
                 QMessageBox::critical(_parent, QObject::tr("Invalid parent service"), QObject::tr("Could not retrieve parent service"));
                 return "";

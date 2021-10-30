@@ -344,7 +344,7 @@ bool ROSTTBAppWindow::_record_current_info()
     }
     else if(ui->radioButtonShuttleStop->isChecked())
     {
-        if(_shuttle_partner.toStdString().empty())
+        if(_shuttle_partner.isEmpty())
         {
             QMessageBox::critical(this, QObject::tr("No Partner"), QObject::tr("You must specify an accompanying return service ID."));
             return false;
@@ -356,7 +356,7 @@ bool ROSTTBAppWindow::_record_current_info()
     }
     else if(ui->radioButtonShuttleFeeder->isChecked())
     {
-        if(_shuttle_partner.toStdString().empty())
+        if(_shuttle_partner.isEmpty())
         {
             QMessageBox::critical(this, QObject::tr("No Partner"), QObject::tr("You must specify an accompanying return service ID."));
             return false;
@@ -376,7 +376,7 @@ bool ROSTTBAppWindow::_record_current_info()
             return false;
         }
         const QString _service_id = _parent->getDaughter();
-        if(_service_id.toStdString().empty())
+        if(_service_id.isEmpty())
         {
             QMessageBox::critical(this, QObject::tr("No Parent Daughter Found"), QObject::tr("Could not find reference to this new service within definition of parent service. Failed to retrieve ID for current service."));
             return false;
@@ -471,7 +471,7 @@ bool ROSTTBAppWindow::_record_current_info()
     {
         QString _srv_id = ui->serviceFinishServiceEdit->text();
 
-        if(_srv_id.toStdString().empty())
+        if(_srv_id.isEmpty())
         {
             QMessageBox::critical(this, QObject::tr("Missing Daughter Service"), QObject::tr("You must provide an identifier for the newly formed service."));
             return false;
@@ -636,12 +636,17 @@ void ROSTTBAppWindow::on_actionNew_triggered()
 void ROSTTBAppWindow::on_actionSave_As_triggered()
 {
     _open_file_str = _current_file->getSaveFileName(this, QObject::tr("Save As"), _ros_timetables->dirName(), QObject::tr("Timetable (*.ttb)") );
+    if(_open_file_str.isEmpty()) return;
     _save_file();
 }
 
 void ROSTTBAppWindow::open_repository()
 {
-    const QString _open_repo = _current_repository->getExistingDirectory(this, QObject::tr("Open Project Repository"), _ros_location,  QFileDialog::DontUseNativeDialog | QFileDialog::ReadOnly);
+    const QString _github_dir_win = QStringList{QDir::homePath(), "Documents", "GitHub"}.join(_qt_path_sep);
+    qDebug() << _github_dir_win << Qt::endl;
+    const QString _open_repo = _current_repository->getExistingDirectory(this, QObject::tr("Open Project Repository"), _github_dir_win,  QFileDialog::DontUseNativeDialog | QFileDialog::ReadOnly);
+
+    if(_open_repo == QString()) return;
 
     // Recover railway and timetable files from location
     QStringList _rly_pattern, _ttb_pattern;
@@ -674,7 +679,7 @@ void ROSTTBAppWindow::open_repository()
     QStringList _candidate_rly = _rly_dir.entryList();
     QStringList _candidate_ttb = _ttb_dir.entryList();
 
-    _current_route = _candidate_rly[0];
+    _current_route = QStringList{_rly_dir.absolutePath(), _candidate_rly[0]}.join(_qt_path_sep);
     const QString _ttb_file = _candidate_ttb[0];
 
     _post_open_action(QStringList{_ttb_dir.absolutePath(), _ttb_file}.join(_qt_path_sep));
@@ -708,6 +713,8 @@ void ROSTTBAppWindow::open_file()
         return;
     }
     QString in_file = _current_file->getOpenFileName(this, QObject::tr("Open Timetable"), _ros_timetables->absolutePath(), QObject::tr("ROS Timetable Files (*.ttb);;"));
+
+    if(in_file == QString()) return;
     _post_open_action(in_file);
 }
 
@@ -877,17 +884,24 @@ void ROSTTBAppWindow::_post_route_select_action()
     QStringList _parts = _current_route.split(_qt_path_sep);
     ui->SelectedRoute->setText(_parts[_parts.size()-1]);
     ui->SelectedRoute->setStyleSheet("QLabel { color : green; }");
-    QStringList _stations = _parser->getStations().toList();
+    QStringList _stations = _parser->getStations().values();
+    if(_stations.empty())
+    {
+        const QString _msg = "Failed to extract locations from '"+_current_route+"'.";
+        QMessageBox::critical(this, QObject::tr("Cannot parse location list"), QObject::tr(_msg.toStdString().c_str()));
+        return;
+    }
     _stations.sort();
     ui->comboBoxTrackIDStations->addItems(_stations);
     ui->comboBoxTrackIDStations->setEnabled(true);
     _populate_coordinates(ui->comboBoxTrackIDStations->currentText());
+    ui->checkBoxAtStation->toggle();
 }
 
 void ROSTTBAppWindow::on_pushButtonRoute_clicked()
 {
-    QString _current_route = QFileDialog::getOpenFileName(this,  QObject::tr("Open Route"), _ros_railways->path(),
-                                   QObject::tr("ROS Railway Files (*.rly)"));
+    _current_route = QFileDialog::getOpenFileName(this,  QObject::tr("Open Route"), _ros_railways->path(),
+                        QObject::tr("ROS Railway Files (*.rly)"));
     _post_route_select_action();
 
 }
@@ -1274,7 +1288,7 @@ void ROSTTBAppWindow::_save_file()
 
 void ROSTTBAppWindow::on_actionSave_triggered()
 {
-    if(_open_file_str.toStdString().empty())
+    if(_open_file_str.isEmpty())
     {
         _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), tr("Timetable (*.ttb)") );
     }
