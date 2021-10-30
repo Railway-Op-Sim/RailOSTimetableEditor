@@ -787,6 +787,7 @@ void ROSTTBAppWindow::_reset()
     ui->tableWidgetTimetable->setRowCount(0);
     ui->tableWidgetService->clear();
     ui->tableWidgetTimetable->clear();
+    ui->radioButtonStandard->toggle();
     _current_file = new QFileDialog(this);
     _current_timetable = new ROSTimetable;
     _station_add = new Station_add(nullptr, this);
