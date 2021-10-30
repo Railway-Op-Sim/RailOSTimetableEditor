@@ -82,6 +82,11 @@ public:
     */
     void open_file();
 
+    /*! @brief Open Git Repository
+    @return void
+     */
+    void open_repository();
+
     /*! @brief Verify location ID is a valid form
     @return True if ID candidate is valid
     */
@@ -108,9 +113,6 @@ public:
     QDir* getCacheDir(){return _cache_dir;}
 
 private slots:
-    //! Open File Menu Action
-    void on_actionOpen_triggered();
-
     //! New File Menu Action
     void on_actionNew_triggered();
 
@@ -235,8 +237,15 @@ private slots:
 
     void on_comboBoxTrackIDs_currentIndexChanged(int index);
 
+    //! Open Timetable File Menu Action
+    void on_actionTimetable_triggered();
+
+    void on_actionGit_Repository_triggered();
+
 private:
     const QString _qt_path_sep = "/";
+
+    QString _ros_location = "";
 
     //! Sets whether current train property change is induced by template selection
     bool _is_template_change = false;
@@ -270,6 +279,9 @@ private:
 
     //! Current open/active file
     QFileDialog* _current_file = new QFileDialog(this);
+
+    //! Current open repository
+    QFileDialog* _current_repository = new QFileDialog(this);
 
     //! String address of current open file
     QString _open_file_str = "";
@@ -307,6 +319,10 @@ private:
     @return int
     */
     int _kph_to_mph(const int speed);
+
+    void _post_open_action(const QString input_file);
+
+    void _post_route_select_action();
 
     /*! @brief Save the current timetable object to file
     @return void

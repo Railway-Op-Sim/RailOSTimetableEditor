@@ -256,9 +256,9 @@ class ROSTTBGen
         /*! @brief Parse the data from an input ROS .ttb file
         @return file contents
         */
-        QString parse_file(const QFileDialog* dialog, const QDir* directory);
+        QString parse_file(const QString in_file);
 
-        QString parse_rly(const QString railways_dir);
+        QString parse_rly(const QString route_file);
 
         /*! @brief Fetch the constructed timetable
         @return Pointer to newly created timetable

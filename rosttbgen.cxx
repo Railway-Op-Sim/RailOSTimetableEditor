@@ -29,16 +29,19 @@
 
 #include "rosttbgen.hxx"
 
-QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
+QString ROSTTBGen::parse_file(const QString input_file)
 {
     _cached_text = "";
-    QString in_file = file->getOpenFileName(_parent, QObject::tr("Open Timetable"), directory->absolutePath(), QObject::tr("ROS Timetable Files (*.ttb);;"));
-    if(in_file == QString()) return in_file; // In case user presses 'Cancel'
-    QFile open_file(in_file);
+
+    if(input_file == QString()) return input_file; // In case user presses 'Cancel'
+
+    QFile open_file(input_file);
+
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
     {
-        if(in_file.isEmpty() || in_file.isNull()) return "NULL";
-        QMessageBox::critical(_parent, QObject::tr("File Open Failure"), QObject::tr("Failed to open file '")+in_file+"'");
+        qDebug() << "Attempting to open " + input_file << Qt::endl;
+        if(input_file.isEmpty() || input_file.isNull()) return "NULL";
+        QMessageBox::critical(_parent, QObject::tr("File Open Failure"), QObject::tr("Failed to open file '")+input_file+"'");
         return QString();
     }
 
@@ -92,22 +95,19 @@ QString ROSTTBGen::parse_file(const QFileDialog* file, const QDir* directory)
     return _file_name;
 }
 
-QString ROSTTBGen::parse_rly(const QString railways_dir)
+QString ROSTTBGen::parse_rly(const QString route_file)
 {
-    QString _current_route = QFileDialog::getOpenFileName(_parent,  QObject::tr("Open Route"), railways_dir,
-                                   QObject::tr("ROS Railway Files (*.rly)"));
-
-    QFile open_file(_current_route);
+    QFile open_file(route_file);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
             return "NULL";
 
     open_file.close();
 
-    _parse_rly_stations(_current_route);
-    _parse_rly_coordinates(_current_route);
+    _parse_rly_stations(route_file);
+    _parse_rly_coordinates(route_file);
 
 
-    return _current_route;
+    return route_file;
 }
 
 QSet<QString> ROSTTBGen::_parse_rly_stations(QString route_file)
@@ -134,7 +134,7 @@ QSet<QString> ROSTTBGen::_parse_rly_stations(QString route_file)
         }
         ++counter;
     }
-    _stations_list = _stations.toSet();
+    _stations_list = QSet<QString>(_stations.begin(), _stations.end());
 
     open_file.close();
 

@@ -107,14 +107,13 @@ ROSTTBAppWindow::ROSTTBAppWindow()
         }
         QTextStream in(&_cache_file);
 
-        QString _ros_loc;
         while (!in.atEnd()) {
-            _ros_loc = in.readLine();
+            _ros_location = in.readLine();
         }
-        ui->ROSStatus->setText(_ros_loc);
+        ui->ROSStatus->setText(_ros_location);
         ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
 
-        _make_paths(_ros_loc);
+        _make_paths(_ros_location);
     }
 
     _cache_file.close();
@@ -226,7 +225,7 @@ bool ROSTTBAppWindow::_record_current_info()
     else
     {
         const int _index = ui->comboBoxTrackIDs->findText(ui->comboBoxTrackIDs->currentText());
-        const QStringList _coord_strs = _current_coords[_index].toList();
+        const QStringList _coord_strs = _current_coords[_index].values();
         _start_ids.push_back(_coord_strs[0]);
         _start_ids.push_back(_coord_strs[1]);
     }
@@ -629,11 +628,6 @@ void ROSTTBAppWindow::_enable_integer_info(bool enable)
     ui->spinBoxPower->setEnabled(enable);
 }
 
-void ROSTTBAppWindow::on_actionOpen_triggered()
-{
-    open_file();
-}
-
 void ROSTTBAppWindow::on_actionNew_triggered()
 {
     _reset();
@@ -641,20 +635,57 @@ void ROSTTBAppWindow::on_actionNew_triggered()
 
 void ROSTTBAppWindow::on_actionSave_As_triggered()
 {
-    _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), tr("Timetable (*.ttb)") );
+    _open_file_str = _current_file->getSaveFileName(this, QObject::tr("Save As"), _ros_timetables->dirName(), QObject::tr("Timetable (*.ttb)") );
     _save_file();
 }
 
-void ROSTTBAppWindow::open_file()
+void ROSTTBAppWindow::open_repository()
 {
-    ui->checkBoxAtStation->setChecked(false);
-    if(!_ros_timetables)
+    const QString _open_repo = _current_repository->getExistingDirectory(this, QObject::tr("Open Project Repository"), _ros_location,  QFileDialog::DontUseNativeDialog | QFileDialog::ReadOnly);
+
+    // Recover railway and timetable files from location
+    QStringList _rly_pattern, _ttb_pattern;
+    _rly_pattern << "*.rly";
+    _ttb_pattern << "*.ttb";
+
+    const QString _rly_dir_str = QStringList{_open_repo, "Railway"}.join(_qt_path_sep);
+    const QString _ttb_dir_str = QStringList{_open_repo, "Program_Timetables"}.join(_qt_path_sep);
+
+    QDir _rly_dir(_rly_dir_str);
+    QDir _ttb_dir(_ttb_dir_str);
+
+    _rly_dir.setNameFilters(_rly_pattern);
+    _ttb_dir.setNameFilters(_ttb_pattern);
+
+    if(_rly_dir.entryList().size() == 0)
     {
-        QMessageBox::critical(this, QObject::tr("Invalid Application Address"), QObject::tr("You need to first set the location of the Railway Operation Simulator executable."));
+        const QString _msg = "Cannot find a candidate '.rly' file in location '" + _rly_dir_str + "'.";
+        QMessageBox::critical(this, QObject::tr("No railway file found"), QObject::tr(_msg.toStdString().c_str()));
         return;
     }
+
+    if(_ttb_dir.entryList().size() == 0)
+    {
+        const QString _msg = "Cannot find a candidate '.ttb' file in location '" + _ttb_dir_str + "'.";
+        QMessageBox::critical(this, QObject::tr("No timetable file found"), QObject::tr(_msg.toStdString().c_str()));
+        return;
+    }
+
+    QStringList _candidate_rly = _rly_dir.entryList();
+    QStringList _candidate_ttb = _ttb_dir.entryList();
+
+    _current_route = _candidate_rly[0];
+    const QString _ttb_file = _candidate_ttb[0];
+
+    _post_open_action(QStringList{_ttb_dir.absolutePath(), _ttb_file}.join(_qt_path_sep));
+    _post_route_select_action();
+}
+
+void ROSTTBAppWindow::_post_open_action(const QString input_file)
+{
+    ui->checkBoxAtStation->setChecked(false);
     _reset();
-    QString _parsed = _parser->parse_file(_current_file, _ros_timetables);
+    QString _parsed = _parser->parse_file(input_file);
     if(_parsed == QString()) return; // User pressed Cancel
     _open_file_str = (_parsed != "NULL")? _parsed : _open_file_str;
     _current_timetable = _parser->getParsedTimetable();
@@ -667,6 +698,17 @@ void ROSTTBAppWindow::open_file()
     update_output();
     _set_form_info();
     this->setWindowTitle(main_window_title+": "+_open_file_str);
+}
+
+void ROSTTBAppWindow::open_file()
+{
+    if(!_ros_timetables)
+    {
+        QMessageBox::critical(this, QObject::tr("Invalid Application Address"), QObject::tr("You need to first set the location of the Railway Operation Simulator executable."));
+        return;
+    }
+    QString in_file = _current_file->getOpenFileName(this, QObject::tr("Open Timetable"), _ros_timetables->absolutePath(), QObject::tr("ROS Timetable Files (*.ttb);;"));
+    _post_open_action(in_file);
 }
 
 void ROSTTBAppWindow::_make_paths(QString ros_path)
@@ -717,11 +759,11 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
 
     QFile _cache_file(join(_qt_path_sep, _cache_dir->absolutePath(), "ros_location_cache.dat"));
 
-    qDebug() << "Writing cache to : " << join(_qt_path_sep, _cache_dir->absolutePath(), "ros_location_cache.dat") << endl;
+    qDebug() << "Writing cache to : " << join(_qt_path_sep, _cache_dir->absolutePath(), "ros_location_cache.dat") << Qt::endl;
     if ( _cache_file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
     {
         QTextStream stream( &_cache_file );
-        stream << _file_name << endl;
+        stream << _file_name << Qt::endl;
     }
     _cache_file.close();
     _make_paths(_file_name);
@@ -828,9 +870,9 @@ void ROSTTBAppWindow::_populate_feederboxes()
     ui->comboBoxParent->addItems(_service_ids);
 }
 
-void ROSTTBAppWindow::on_pushButtonRoute_clicked()
+void ROSTTBAppWindow::_post_route_select_action()
 {
-    QString _parsed = _parser->parse_rly(_ros_railways->path());
+    QString _parsed = _parser->parse_rly(_current_route);
     _current_route = (_parsed != "NULL") ? _parsed : _current_route;
     QStringList _parts = _current_route.split(_qt_path_sep);
     ui->SelectedRoute->setText(_parts[_parts.size()-1]);
@@ -840,6 +882,14 @@ void ROSTTBAppWindow::on_pushButtonRoute_clicked()
     ui->comboBoxTrackIDStations->addItems(_stations);
     ui->comboBoxTrackIDStations->setEnabled(true);
     _populate_coordinates(ui->comboBoxTrackIDStations->currentText());
+}
+
+void ROSTTBAppWindow::on_pushButtonRoute_clicked()
+{
+    QString _current_route = QFileDialog::getOpenFileName(this,  QObject::tr("Open Route"), _ros_railways->path(),
+                                   QObject::tr("ROS Railway Files (*.rly)"));
+    _post_route_select_action();
+
 }
 
 void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
@@ -1765,5 +1815,16 @@ void ROSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QStrin
 void ROSTTBAppWindow::on_comboBoxTrackIDs_currentIndexChanged(int index)
 {
     if(_arrows.size() > 0 && index >= 0 && index < _arrows.size()) ui->labelDirection->setText(_arrows[index]);
+}
+
+
+void ROSTTBAppWindow::on_actionTimetable_triggered()
+{
+    open_file();
+}
+
+void ROSTTBAppWindow::on_actionGit_Repository_triggered()
+{
+   open_repository();
 }
 
