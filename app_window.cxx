@@ -631,6 +631,9 @@ void ROSTTBAppWindow::_enable_integer_info(bool enable)
 void ROSTTBAppWindow::on_actionNew_triggered()
 {
     _reset();
+    ui->radioButtonShuttleFeeder->setEnabled(false);
+    ui->radioButtonFromOther->setEnabled(false);
+    ui->radioButtonShuttleFinish->setEnabled(false);
 }
 
 void ROSTTBAppWindow::on_actionSave_As_triggered()
@@ -1079,9 +1082,24 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
         ui->textEditParentShuttleRef->clear();
         ui->textEditParentShuttleRef->setEnabled(false);
 
-        QString _current_parent = ui->comboBoxParent->currentText();
-        ui->servicerefEdit->setText(_current_timetable->getServices()[_current_parent]->getDaughter());
-        ui->starttimeEdit->setTime(_current_timetable->getServices()[_current_parent]->getExitTime());
+        const QString _current_parent = ui->comboBoxParent->currentText();
+
+        if(_current_timetable->getServices().empty())
+        {
+            QMessageBox::critical(this, "No other services", "Cannot create service from another, must be at least one other service already in timetable.");
+            ui->radioButtonStandard->toggle();
+            return;
+        }
+
+        if(_current_parent.isEmpty())
+        {
+            return;
+        }
+
+        const QMap<QString, ROSService*> _services = _current_timetable->getServices();
+
+        ui->servicerefEdit->setText(_services[_current_parent]->getDaughter());
+        ui->starttimeEdit->setTime(_services[_current_parent]->getExitTime());
     }
 }
 
