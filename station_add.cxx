@@ -246,7 +246,7 @@ void Station_add::_redraw_table()
               _depart_time  = _current_element_times[i][1];
         QString _ns_string = "";
 
-        if(_current_srv->getParent() != "" && i == 0)
+        if(!_current_srv->getParent().isEmpty() && i == 0)
         {
             if(_current_srv->getParent() == _current_srv->getDaughter())
             {
@@ -263,7 +263,7 @@ void Station_add::_redraw_table()
             _ns_string += " ⤸ "+_current_srv->getCDTTimes()[i].toString("HH:mm");
         }
 
-        if(_current_srv->getDaughter() != "" && i == _current_element_stations.size()-1)
+        if(!_current_srv->getDaughter().isEmpty() && i == _current_element_stations.size()-1)
         {
             _ns_string += " → "+_current_srv->getDaughter();
         }
@@ -284,7 +284,7 @@ void Station_add::_redraw_table()
             _service_table->setItem(_service_table->rowCount()-1, j, _new_time_item);
         }
 
-        if(_join_service != "" && _join_data[_join_service][0] == _current_element_stations[i] && !_join_shown)
+        if(!_join_service.isEmpty() && _join_data[_join_service][0] == _current_element_stations[i] && !_join_shown)
         {
            QStringList _join_item =  QStringList({_join_data[_join_service][1],
                                                      "",

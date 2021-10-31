@@ -16,4 +16,6 @@ About::~About()
 void About::setVersion(const QString &version)
 {
     ui->labelVersion->setText(version);
+    const int year = QDate::currentDate().year();
+    ui->labelCopyright->setText("Copyright © "+QString::number(year)+" Kristian Zarebski");
 }

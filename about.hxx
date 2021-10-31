@@ -2,8 +2,9 @@
 #define ABOUT_HXX
 
 #include <QDialog>
+#include <QDateTime>
 
-const QString VERSION="0.2.1-alpha";
+const QString VERSION="0.2.2-alpha";
 
 namespace Ui {
 class About;

@@ -59,7 +59,7 @@ const QString main_window_title = "ROS Timetable Editor";
 
 /*! @brief      ROS Timetable Editor Main Application Window
     @details    Main window for viewing, creating and editting services within a ROS timetable
-    @version    0.2.1-alpha
+    @version    0.2.2-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-02-24
     @copyright  GNU Public License v3
