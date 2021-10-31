@@ -120,6 +120,7 @@ ROSTTBAppWindow::ROSTTBAppWindow()
 
     ui->radioButtonStandard->setEnabled(true);
     ui->radioButtonStandard->toggle();
+    ui->radioButtonFrh->toggle();
     ui->radioButton_kph->toggle();
 
 }
@@ -489,6 +490,12 @@ bool ROSTTBAppWindow::_record_current_info()
 
     // -------------------------------------------------------------------------------------------------------------------- //
 
+    // If a start location is specified auto-add it to the start of the timetable
+    if(ui->comboBoxTrackIDStations->isEnabled())
+    {
+        _current_service_selection->addStation({QTime(), ui->starttimeEdit->time()}, ui->comboBoxTrackIDStations->currentText());
+    }
+
     update_output();
 
     return true;
@@ -792,6 +799,7 @@ void ROSTTBAppWindow::_reset()
     _current_file = new QFileDialog(this);
     _current_timetable = new ROSTimetable;
     _station_add = new Station_add(nullptr, this);
+    _read_in_custom_templates();
 }
 
 bool ROSTTBAppWindow::_checkROS()
@@ -808,7 +816,7 @@ bool ROSTTBAppWindow::_checkROS()
 void ROSTTBAppWindow::_clear()
 {
     ui->servicerefEdit->clear();
-    ui->comboBoxTrainSet->clear();
+    ui->comboBoxTrainSet->setCurrentIndex(0);
     ui->spinBoxMU->setValue(1);
     ui->spinBoxMaxSpeed->setValue(0);
     ui->spinBoxForce->setValue(0);
@@ -824,6 +832,7 @@ void ROSTTBAppWindow::_clear()
     ui->descEdit->clear();
     ui->spinBoxMass->setValue(0);
     ui->spinBoxPower->setValue(0);
+    ui->starttimeEdit->setTime(_current_timetable->getStartTime());
 }
 
 void ROSTTBAppWindow::on_pushButtonInsert_clicked()
@@ -854,11 +863,20 @@ void ROSTTBAppWindow::_delete_entries()
     qDebug() << "Timetable Size Changed from " << _before << " to " << _current_timetable->size();
     _current_service_selection = (_current_timetable->size() == 0) ? nullptr : _current_timetable->end();
     update_output();
+    _clear();
 }
 
 void ROSTTBAppWindow::on_pushButtonDelete_clicked()
 {
     _delete_entries();
+    if(_current_timetable->getServices().size() == 0)
+    {
+        ui->radioButtonShuttleFeeder->setEnabled(false);
+        ui->radioButtonShuttleFinish->setEnabled(false);
+        ui->radioButtonFromOther->setEnabled(false);
+        ui->radioButtonStandard->toggle();
+        ui->radioButtonFrh->toggle();
+    }
 }
 
 void ROSTTBAppWindow::_populate_feederboxes()
@@ -914,7 +932,8 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     {
         QMessageBox::critical(this, QObject::tr("No Service Defined"), QObject::tr("You must add a service before selecting calling points."));
         return;
-    }    
+    }
+
     if(_parser->getStations().size() == 0)
     {
       QMessageBox::critical(this, QObject::tr("No Route"), QObject::tr("You must open the relevant route before adjusting an existing timetable."));
@@ -922,14 +941,16 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
       update_output();
       return;
     }
+
     _station_add->setCurrentService(_current_service_selection);
     _station_add->setStations(_parser->getStations());
     _station_add->clearForm();
     _station_add->setVisible(true);
     QList<QTime> _times;
     if(_current_service_selection->getTimes().size() > 0)
-    {
+    { 
         _times = _current_service_selection->getTimes()[_current_service_selection->getTimes().size()-1];
+        qDebug() << _times << Qt::endl;
     }
     else
     {
@@ -1086,6 +1107,7 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
         {
             QMessageBox::critical(this, "No other services", "Cannot create service from another, must be at least one other service already in timetable.");
             ui->radioButtonStandard->toggle();
+            ui->radioButtonFrh->toggle();
             return;
         }
 
@@ -1807,8 +1829,8 @@ void ROSTTBAppWindow::_populate_coordinates(QString location)
 
             if(x_1 == x_2 && y_1 == y_2) continue;
 
-            bool is_up = x_1 == x_2 && y_2 - y_1 == 1;
-            bool is_down = x_1 == x_2 && y_1 - y_2 == 1;
+            bool is_down = x_1 == x_2 && y_2 - y_1 == 1;
+            bool is_up = x_1 == x_2 && y_1 - y_2 == 1;
             bool is_left = x_1 - x_2 == 1 && y_1 == y_2;
             bool is_right = x_2 - x_1 == 1 && y_1 == y_2;
 

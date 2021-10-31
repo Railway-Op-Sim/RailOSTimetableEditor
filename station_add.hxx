@@ -124,7 +124,7 @@ public:
     @param time Most recent event time from current timetable
     @return void
     */
-    void fwdPreviousEventTimes(const QList<QTime>& times) {_times = times;}
+    void fwdPreviousEventTimes(const QList<QTime>& times);
 
     /*! @brief Clear the form contents
     @return void

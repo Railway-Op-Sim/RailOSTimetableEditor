@@ -200,6 +200,32 @@ void Station_add::on_buttonBoxAddStation_accepted()
     _redraw_table();
 }
 
+void Station_add::fwdPreviousEventTimes(const QList<QTime> &times)
+{
+       QList<QTime> _new_times;
+
+       if(!times[0].isValid() && times[1].isValid())
+       {
+           _new_times.append(times[1]);
+           _new_times.append(times[1]);
+           _times = _new_times;
+       }
+       else if(times[0].isValid() && !times[1].isValid())
+       {
+           _new_times.append(times[0]);
+           _new_times.append(times[0]);
+           _times = _new_times;
+       }
+       else
+       {
+           _times = times;
+       }
+       ui->timeEditArrival->setTime(_times[0]);
+       ui->timeEditDeparture->setTime(_times[1]);
+       ui->timeEditCDT->setTime(_times[1]);
+       ui->timeEditSplit->setTime(_times[1]);
+}
+
 void Station_add::_redraw_table()
 {
 
