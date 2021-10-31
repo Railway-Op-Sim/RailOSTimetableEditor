@@ -781,11 +781,9 @@ void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
 
 void ROSTTBAppWindow::_reset()
 {
-    const QSet<QString> _temp = _parser->getStations();
     delete _current_file;
     delete _parser;
-    _parser = new ROSTTBGen(this);
-    _parser->setStations(_temp);
+    _parser = new ROSTTBGen(this, _current_route);
     ui->tableWidgetService->setRowCount(0);
     ui->tableWidgetTimetable->setRowCount(0);
     ui->tableWidgetService->clear();
@@ -1637,8 +1635,8 @@ void ROSTTBAppWindow::_read_in_custom_templates()
     }
     ui->comboBoxTrainSet->clear();
     QStringList _temp = TrainSet::TrainSet.keys()+_custom_types.keys();
-    QSet<QString> _temp_set = _temp.toSet();
-    _temp = _temp_set.toList();
+    QSet<QString> _temp_set(_temp.begin(), _temp.end());
+    _temp = QStringList(_temp_set.begin(), _temp_set.end());
     std::sort(_temp.begin(), _temp.end());
     ui->comboBoxTrainSet->addItem("Custom");
     ui->comboBoxTrainSet->addItems(_temp);
@@ -1789,6 +1787,13 @@ void ROSTTBAppWindow::_populate_coordinates(QString location)
     const QMap<QString, QList<QList<int>>> _coords = _parser->getCoordinates();
     QStringList _coords_for_loc = {};
     _arrows.clear();
+
+    if(_coords.empty())
+    {
+        const QString _msg = "Failed to retrieve coordinates for location '"+location+"'.";
+        QMessageBox::critical(this, "Coordinates not found", _msg.toStdString().c_str());
+        return;
+    }
 
     for(auto& coord_set_1 : QSet<QList<int>>(_coords[location].begin(), _coords[location].end()))
     {

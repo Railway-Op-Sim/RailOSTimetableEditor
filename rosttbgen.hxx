@@ -64,6 +64,9 @@ class ROSTTBGen
         //! Container for parsed cordinates
         QMap<QString, QList<QList<int>>> _coordinates;
 
+        //! Current loaded route
+        QString _current_route = "";
+
         //! Current timetable to be modified
         ROSTimetable* _current_timetable = new ROSTimetable;
 
@@ -214,7 +217,7 @@ class ROSTTBGen
         /*! @brief Parse railway station coordinates from .rly file
         @return map of coordinates for each station
         */
-        QMap<QString, QList<QList<int>>> _parse_rly_coordinates(const QString railways_dir);
+        QMap<QString, QList<QList<int>>> _parse_rly_coordinates(const QString route_file = "");
 
         //! Map object to map ROSService::FinishState onto the ROS syntax
         QMap<ROSService::FinishState, QString> _exit_types = {{ROSService::FinishState::FinishExit, "Fer"},
@@ -236,7 +239,18 @@ class ROSTTBGen
         /*! @brief Construct a parser instance
         @param parent Pointer to parent application window
         */
-        ROSTTBGen(QWidget* parent) : _parent(parent) {}
+        ROSTTBGen(QWidget* parent, const QString railway_file = "", const QString timetable_file = "") : _parent(parent) {
+
+            if(!railway_file.isEmpty())
+            {
+                parse_rly(railway_file);
+            }
+
+            if(!timetable_file.isEmpty())
+            {
+                parse_file(timetable_file);
+            }
+        }
 
         /*! @brief Check string is a time (public)
         @return True if string is a valid time
@@ -251,7 +265,7 @@ class ROSTTBGen
         /*! @brief Get list of parsed coordinates
         @return map of coordinates
         */
-        QMap<QString, QList<QList<int>>> getCoordinates(){return _coordinates;}
+        QMap<QString, QList<QList<int>>> getCoordinates();
 
         /*! @brief Parse the data from an input ROS .ttb file
         @return file contents

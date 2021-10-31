@@ -141,12 +141,32 @@ QSet<QString> ROSTTBGen::_parse_rly_stations(QString route_file)
     return _stations_list;
 }
 
+QMap<QString, QList<QList<int>>> ROSTTBGen::getCoordinates()
+{
+    if(_coordinates.empty())
+    {
+        _parse_rly_coordinates();
+    }
+
+    return _coordinates;
+}
+
 QMap<QString, QList<QList<int>>> ROSTTBGen::_parse_rly_coordinates(const QString route_file)
 {
+    const QString _route_to_parse = (route_file.isEmpty() && !_current_route.isEmpty()) ? _current_route : route_file;
+
+    if(_route_to_parse.isEmpty())
+    {
+        QMessageBox::critical(_parent, "No route specified", "Cannot run parser on railway file, no file provided.");
+        return {};
+    }
+
     QFile open_file(route_file);
 
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
         return {};
+
+    qDebug() << "Opened file '"+route_file+"'" << Qt::endl;
 
     QTextStream in(&open_file);
 
@@ -178,6 +198,8 @@ QMap<QString, QList<QList<int>>> ROSTTBGen::_parse_rly_coordinates(const QString
             }
         }
     }
+
+    _current_route = route_file;
 
     return _coordinates;
 }
