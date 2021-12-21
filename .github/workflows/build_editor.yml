@@ -1,8 +1,6 @@
 name: Railway Operation Simulator Timetable Editor
 on:
-  push:
-    branches:
-      - master
+  [push]
 jobs:
   build:
     name: Build ROSTTB Editor
