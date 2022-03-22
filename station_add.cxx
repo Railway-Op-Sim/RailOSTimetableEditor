@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//             ROS Timetable Editor Location Add Window                    //
+//             RailOS Timetable Editor Location Add Window                    //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -30,7 +30,7 @@
 #include "station_add.hxx"
 #include "ui_station_add.h"
 
-Station_add::Station_add(ROSService* service, QWidget *parent) :
+Station_add::Station_add(RailOSService* service, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Station_add),
     _current_srv(service)
@@ -69,10 +69,10 @@ Station_add::~Station_add()
 
 bool Station_add::setInfo()
 {
-    if(_times.size() != 3)
+    if(_times.size() < 2)
     {
-        qDebug() << _times << endl;
-        QMessageBox::critical(this, QObject::tr("Invalid Times Array Size"), "Expected to read a time array of size 3,\ngot size "+QString::number(_times.size()));
+        qDebug() << "SetInfo: " << _times << endl;
+        QMessageBox::critical(this, QObject::tr("Invalid Times Array Size"), "Expected to read a time array of size 2,\ngot size "+QString::number(_times.size()));
         return false;
     }
 
@@ -166,7 +166,7 @@ void Station_add::on_buttonBoxAddStation_accepted()
         else
         {
             _current_station = ui->comboBoxStations->currentText();
-            _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time(), ui->timeEditCDT->time()};
+            _times = {ui->timeEditArrival->time(), ui->timeEditDeparture->time(), _cdt_time};
             qDebug() << "Adding Station: " << _times[0].toString("HH:mm") << ";" << _times[1].toString("HH:mm") << ";" << _current_station;
             _current_srv->addStation(_times, _current_station);
             _current_srv->setStopAsPassPoint(_current_srv->getStations().size()-1, ui->checkBoxPASS->isChecked());

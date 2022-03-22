@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//              ROS Timetable Editor Main Application Window               //
+//              RailOS Timetable Editor Main Application Window               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -30,16 +30,16 @@
 #include "app_window.hxx"
 #include "ui_rosttbappwindow.h"
 
-ROSTTBAppWindow::ROSTTBAppWindow()
+RailOSTTBAppWindow::RailOSTTBAppWindow()
     : QMainWindow()
-    , ui(new Ui::ROSTTBAppWindow)
+    , ui(new Ui::RailOSTTBAppWindow)
 {
     _about_window->setVersion(VERSION);
 
     const int SERV_COL_COUNT = 4, TTB_COL_COUNT = 3;
     ui->setupUi(this);
     _tt_model_select = new QItemSelectionModel(ui->tableWidgetTimetable->model());
-    ui->ROSStatus->setStyleSheet("QLabel { color : red; }");
+    ui->RailOSStatus->setStyleSheet("QLabel { color : red; }");
     ui->SelectedRoute->setStyleSheet("QLabel { color : red; }");
     ui->checkBoxManualTimeEdit->setEnabled(false);
     QHeaderView* _header_ttb = ui->tableWidgetTimetable->horizontalHeader();
@@ -88,35 +88,35 @@ ROSTTBAppWindow::ROSTTBAppWindow()
     font.setPixelSize(12);
     qApp->setFont(font);
 
-    _cache_dir = new QDir(join(_qt_path_sep, QStandardPaths::writableLocation(QStandardPaths::HomeLocation), "Documents", "ROSTTBEditor", "cache"));
+    QDir _cache_dir = QFileInfo(_cache_file).absolutePath();
 
     _read_in_custom_templates();
 
-    if(!_cache_dir->exists())
+    if(!_cache_dir.exists())
     {
-        qDebug() << "Creating Cache Folder at: " << _cache_dir->absolutePath();
-        _cache_dir->mkpath(".");
+        qDebug() << "Creating Cache Folder at: " << _cache_dir.absolutePath();
+        _cache_dir.mkpath(".");
     }
-    QFile _cache_file(join("/", _cache_dir->absolutePath(), "ros_location_cache.dat"));
+    QFile _file(_cache_file);
 
-    if(_cache_file.exists())
+    if(_file.exists())
     {
-        qDebug() << "Reading ROS Location from cache: " << _cache_file.fileName();
-        if(!_cache_file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(0, QObject::tr("error"), _cache_file.errorString());
+        qDebug() << "Reading RailOS Location from cache: " << _file.fileName();
+        if(!_file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(0, QObject::tr("error"), _file.errorString());
         }
-        QTextStream in(&_cache_file);
+        QTextStream in(&_file);
 
         while (!in.atEnd()) {
-            _ros_location = in.readLine();
+            _railos_location = in.readLine();
         }
-        ui->ROSStatus->setText(_ros_location);
-        ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
+        ui->RailOSStatus->setText(_railos_location);
+        ui->RailOSStatus->setStyleSheet("QLabel { color : green; }");
 
-        _make_paths(_ros_location);
+        _make_paths(_railos_location);
     }
 
-    _cache_file.close();
+    _file.close();
 
     ui->radioButtonStandard->setEnabled(true);
     ui->radioButtonStandard->toggle();
@@ -125,12 +125,12 @@ ROSTTBAppWindow::ROSTTBAppWindow()
 
 }
 
-ROSTTBAppWindow::~ROSTTBAppWindow()
+RailOSTTBAppWindow::~RailOSTTBAppWindow()
 {
     delete ui;
 }
 
-bool ROSTTBAppWindow::checkLocID(QString id)
+bool RailOSTTBAppWindow::checkLocID(QString id)
 {
     const QStringList _parts = id.split("-");
     if(_parts.size() != 2) return false;
@@ -146,7 +146,7 @@ bool ROSTTBAppWindow::checkLocID(QString id)
     return true;
 }
 
-bool ROSTTBAppWindow::checkIDsAreNeighbours(QStringList ids)
+bool RailOSTTBAppWindow::checkIDsAreNeighbours(QStringList ids)
 {
     QString _coordinate_0_0 = ids[0].split("-")[0],
             _coordinate_0_1 = ids[0].split("-")[1],
@@ -197,10 +197,10 @@ bool ROSTTBAppWindow::checkIDsAreNeighbours(QStringList ids)
        return true;
 }
 
-bool ROSTTBAppWindow::_record_current_info()
+bool RailOSTTBAppWindow::_record_current_info()
 {
     ui->labelParentOfJoin->setText("");
-    if(!_checkROS()) return false;
+    if(!_checkRailOS()) return false;
     QString _srv_id = ui->servicerefEdit->text();
     const QString _desc = ui->descEdit->text();
     const QTime _start_time = ui->starttimeEdit->time();
@@ -322,7 +322,7 @@ bool ROSTTBAppWindow::_record_current_info()
 
     if(ui->radioButtonShuttleFinish->isChecked())
     {
-        const ROSService* _parent = _current_timetable->getServices()[ui->comboBoxFeeder->currentText()];
+        const RailOSService* _parent = _current_timetable->getServices()[ui->comboBoxFeeder->currentText()];
         QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][0];
 
         const QString _service_id = _current_timetable->getServices()[_current_service_selection->getParent()]->getDaughter();
@@ -337,7 +337,7 @@ bool ROSTTBAppWindow::_record_current_info()
             return false;
         }
 
-        _current_service_selection->setType(ROSService::ServiceType::ShuttleFinishService);
+        _current_service_selection->setType(RailOSService::ServiceType::ShuttleFinishService);
         _current_service_selection->setEntryTime(_parent_last_time);
         _current_service_selection->setParent(ui->comboBoxFeeder->currentText());
         _current_service_selection->setID(_service_id);
@@ -351,7 +351,7 @@ bool ROSTTBAppWindow::_record_current_info()
             return false;
         }
         _current_service_selection->setDaughter(_shuttle_partner);
-        _current_service_selection->setType(ROSService::ServiceType::ShuttleFromStop);
+        _current_service_selection->setType(RailOSService::ServiceType::ShuttleFromStop);
         _current_service_selection->setEntryPoint(_start_ids);
 
     }
@@ -363,12 +363,12 @@ bool ROSTTBAppWindow::_record_current_info()
             return false;
         }
         _current_service_selection->setDaughter(_shuttle_partner);
-        _current_service_selection->setType(ROSService::ServiceType::ShuttleFromFeeder);
+        _current_service_selection->setType(RailOSService::ServiceType::ShuttleFromFeeder);
         _current_service_selection->setParent(ui->comboBoxFeeder->currentText());
     }
     else if(ui->radioButtonFromOther->isChecked())
     {
-        const ROSService* _parent = _current_timetable->getServices()[ui->comboBoxParent->currentText()];
+        const RailOSService* _parent = _current_timetable->getServices()[ui->comboBoxParent->currentText()];
         QTime _parent_last_time = _parent->getTimes()[_parent->getTimes().size()-1][0];
 
         if(ui->starttimeEdit->time().msecsTo(_parent_last_time) < 0)
@@ -390,25 +390,25 @@ bool ROSTTBAppWindow::_record_current_info()
 
         if(_current_timetable->getServices()[ui->comboBoxParent->currentText()]->getSplitData() != QMap<QString, QStringList>())
         {
-            _current_service_selection->setType(ROSService::ServiceType::ServiceFromSplit);
+            _current_service_selection->setType(RailOSService::ServiceType::ServiceFromSplit);
         }
 
         else
         {
-            _current_service_selection->setType(ROSService::ServiceType::ServiceFromService);
+            _current_service_selection->setType(RailOSService::ServiceType::ServiceFromService);
         }
 
 
         _current_service_selection->setID(_service_id);
         _current_service_selection->setEntryTime(_parent_last_time);
         _current_service_selection->setParent(ui->comboBoxParent->currentText());
-        _current_service_selection->addStation({_parent->getTimes()[_parent->getTimes().size()-1][0], _parent->getTimes()[_parent->getTimes().size()-1][0]}, _parent->getStations()[_parent->getStations().size()-1]);
+        _current_service_selection->addStation(_parent->getTimes()[_parent->getTimes().size()-1], _parent->getStations()[_parent->getStations().size()-1]);
         ui->servicerefEdit->setText(_service_id);
 
     }
     else
     {
-        _current_service_selection->setType(ROSService::ServiceType::Service);
+        _current_service_selection->setType(RailOSService::ServiceType::Service);
         _current_service_selection->setEntryPoint(_start_ids);
     }
 
@@ -442,7 +442,7 @@ bool ROSTTBAppWindow::_record_current_info()
         }
 
         _current_service_selection->setExitPoints(_exit_ids);
-        _current_service_selection->setFinishState(ROSService::FinishState::FinishExit);
+        _current_service_selection->setFinishState(RailOSService::FinishState::FinishExit);
     }
 
     else if(ui->radioButtonFjo->isChecked())
@@ -479,21 +479,21 @@ bool ROSTTBAppWindow::_record_current_info()
         }
 
         _current_service_selection->setDaughter(_srv_id);
-        if(ui->radioButtonFns->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishFormNew);
-        else if(ui->radioButtonFshf->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleFormNew);
-        else _current_service_selection->setFinishState(ROSService::FinishState::FinishSingleShuttleFeeder);
+        if(ui->radioButtonFns->isChecked()) _current_service_selection->setFinishState(RailOSService::FinishState::FinishFormNew);
+        else if(ui->radioButtonFshf->isChecked()) _current_service_selection->setFinishState(RailOSService::FinishState::FinishShuttleFormNew);
+        else _current_service_selection->setFinishState(RailOSService::FinishState::FinishSingleShuttleFeeder);
     }
 
-    else if(ui->radioButtonFrh->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishRemainHere);
-    else if(ui->radioButtonFrsrh->isChecked()) _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleRemainHere);
-    else _current_service_selection->setFinishState(ROSService::FinishState::FinishShuttleRemainHere);
+    else if(ui->radioButtonFrh->isChecked()) _current_service_selection->setFinishState(RailOSService::FinishState::FinishRemainHere);
+    else if(ui->radioButtonFrsrh->isChecked()) _current_service_selection->setFinishState(RailOSService::FinishState::FinishShuttleRemainHere);
+    else _current_service_selection->setFinishState(RailOSService::FinishState::FinishShuttleRemainHere);
 
     // -------------------------------------------------------------------------------------------------------------------- //
 
     // If a start location is specified auto-add it to the start of the timetable
     if(ui->comboBoxTrackIDStations->isEnabled())
     {
-        _current_service_selection->addStation({QTime(), ui->starttimeEdit->time()}, ui->comboBoxTrackIDStations->currentText());
+        _current_service_selection->addStation({QTime(), ui->starttimeEdit->time(), QTime()}, ui->comboBoxTrackIDStations->currentText());
     }
 
     update_output();
@@ -501,7 +501,7 @@ bool ROSTTBAppWindow::_record_current_info()
     return true;
 }
 
-void ROSTTBAppWindow::update_output(ROSService* current_serv)
+void RailOSTTBAppWindow::update_output(RailOSService* current_serv)
 {
     // Do not allow daughter service creation without at least one timetable entry already present
     if(_current_timetable->size() > 0)
@@ -626,7 +626,7 @@ void ROSTTBAppWindow::update_output(ROSService* current_serv)
 
 }
 
-void ROSTTBAppWindow::_enable_integer_info(bool enable)
+void RailOSTTBAppWindow::_enable_integer_info(bool enable)
 {
     ui->spinBoxMass->setEnabled(enable);
     ui->spinBoxForce->setEnabled(enable);
@@ -635,7 +635,7 @@ void ROSTTBAppWindow::_enable_integer_info(bool enable)
     ui->spinBoxPower->setEnabled(enable);
 }
 
-void ROSTTBAppWindow::on_actionNew_triggered()
+void RailOSTTBAppWindow::on_actionNew_triggered()
 {
     _reset();
     ui->radioButtonShuttleFeeder->setEnabled(false);
@@ -643,16 +643,16 @@ void ROSTTBAppWindow::on_actionNew_triggered()
     ui->radioButtonShuttleFinish->setEnabled(false);
 }
 
-void ROSTTBAppWindow::on_actionSave_As_triggered()
+void RailOSTTBAppWindow::on_actionSave_As_triggered()
 {
-    _open_file_str = _current_file->getSaveFileName(this, QObject::tr("Save As"), _ros_timetables->dirName(), QObject::tr("Timetable (*.ttb)") );
+    _open_file_str = _current_file->getSaveFileName(this, QObject::tr("Save As"), _railos_timetables->dirName(), QObject::tr("Timetable (*.ttb)") );
     if(_open_file_str.isEmpty()) return;
     _save_file();
 }
 
-void ROSTTBAppWindow::open_repository()
+void RailOSTTBAppWindow::open_repository()
 {
-    const QString _github_dir_win = QStringList{QDir::homePath(), "Documents", "GitHub"}.join(_qt_path_sep);
+    const QString _github_dir_win = QDir(QDir::homePath()).filePath("Documents/GitHub");
     qDebug() << _github_dir_win << Qt::endl;
     const QString _open_repo = _current_repository->getExistingDirectory(this, QObject::tr("Open Project Repository"), _github_dir_win,  QFileDialog::DontUseNativeDialog | QFileDialog::ReadOnly);
 
@@ -663,8 +663,8 @@ void ROSTTBAppWindow::open_repository()
     _rly_pattern << "*.rly";
     _ttb_pattern << "*.ttb";
 
-    const QString _rly_dir_str = QStringList{_open_repo, "Railway"}.join(_qt_path_sep);
-    const QString _ttb_dir_str = QStringList{_open_repo, "Program_Timetables"}.join(_qt_path_sep);
+    const QString _rly_dir_str = QDir(_open_repo).filePath("Railway");
+    const QString _ttb_dir_str = QDir(_open_repo).filePath("Program_Timetables");
 
     QDir _rly_dir(_rly_dir_str);
     QDir _ttb_dir(_ttb_dir_str);
@@ -689,14 +689,14 @@ void ROSTTBAppWindow::open_repository()
     QStringList _candidate_rly = _rly_dir.entryList();
     QStringList _candidate_ttb = _ttb_dir.entryList();
 
-    _current_route = QStringList{_rly_dir.absolutePath(), _candidate_rly[0]}.join(_qt_path_sep);
+    _current_route = QDir(_rly_dir.absolutePath()).filePath(_candidate_rly[0]);
     const QString _ttb_file = _candidate_ttb[0];
 
-    _post_open_action(QStringList{_ttb_dir.absolutePath(), _ttb_file}.join(_qt_path_sep));
+    _post_open_action(QDir(_ttb_dir.absolutePath()).filePath(_ttb_file));
     _post_route_select_action();
 }
 
-void ROSTTBAppWindow::_post_open_action(const QString input_file)
+void RailOSTTBAppWindow::_post_open_action(const QString input_file)
 {
     ui->checkBoxAtStation->setChecked(false);
     _reset();
@@ -715,96 +715,75 @@ void ROSTTBAppWindow::_post_open_action(const QString input_file)
     this->setWindowTitle(main_window_title+": "+_open_file_str);
 }
 
-void ROSTTBAppWindow::open_file()
+void RailOSTTBAppWindow::open_file()
 {
-    if(!_ros_timetables)
+    if(!_railos_timetables)
     {
         QMessageBox::critical(this, QObject::tr("Invalid Application Address"), QObject::tr("You need to first set the location of the Railway Operation Simulator executable."));
         return;
     }
-    QString in_file = _current_file->getOpenFileName(this, QObject::tr("Open Timetable"), _ros_timetables->absolutePath(), QObject::tr("ROS Timetable Files (*.ttb);;"));
+    QString in_file = _current_file->getOpenFileName(this, QObject::tr("Open Timetable"), _railos_timetables->absolutePath(), QObject::tr("RailOS Timetable Files (*.ttb);;"));
 
     if(in_file == QString()) return;
     _post_open_action(in_file);
 }
 
-void ROSTTBAppWindow::_make_paths(QString ros_path)
+void RailOSTTBAppWindow::_make_paths(QString railos_path)
 {
-    QStringList _dot_split = ros_path.split(".");
-    QString _type = _dot_split[_dot_split.size()-1];
-    QStringList _locations = ros_path.split(_qt_path_sep);
-
-    if(_type == "app")
-    {
-      _locations.append("Contents");
-      _locations.append("Resources");
-      _locations.append("wineprefix");
-      _locations.append("drive_c");
-      _locations.append("winebottler");
-    }
-    else
-    {
-        _locations.pop_back();
-    }
-    QString _ttb_dir = (QSysInfo::productType() == "windows") ? "Program timetables" : "Program\\ timetables";
-    QString _rly_dir = "Railways";
-
-    QStringList _rly_parts(_locations);
-    QStringList _ttb_parts(_locations);
-
-    _ttb_parts.append(_ttb_dir);
-    _rly_parts.append(_rly_dir);
-
-    _ros_timetables = new QDir(_ttb_parts.join(_qt_path_sep));
-    _ros_railways = new QDir(_rly_parts.join(_qt_path_sep));
+    QString _railos_dir = QFileInfo(_railos_location).absolutePath();
+    _railos_railways = new QDir(QDir(_railos_dir).filePath("Railways"));
+    _railos_timetables = new QDir(QDir(_railos_dir).filePath("Program timetables"));
+    qDebug() << _railos_railways->absolutePath() << Qt::endl;
 }
 
-void ROSTTBAppWindow::on_pushButtonROSLoc_clicked()
+void RailOSTTBAppWindow::on_pushButtonRailOSLoc_clicked()
 {
-    QString _file_name = _current_file->getOpenFileName(this, tr("Open File"), QDir::currentPath(),
-                                                        tr("ROS Executable (*.exe *.app)"));
+    QString _file_name = _current_file->getOpenFileName(this, tr("Open File"), QProcessEnvironment::systemEnvironment().value("HOME", (QSysInfo::productType() == "windows" ? "C:/" : "/home")),
+                                                        tr("RailOS Executable (*.exe *.app)"));
     if(_file_name == QString()) return;
 
-    ui->ROSStatus->setText(_file_name);
-    ui->ROSStatus->setStyleSheet("QLabel { color : green; }");
+    ui->RailOSStatus->setText(_file_name);
+    ui->RailOSStatus->setStyleSheet("QLabel { color : green; }");
 
-    if(!_cache_dir->exists())
+    const QDir _cache_dir = QFileInfo(_cache_file).absolutePath();
+
+    if(!_cache_dir.exists())
     {
-        qDebug() << "Creating Cache Folder at: " << _cache_dir->absolutePath();
-        _cache_dir->mkpath(".");
+        qDebug() << "Creating Cache Folder at: " << _cache_dir.absolutePath();
+        _cache_dir.mkpath(".");
     }
 
-    QFile _cache_file(join(_qt_path_sep, _cache_dir->absolutePath(), "ros_location_cache.dat"));
+    QFile _file(_cache_file);
 
-    qDebug() << "Writing cache to : " << join(_qt_path_sep, _cache_dir->absolutePath(), "ros_location_cache.dat") << Qt::endl;
-    if ( _cache_file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
+    qDebug() << "Writing cache to : " << _cache_file << Qt::endl;
+    if ( _file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
     {
-        QTextStream stream( &_cache_file );
+        QTextStream stream( &_file );
         stream << _file_name << Qt::endl;
     }
-    _cache_file.close();
+    _file.close();
     _make_paths(_file_name);
 }
 
-void ROSTTBAppWindow::_reset()
+void RailOSTTBAppWindow::_reset()
 {
     delete _current_file;
     delete _parser;
-    _parser = new ROSTTBGen(this, _current_route);
+    _parser = new RailOSTTBGen(this, _current_route);
     ui->tableWidgetService->setRowCount(0);
     ui->tableWidgetTimetable->setRowCount(0);
     ui->tableWidgetService->clear();
     ui->tableWidgetTimetable->clear();
     ui->radioButtonStandard->toggle();
     _current_file = new QFileDialog(this);
-    _current_timetable = new ROSTimetable;
+    _current_timetable = new RailOSTimetable;
     _station_add = new Station_add(nullptr, this);
     _read_in_custom_templates();
 }
 
-bool ROSTTBAppWindow::_checkROS()
+bool RailOSTTBAppWindow::_checkRailOS()
 {
-    if(!_ros_timetables)
+    if(!_railos_timetables)
     {
         QMessageBox::critical(this, QObject::tr("Invalid Application Address"), QObject::tr("You need to first set the location of the Railway Operation Simulator executable."));
         return false;
@@ -813,7 +792,7 @@ bool ROSTTBAppWindow::_checkROS()
     return true;
 }
 
-void ROSTTBAppWindow::_clear()
+void RailOSTTBAppWindow::_clear()
 {
     ui->servicerefEdit->clear();
     ui->comboBoxTrainSet->setCurrentIndex(0);
@@ -835,7 +814,7 @@ void ROSTTBAppWindow::_clear()
     ui->starttimeEdit->setTime(_current_timetable->getStartTime());
 }
 
-void ROSTTBAppWindow::on_pushButtonInsert_clicked()
+void RailOSTTBAppWindow::on_pushButtonInsert_clicked()
 {
     if(_record_current_info())
     {
@@ -844,7 +823,7 @@ void ROSTTBAppWindow::on_pushButtonInsert_clicked()
     }
 }
 
-void ROSTTBAppWindow::_delete_entries()
+void RailOSTTBAppWindow::_delete_entries()
 {
     if(!_current_service_selection)
     {
@@ -866,7 +845,7 @@ void ROSTTBAppWindow::_delete_entries()
     _clear();
 }
 
-void ROSTTBAppWindow::on_pushButtonDelete_clicked()
+void RailOSTTBAppWindow::on_pushButtonDelete_clicked()
 {
     _delete_entries();
     if(_current_timetable->getServices().size() == 0)
@@ -879,9 +858,9 @@ void ROSTTBAppWindow::on_pushButtonDelete_clicked()
     }
 }
 
-void ROSTTBAppWindow::_populate_feederboxes()
+void RailOSTTBAppWindow::_populate_feederboxes()
 {
-    const QMap<QString, ROSService*> _services = _current_timetable->getServices();
+    const QMap<QString, RailOSService*> _services = _current_timetable->getServices();
     if(_services.size() < 1) return;
 
     QStringList _service_ids = {};
@@ -897,11 +876,11 @@ void ROSTTBAppWindow::_populate_feederboxes()
     ui->comboBoxParent->addItems(_service_ids);
 }
 
-void ROSTTBAppWindow::_post_route_select_action()
+void RailOSTTBAppWindow::_post_route_select_action()
 {
     QString _parsed = _parser->parse_rly(_current_route);
     _current_route = (_parsed != "NULL") ? _parsed : _current_route;
-    QStringList _parts = _current_route.split(_qt_path_sep);
+    QStringList _parts = _current_route.split(QDir::separator());
     ui->SelectedRoute->setText(_parts[_parts.size()-1]);
     ui->SelectedRoute->setStyleSheet("QLabel { color : green; }");
     QStringList _stations = _parser->getStations().values();
@@ -918,15 +897,15 @@ void ROSTTBAppWindow::_post_route_select_action()
     ui->checkBoxAtStation->toggle();
 }
 
-void ROSTTBAppWindow::on_pushButtonRoute_clicked()
+void RailOSTTBAppWindow::on_pushButtonRoute_clicked()
 {
-    _current_route = QFileDialog::getOpenFileName(this,  QObject::tr("Open Route"), _ros_railways->path(),
-                        QObject::tr("ROS Railway Files (*.rly)"));
+    _current_route = QFileDialog::getOpenFileName(this,  QObject::tr("Open Route"), _railos_railways->path(),
+                        QObject::tr("RailOS Railway Files (*.rly)"));
     _post_route_select_action();
 
 }
 
-void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
+void RailOSTTBAppWindow::on_pushButtonAddLocation_clicked()
 {
     if(_current_timetable->size() == 0)
     {
@@ -950,7 +929,7 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     if(_current_service_selection->getTimes().size() > 0)
     { 
         _times = _current_service_selection->getTimes()[_current_service_selection->getTimes().size()-1];
-        qDebug() << _times << Qt::endl;
+        qDebug() << "AddLocation: " << _times << Qt::endl;
     }
     else
     {
@@ -962,7 +941,7 @@ void ROSTTBAppWindow::on_pushButtonAddLocation_clicked()
     update_output();
 }
 
-void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
 {
     _enable_integer_info(true);
     if(checked)
@@ -994,7 +973,7 @@ void ROSTTBAppWindow::on_radioButtonStandard_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
 {
     _enable_integer_info(false);
     if(checked)
@@ -1033,7 +1012,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleFeeder_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
 {
     _enable_integer_info(false);
     if(checked)
@@ -1065,7 +1044,7 @@ void ROSTTBAppWindow::on_radioButtonShuttleStop_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
 {
     _enable_integer_info(false);
     if(checked)
@@ -1116,14 +1095,14 @@ void ROSTTBAppWindow::on_radioButtonFromOther_toggled(bool checked)
             return;
         }
 
-        const QMap<QString, ROSService*> _services = _current_timetable->getServices();
+        const QMap<QString, RailOSService*> _services = _current_timetable->getServices();
 
         ui->servicerefEdit->setText(_services[_current_parent]->getDaughter());
         ui->starttimeEdit->setTime(_services[_current_parent]->getExitTime());
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonShuttleFinish_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonShuttleFinish_toggled(bool checked)
 {
     _enable_integer_info(false);
     if(checked)
@@ -1162,17 +1141,17 @@ void ROSTTBAppWindow::on_radioButtonShuttleFinish_toggled(bool checked)
     }
 }
 
-int ROSTTBAppWindow::_mph_to_kph(const int speed)
+int RailOSTTBAppWindow::_mph_to_kph(const int speed)
 {
     return (ui->radioButton_kph->isChecked()) ? speed : int(1.609344*speed);
 }
 
-int ROSTTBAppWindow::_kph_to_mph(const int speed)
+int RailOSTTBAppWindow::_kph_to_mph(const int speed)
 {
     return (ui->radioButton_kph->isChecked()) ? speed : int(speed/1.609344);
 }
 
-void ROSTTBAppWindow::_set_form_info()
+void RailOSTTBAppWindow::_set_form_info()
 {
 
     const QString _serv_id = _current_service_selection->getID(),
@@ -1182,8 +1161,8 @@ void ROSTTBAppWindow::_set_form_info()
 
     const QStringList _exit_locs = _current_service_selection->getExitIDs();
 
-    const ROSService::ServiceType _type = _current_service_selection->getType();
-    const ROSService::FinishState _exit_as = _current_service_selection->getFinState();
+    const RailOSService::ServiceType _type = _current_service_selection->getType();
+    const RailOSService::FinishState _exit_as = _current_service_selection->getFinState();
 
     const int _max_power   = _current_service_selection->getPower(),
               _start_speed = _current_service_selection->getStartSpeed(),
@@ -1228,23 +1207,23 @@ void ROSTTBAppWindow::_set_form_info()
 
     switch(_type)
     {
-        case ROSService::ServiceType::Service:
+        case RailOSService::ServiceType::Service:
             ui->radioButtonStandard->setChecked(true);
             break;
-        case ROSService::ServiceType::ShuttleFromStop:
+        case RailOSService::ServiceType::ShuttleFromStop:
             ui->textEditShuttlePart2->setText(_daughter_ref);
             ui->radioButtonShuttleStop->setChecked(false);
             break;
-        case ROSService::ServiceType::ServiceFromSplit:
+        case RailOSService::ServiceType::ServiceFromSplit:
             ui->radioButtonFromOther->setChecked(true);
             break;
-        case ROSService::ServiceType::ServiceFromService:
+        case RailOSService::ServiceType::ServiceFromService:
             ui->radioButtonFromOther->setChecked(true);
             break;
-        case ROSService::ServiceType::ShuttleFinishService:
+        case RailOSService::ServiceType::ShuttleFinishService:
             ui->radioButtonShuttleFinish->setChecked(true);
             break;
-        case ROSService::ServiceType::ShuttleFromFeeder:
+        case RailOSService::ServiceType::ShuttleFromFeeder:
             ui->textEditShuttlePart2->setText(_daughter_ref);
             ui->radioButtonShuttleFeeder->setChecked(true);
             break;
@@ -1254,35 +1233,35 @@ void ROSTTBAppWindow::_set_form_info()
 
     switch(_exit_as)
     {
-        case ROSService::FinishState::FinishRemainHere:
+        case RailOSService::FinishState::FinishRemainHere:
             ui->checkBoxManualTimeEdit->setChecked(false);
             ui->radioButtonFrh->setChecked(true);
             break;
-        case ROSService::FinishState::FinishExit:
+        case RailOSService::FinishState::FinishExit:
             ui->checkBoxManualTimeEdit->setChecked(true);
             ui->serviceExitEdit->setText(join(",", _exit_locs));
             ui->radioButtonFer->setChecked(true);
             break;
-        case ROSService::FinishState::FinishFormNew:
+        case RailOSService::FinishState::FinishFormNew:
             ui->checkBoxManualTimeEdit->setChecked(false);
             ui->serviceFinishServiceEdit->setText(_daughter_ref);
             ui->radioButtonFns->setChecked(true);
             break;
-        case ROSService::FinishState::FinishJoinOther:
+        case RailOSService::FinishState::FinishJoinOther:
             ui->checkBoxManualTimeEdit->setChecked(false);
             ui->labelParentOfJoin->setText(_feeder_ref);
             ui->radioButtonFjo->setChecked(true);
             break;
-        case ROSService::FinishState::FinishShuttleFormNew:
+        case RailOSService::FinishState::FinishShuttleFormNew:
             ui->checkBoxManualTimeEdit->setChecked(false);
             ui->serviceFinishServiceEdit->setText(_daughter_ref);
             ui->radioButtonFrsfns->setChecked(true);
             break;
-        case ROSService::FinishState::FinishShuttleRemainHere:
+        case RailOSService::FinishState::FinishShuttleRemainHere:
             ui->checkBoxManualTimeEdit->setChecked(false);
             ui->radioButtonFrsrh->setChecked(true);
             break;
-        case ROSService::FinishState::FinishSingleShuttleFeeder:
+        case RailOSService::FinishState::FinishSingleShuttleFeeder:
             ui->checkBoxManualTimeEdit->setChecked(false);
             ui->radioButtonFshf->setChecked(true);
             break;
@@ -1292,10 +1271,10 @@ void ROSTTBAppWindow::_set_form_info()
 
 }
 
-void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
+void RailOSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
 {
     if(ui->tableWidgetTimetable->rowCount() < 1) return;
-    ROSService* _selection = _current_timetable->operator[](ui->tableWidgetTimetable->takeItem(row, 1)->text());
+    RailOSService* _selection = _current_timetable->operator[](ui->tableWidgetTimetable->takeItem(row, 1)->text());
     qDebug() << "Selected: " << _selection->summarise();
     update_output(_selection);
     ui->tableWidgetTimetable->selectRow(row);
@@ -1303,7 +1282,7 @@ void ROSTTBAppWindow::on_tableWidgetTimetable_cellClicked(int row, int column)
     this->setWindowTitle(main_window_title+": "+_open_file_str);
 }
 
-void ROSTTBAppWindow::_save_file()
+void RailOSTTBAppWindow::_save_file()
 {
     QStringList _ttb = _parser->createTimetableStrings(_current_timetable);
     if(_ttb.size() < 2)
@@ -1312,6 +1291,9 @@ void ROSTTBAppWindow::_save_file()
         return;
     }
     QString _output = join(QChar::Null, _ttb);
+
+    // Timetable must end in NULL
+    _output += QChar::Null;
 
     qDebug() << "Writing timetable output to: " <<  _open_file_str;
 
@@ -1325,16 +1307,16 @@ void ROSTTBAppWindow::_save_file()
     _file.close();
 }
 
-void ROSTTBAppWindow::on_actionSave_triggered()
+void RailOSTTBAppWindow::on_actionSave_triggered()
 {
     if(_open_file_str.isEmpty())
     {
-        _open_file_str = _current_file->getSaveFileName(this, "Save As", _ros_timetables->dirName(), tr("Timetable (*.ttb)") );
+        _open_file_str = _current_file->getSaveFileName(this, "Save As", _railos_timetables->dirName(), tr("Timetable (*.ttb)") );
     }
     _save_file();
 }
 
-void ROSTTBAppWindow::on_pushButtonTTBTime_clicked()
+void RailOSTTBAppWindow::on_pushButtonTTBTime_clicked()
 {
     QTime _temp_time = ui->timeEditTTBStart->time();
     ui->starttimeEdit->setTime(_temp_time);
@@ -1354,7 +1336,7 @@ void ROSTTBAppWindow::on_pushButtonTTBTime_clicked()
     ui->labelStartTime->setVisible(true);
 }
 
-void ROSTTBAppWindow::on_pushButtonTTBTimeEdit_clicked()
+void RailOSTTBAppWindow::on_pushButtonTTBTimeEdit_clicked()
 {
     ui->pushButtonTTBTime->setVisible(true);
     ui->pushButtonTTBTimeEdit->setVisible(false);
@@ -1362,7 +1344,7 @@ void ROSTTBAppWindow::on_pushButtonTTBTimeEdit_clicked()
     ui->labelStartTime->setVisible(false);
 }
 
-void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int column)
+void RailOSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int column)
 {
     if(_parser->getStations().size() == 0)
     {
@@ -1420,7 +1402,7 @@ void ROSTTBAppWindow::on_tableWidgetService_cellDoubleClicked(int row, int colum
     update_output();
 }
 
-void ROSTTBAppWindow::on_radioButtonFrh_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonFrh_toggled(bool checked)
 {
     if(checked)
     {
@@ -1432,7 +1414,7 @@ void ROSTTBAppWindow::on_radioButtonFrh_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonFns_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonFns_toggled(bool checked)
 {
     if(checked)
     {
@@ -1443,7 +1425,7 @@ void ROSTTBAppWindow::on_radioButtonFns_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonFjo_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonFjo_toggled(bool checked)
 {
     if(checked)
     {
@@ -1455,7 +1437,7 @@ void ROSTTBAppWindow::on_radioButtonFjo_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonFrsrh_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonFrsrh_toggled(bool checked)
 {
     if(checked)
     {
@@ -1467,7 +1449,7 @@ void ROSTTBAppWindow::on_radioButtonFrsrh_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonFrsfns_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonFrsfns_toggled(bool checked)
 {
     if(checked)
     {
@@ -1478,7 +1460,7 @@ void ROSTTBAppWindow::on_radioButtonFrsfns_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonFshf_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonFshf_toggled(bool checked)
 {
     if(checked)
     {
@@ -1489,7 +1471,7 @@ void ROSTTBAppWindow::on_radioButtonFshf_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::on_radioButtonFer_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButtonFer_toggled(bool checked)
 {
     if(checked)
     {
@@ -1500,7 +1482,7 @@ void ROSTTBAppWindow::on_radioButtonFer_toggled(bool checked)
     }
 }
 
-void ROSTTBAppWindow::_clone_current()
+void RailOSTTBAppWindow::_clone_current()
 {
     if(!_current_service_selection) return;
     _clone_srv->fwdCurrentService(_current_timetable, _current_service_selection, ui->tableWidgetTimetable);
@@ -1511,22 +1493,22 @@ void ROSTTBAppWindow::_clone_current()
     _clone_srv->setVisible(true);
 }
 
-void ROSTTBAppWindow::on_pushButtonClone_clicked()
+void RailOSTTBAppWindow::on_pushButtonClone_clicked()
 {
     _clone_current();
     if(!_clone_srv->getNewService()) return;
     update_output();
 }
 
-void ROSTTBAppWindow::on_pushButtonClear_clicked()
+void RailOSTTBAppWindow::on_pushButtonClear_clicked()
 {
     _clear();
 }
 
-void ROSTTBAppWindow::on_comboBoxParent_currentTextChanged(const QString &arg1)
+void RailOSTTBAppWindow::on_comboBoxParent_currentTextChanged(const QString &arg1)
 {
     if(_current_timetable->size() < 1 || !_current_timetable->getServices().contains(arg1) || _current_service_selection->getID() == arg1) return;
-    const ROSService* _parent = _current_timetable->getServices()[arg1];
+    const RailOSService* _parent = _current_timetable->getServices()[arg1];
     if(!_parent)
     {
         qDebug() << "Failed to Retrieve Parent from Services";
@@ -1550,12 +1532,12 @@ void ROSTTBAppWindow::on_comboBoxParent_currentTextChanged(const QString &arg1)
     ui->servicerefEdit->setText(_parent->getDaughter());
 }
 
-void ROSTTBAppWindow::on_checkBoxManualTimeEdit_toggled(bool checked)
+void RailOSTTBAppWindow::on_checkBoxManualTimeEdit_toggled(bool checked)
 {
     ui->timeEditTermination->setEnabled(checked);
 }
 
-void ROSTTBAppWindow::on_comboBoxTrainSet_currentTextChanged(const QString &arg1)
+void RailOSTTBAppWindow::on_comboBoxTrainSet_currentTextChanged(const QString &arg1)
 {
     if(arg1 == "Custom" || arg1 == "") return;
     const int factor = ui->spinBoxMU->value();
@@ -1595,49 +1577,49 @@ void ROSTTBAppWindow::on_comboBoxTrainSet_currentTextChanged(const QString &arg1
 
 }
 
-void ROSTTBAppWindow::on_spinBoxMU_valueChanged(int arg1)
+void RailOSTTBAppWindow::on_spinBoxMU_valueChanged(int arg1)
 {
     on_comboBoxTrainSet_currentTextChanged(ui->comboBoxTrainSet->currentText());
 }
 
-void ROSTTBAppWindow::on_spinBoxMaxSpeed_valueChanged(int arg1)
+void RailOSTTBAppWindow::on_spinBoxMaxSpeed_valueChanged(int arg1)
 {
     if(!_is_template_change) ui->comboBoxTrainSet->setCurrentIndex(0);
     _is_template_change = false;
 }
 
-void ROSTTBAppWindow::on_spinBoxMass_valueChanged(int arg1)
+void RailOSTTBAppWindow::on_spinBoxMass_valueChanged(int arg1)
 {
     if(!_is_template_change) ui->comboBoxTrainSet->setCurrentIndex(0);
     _is_template_change = false;
 }
 
-void ROSTTBAppWindow::on_spinBoxForce_valueChanged(int arg1)
+void RailOSTTBAppWindow::on_spinBoxForce_valueChanged(int arg1)
 {
     if(!_is_template_change) ui->comboBoxTrainSet->setCurrentIndex(0);
     _is_template_change = false;
 }
 
-void ROSTTBAppWindow::on_spinBoxPower_valueChanged(int arg1)
+void RailOSTTBAppWindow::on_spinBoxPower_valueChanged(int arg1)
 {
     if(!_is_template_change) ui->comboBoxTrainSet->setCurrentIndex(0);
     _is_template_change = false;
 }
 
-void ROSTTBAppWindow::_read_in_custom_templates()
+void RailOSTTBAppWindow::_read_in_custom_templates()
 {
 
     _custom_types = QMap<QString, TrainType*>();
 
-    QFile _cache_file(join(_qt_path_sep, _cache_dir->absolutePath(), "trainset_templates_cache.dat"));
+    QFile _file(_templates_file);
 
-    if(_cache_file.exists())
+    if(_file.exists())
     {
 
-        if(!_cache_file.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(0,QObject::tr("error"), _cache_file.errorString());
+        if(!_file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(0,QObject::tr("error"), _file.errorString());
         }
-        QTextStream in(&_cache_file);
+        QTextStream in(&_file);
         while (!in.atEnd()) {
             QString line = in.readLine();
             QStringList _elements = line.split(";");
@@ -1653,7 +1635,7 @@ void ROSTTBAppWindow::_read_in_custom_templates()
             break;
         }
 
-        _cache_file.close();
+        _file.close();
     }
     ui->comboBoxTrainSet->clear();
     QStringList _temp = TrainSet::TrainSet.keys()+_custom_types.keys();
@@ -1665,7 +1647,7 @@ void ROSTTBAppWindow::_read_in_custom_templates()
     ui->comboBoxTrainSet->setCurrentIndex(0);
 }
 
-QStringList ROSTTBAppWindow::_create_custom_template_strings()
+QStringList RailOSTTBAppWindow::_create_custom_template_strings()
 {
     QStringList _temp = {};
 
@@ -1682,14 +1664,15 @@ QStringList ROSTTBAppWindow::_create_custom_template_strings()
     return _temp;
 }
 
-void ROSTTBAppWindow::_save_template()
+void RailOSTTBAppWindow::_save_template()
 {
-    if(!_cache_dir->exists())
+    QDir _cache_dir = QFileInfo(_cache_file).absolutePath();
+    if(!_cache_dir.exists())
     {
-        qDebug() << "Creating Cache Folder at: " << _cache_dir->absolutePath();
-        _cache_dir->mkpath(".");
+        qDebug() << "Creating Cache Folder at: " << _cache_dir.absolutePath();
+        _cache_dir.mkpath(".");
     }
-    QFile _cache_file(join(_qt_path_sep, _cache_dir->absolutePath(), "trainset_templates_cache.dat"));
+    QFile _cache_file(_templates_file);
 
     const int _max_speed = ui->spinBoxMaxSpeed->value(),
               _mass      = ui->spinBoxMass->value(),
@@ -1718,7 +1701,7 @@ void ROSTTBAppWindow::_save_template()
     _read_in_custom_templates();
 }
 
-void ROSTTBAppWindow::on_pushButtonTemplateSave_clicked()
+void RailOSTTBAppWindow::on_pushButtonTemplateSave_clicked()
 {
     ui->labelDescription->setVisible(true);
     ui->labelInMultiple->setVisible(true);
@@ -1737,7 +1720,7 @@ void ROSTTBAppWindow::on_pushButtonTemplateSave_clicked()
     _save_template();
 }
 
-void ROSTTBAppWindow::on_pushButtonTemplateCancel_clicked()
+void RailOSTTBAppWindow::on_pushButtonTemplateCancel_clicked()
 {
     ui->labelDescription->setVisible(true);
     ui->labelInMultiple->setVisible(true);
@@ -1755,7 +1738,7 @@ void ROSTTBAppWindow::on_pushButtonTemplateCancel_clicked()
 
 }
 
-void ROSTTBAppWindow::on_pushButtonCreateTemplate_clicked()
+void RailOSTTBAppWindow::on_pushButtonCreateTemplate_clicked()
 {
     ui->labelDescription->setVisible(false);
     ui->labelInMultiple->setVisible(false);
@@ -1773,12 +1756,12 @@ void ROSTTBAppWindow::on_pushButtonCreateTemplate_clicked()
 
 }
 
-void ROSTTBAppWindow::on_actionAbout_ROSTTBGen_triggered()
+void RailOSTTBAppWindow::on_actionAbout_RailOSTTBGen_triggered()
 {
     _about_window->setVisible(true);
 }
 
-void ROSTTBAppWindow::on_checkBoxAtStation_toggled(bool checked)
+void RailOSTTBAppWindow::on_checkBoxAtStation_toggled(bool checked)
 {
     // Cannot start a service from a station with non-zero start speed
     if(checked) ui->spinBoxStartSpeed->setValue(0);
@@ -1791,7 +1774,7 @@ void ROSTTBAppWindow::on_checkBoxAtStation_toggled(bool checked)
     ui->labelTrackIDFront->setVisible(!checked);
 }
 
-void ROSTTBAppWindow::on_radioButton_kph_toggled(bool checked)
+void RailOSTTBAppWindow::on_radioButton_kph_toggled(bool checked)
 {
     ui->start_speed_label->setText(checked ? "Start Speed (kph)" : "Start Speed (mph)");
     ui->max_speed_label->setText(checked ? "Max Speed (kph)" : "Max Speed (mph)");
@@ -1799,12 +1782,12 @@ void ROSTTBAppWindow::on_radioButton_kph_toggled(bool checked)
     ui->spinBoxStartSpeed->setValue(checked ? std::round(ui->spinBoxStartSpeed->value()*1.609344) : std::round(ui->spinBoxStartSpeed->value()/1.609344));
 }
 
-void ROSTTBAppWindow::on_actionExit_triggered()
+void RailOSTTBAppWindow::on_actionExit_triggered()
 {
     QApplication::exit();
 }
 
-void ROSTTBAppWindow::_populate_coordinates(QString location)
+void RailOSTTBAppWindow::_populate_coordinates(QString location)
 {
     const QMap<QString, QList<QList<int>>> _coords = _parser->getCoordinates();
     QStringList _coords_for_loc = {};
@@ -1857,7 +1840,7 @@ void ROSTTBAppWindow::_populate_coordinates(QString location)
     ui->comboBoxTrackIDs->addItems(_coords_for_loc);
 }
 
-void ROSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QString &arg1)
+void RailOSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QString &arg1)
 {
     if(!arg1.isEmpty())
     {
@@ -1872,18 +1855,18 @@ void ROSTTBAppWindow::on_comboBoxTrackIDStations_currentTextChanged(const QStrin
 }
 
 
-void ROSTTBAppWindow::on_comboBoxTrackIDs_currentIndexChanged(int index)
+void RailOSTTBAppWindow::on_comboBoxTrackIDs_currentIndexChanged(int index)
 {
     if(_arrows.size() > 0 && index >= 0 && index < _arrows.size()) ui->labelDirection->setText(_arrows[index]);
 }
 
 
-void ROSTTBAppWindow::on_actionTimetable_triggered()
+void RailOSTTBAppWindow::on_actionTimetable_triggered()
 {
     open_file();
 }
 
-void ROSTTBAppWindow::on_actionGit_Repository_triggered()
+void RailOSTTBAppWindow::on_actionGit_Repository_triggered()
 {
    open_repository();
 }

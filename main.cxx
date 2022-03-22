@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//                        ROS Timetable Editor                             //
+//                        RailOS Timetable Editor                             //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication a(argc, argv);
     a.setAttribute(Qt::AA_Use96Dpi);
-    ROSTTBAppWindow w;
+    RailOSTTBAppWindow w;
     w.setVisible(true);
-    a.setWindowIcon(QIcon("./img/rosttbgen_icon.png"));
+    a.setWindowIcon(QIcon("./img/railosttbgen_icon.png"));
     return a.exec();
 }

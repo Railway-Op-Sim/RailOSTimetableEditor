@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//         ROS Timetable Editor Clone Service Application Window           //
+//         RailOS Timetable Editor Clone Service Application Window           //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -159,7 +159,7 @@ void CloneDialog::on_buttonBoxClone_rejected()
 void CloneDialog::_create_clone()
 {
     const int _temporal_diff = _current_srv->getStartTime().secsTo(ui->timeEditCloneStart->time());
-    _cloned_srv = new ROSService(*_current_srv);
+    _cloned_srv = new RailOSService(*_current_srv);
     _cloned_srv->shiftServiceTimes(_temporal_diff);
     QString _srv_id = ui->textEditCloneRef->text();
     _cloned_srv->setID(_srv_id);

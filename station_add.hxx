@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//             ROS Timetable Editor Location Add Window                    //
+//             RailOS Timetable Editor Location Add Window                    //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -42,7 +42,7 @@ namespace Ui {
 class Station_add;
 }
 
-/*! @brief      ROS Timetable Editor Location Addition Window
+/*! @brief      RailOS Timetable Editor Location Addition Window
     @details    Pop-up window for adding a new location to an existing service
     @version    0.2.2-alpha
     @author     Kristian Zarebski
@@ -58,7 +58,7 @@ public:
     @param service Current service open for edit
     @param parent Parent application window
     */
-    explicit Station_add(ROSService* service=nullptr, QWidget *parent = nullptr);
+    explicit Station_add(RailOSService* service=nullptr, QWidget *parent = nullptr);
 
     //! Destructor for Dialogue
     ~Station_add();
@@ -80,7 +80,7 @@ public:
     @param service Pointer to service to edit
     @return void
     */
-    void setCurrentService(ROSService* service)
+    void setCurrentService(RailOSService* service)
     {
         if(!service || service->getStartTime() == QTime()) return;
         _current_srv = service;
@@ -166,7 +166,7 @@ private:
     bool _edit_mode = false;
 
     //! Pointer to currently editable service
-    ROSService* _current_srv;
+    RailOSService* _current_srv;
 
     //! Pointer to display table for locations
     QTableWidget* _service_table;
