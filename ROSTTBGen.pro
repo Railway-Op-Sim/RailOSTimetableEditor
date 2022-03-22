@@ -7,7 +7,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 ######################################################################
 
 TEMPLATE = app
-TARGET = "ROS Timetable Editor"
+TARGET = "RailOS Timetable Editor"
 INCLUDEPATH += .
 
 # You can make your code fail to compile if you use deprecated APIs.

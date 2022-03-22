@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//              ROS Timetable Editor train Train Class                      //
+//              RailOS Timetable Editor train Train Class                      //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -32,7 +32,7 @@
 
 #include <QString>
 
-/*! @brief      ROS Timetable Editor train Train Class
+/*! @brief      RailOS Timetable Editor train Train Class
     @details    Template train definitions for train
     @version    0.2.2-alpha
     @author     Kristian Zarebski

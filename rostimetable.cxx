@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//         ROS Timetable Editor Timetable Class Definition                 //
+//         RailOS Timetable Editor Timetable Class Definition                 //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -29,12 +29,12 @@
 
 #include "rostimetable.hxx"
 
-ROSService* ROSTimetable::operator[](const QString& id)
+RailOSService* RailOSTimetable::operator[](const QString& id)
 {
     return _services[id];
 }
 
-ROSService* ROSTimetable::operator[](const int& i)
+RailOSService* RailOSTimetable::operator[](const int& i)
 {
     int counter = 0;
     const int index = (i == -1) ? _services.size()-1 : i;
