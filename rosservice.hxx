@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//         ROS Timetable Editor Service Class Definition                   //
+//         RailOS Timetable Editor Service Class Definition                   //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -27,8 +27,8 @@
 //                                                                         //
 //-------------------------------------------------------------------------//
 
-#ifndef ROSSERVICE_HXX
-#define ROSSERVICE_HXX
+#ifndef RailOSSERVICE_HXX
+#define RailOSSERVICE_HXX
 
 #include <QString>
 #include <QTime>
@@ -48,14 +48,14 @@ extern QString join(QString join_symbol, QStringList list);
 //! Join function for combining multiple QStrings as a QStringList using a special character (e.g. null string) as a connector symbol
 extern QString join(QChar::SpecialCharacter join_symbol, QStringList list);
 
-/*! @brief      ROS Timetable Editor Service Class
-    @details    A class to handle all properties of an ROS service
+/*! @brief      RailOS Timetable Editor Service Class
+    @details    A class to handle all properties of an RailOS service
     @version    0.2.2-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-02-16
     @copyright  GNU Public License v3
 */
-class ROSService
+class RailOSService
 {
 private:
     //! Unique integer ID
@@ -66,15 +66,15 @@ private:
     QTime _enter_map_time = QTime();
     //! Service exit/end time
     QTime _exit_map_time = QTime();
-    //! ROS map location IDs for entrance
+    //! RailOS map location IDs for entrance
     QStringList _enter_ids = {"", ""};
-    //! ROS map exit location ID
+    //! RailOS map exit location ID
     QStringList _exit_ids = {};
     //! Times for direction changes
     QList<QTime> _cdt_times = {};
-    //! ROS service ID for newly formed service
+    //! RailOS service ID for newly formed service
     QString _daughter_id = "";
-    //! ROS service ID for the current service
+    //! RailOS service ID for the current service
     QString _service_id = "";
     //! Array containing whether sTrainSet are passed or called at
     QList<bool> _passing_sTrainSet = {};
@@ -86,7 +86,7 @@ private:
     QMap<QString, QStringList> _join_data = QMap<QString, QStringList>();
     //! Lists of strings consisting of names of calling/passing points
     QStringList _stations = QStringList();
-    //! ROS service ID for service which formed current service (where applicable)
+    //! RailOS service ID for service which formed current service (where applicable)
     QString _parent_service = "";
     //! List of two element lists consisting of arrival and departure times
     QList<QList<QTime>> _times = QList<QList<QTime>>();
@@ -104,13 +104,13 @@ private:
     int _n_repeats = 0;
     //! Time interval of service repeats (mins)
     int _repeat_interval = 0;
-    //! Increment of ROS service ID with each repeat
+    //! Increment of RailOS service ID with each repeat
     int _id_increment = 1;
     //! Service description
     QString _description = "";
 
     /*! @brief Create new service definition line
-    @return String representing the defining line of the service in ROS
+    @return String representing the defining line of the service in RailOS
     */
     QString _start_new();
 
@@ -120,7 +120,7 @@ private:
     QString _add_sTrainSet();
 
     /*! @brief Create service termination string
-    @return a string representing service termination in ROS
+    @return a string representing service termination in RailOS
     */
     QString _finalize();
 public:
@@ -147,7 +147,7 @@ public:
         FinishSingleShuttleFeeder, //!< Finish a feeder service for a shuttle
     };
 
-    /*! @brief Create a new ROS Service object
+    /*! @brief Create a new RailOS Service object
     @param int_id Unique integer identifier for service
     @param start_time Entry time/service start time
     @param description A short comment describing the service
@@ -158,7 +158,7 @@ public:
     @param power Maximum power in kW
     @return void
     */
-    ROSService(int int_id, QTime start_time, QString id, QString description, int start_speed=-1, int max_speed=-1, int mass=-1, int max_brake_force=-1, int power=-1) :
+    RailOSService(int int_id, QTime start_time, QString id, QString description, int start_speed=-1, int max_speed=-1, int mass=-1, int max_brake_force=-1, int power=-1) :
         _integer_id(int_id), _enter_map_time(start_time), _service_id(id), _power(power), _mass(mass), _max_speed(max_speed), _max_brake(max_brake_force), _start_speed(start_speed), _description(description)  {}
 
     /*! @brief Set number of service repetitions
@@ -227,7 +227,7 @@ public:
     */
     void setMass(const int& mass){_mass = mass;}
 
-    /*! @brief Set the ROS service identifier
+    /*! @brief Set the RailOS service identifier
     @param id Identifier of length 4
     @return void
     */
@@ -241,7 +241,7 @@ public:
 
     /*! @brief Set the service split data
     @param fr_rear Whether service is front "fsp" or rear "rsp" split
-    @param service_id Newly formed service ROS service ID
+    @param service_id Newly formed service RailOS service ID
     @param station Station where split takes place
     @param time Time at which split occurs
     @return void
@@ -252,7 +252,7 @@ public:
     }
 
     /*! @brief set the service join data
-    @param joining_srv ROS Service ID of joining service
+    @param joining_srv RailOS Service ID of joining service
     @param station Station at which join occurs
     @param time Time at which join occurs as string
     @return void
@@ -273,7 +273,7 @@ public:
     QMap<QString, QStringList> getJoinData() const {return _join_data;}
 
     /*! @brief Set the map ID for the exit location of ther service
-    @param id ROS Map ID for exit location
+    @param id RailOS Map ID for exit location
     @return void
     */
     void setExitPoints(const QStringList& ids) {_exit_ids = ids;}
@@ -420,19 +420,19 @@ public:
     bool labelledLocationStart() const {return _labelled_location_start;}
 
     /*! @brief Set the service type
-    @param type A valid ROSService::ServiceType describing the initialisation state
+    @param type A valid RailOSService::ServiceType describing the initialisation state
     @return void
     */
-    void setType(const ROSService::ServiceType& type) {_service_type = type;}
+    void setType(const RailOSService::ServiceType& type) {_service_type = type;}
 
     /*! @brief Set the service termination category
-    @param fin_state A valid ROSService::FinishState describing the service conclusion
+    @param fin_state A valid RailOSService::FinishState describing the service conclusion
     @return void
     */
-    void setFinishState(const ROSService::FinishState& fin_state);
+    void setFinishState(const RailOSService::FinishState& fin_state);
 
     /*! @brief Set the ID of the parent of the current service
-    @param parent_service ROS service identifier for the parent
+    @param parent_service RailOS service identifier for the parent
     @return void
     */
     void setParent(const QString& parent_service)
@@ -441,7 +441,7 @@ public:
     }
 
     /*! @brief Set the ID of the daughter of the current service
-     @param daughter_service ROS service identifier for the daughter
+     @param daughter_service RailOS service identifier for the daughter
      @return void
     */
     void setDaughter(const QString& daughter_service)
@@ -540,7 +540,7 @@ public:
     }
 
     /*! @brief Fetch service ID
-     @return A string of the ROS service identifier
+     @return A string of the RailOS service identifier
     */
     QString getID() const {return _service_id; }
 
@@ -555,14 +555,14 @@ private:
 
 public:
       /*! @brief Fetch the initialisation type
-      @return ROSService::ServiceType which describes the type of service
+      @return RailOSService::ServiceType which describes the type of service
       */
-      ROSService::ServiceType getType() const {return _service_type;}
+      RailOSService::ServiceType getType() const {return _service_type;}
 
       /*! @brief Fetch termination type
-      @return ROSService:FinishState describing the service state at termination
+      @return RailOSService:FinishState describing the service state at termination
       */
-      ROSService::FinishState getFinState() const {return _finish_as;}
+      RailOSService::FinishState getFinState() const {return _finish_as;}
 
       /*! @brief Remove a station by index from the service
       @param index Index of station in stations list
@@ -575,4 +575,4 @@ public:
       void deleteEntry(const QString& station);
 };
 
-#endif // ROSSERVICE_HXX
+#endif // RailOSSERVICE_HXX

@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//             ROS Timetable Editor Location Add Window                    //
+//             RailOS Timetable Editor Location Add Window                    //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -30,7 +30,7 @@
 #include "station_add.hxx"
 #include "ui_station_add.h"
 
-Station_add::Station_add(ROSService* service, QWidget *parent) :
+Station_add::Station_add(RailOSService* service, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Station_add),
     _current_srv(service)

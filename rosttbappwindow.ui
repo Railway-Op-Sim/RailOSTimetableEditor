@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ROSTTBAppWindow</class>
- <widget class="QMainWindow" name="ROSTTBAppWindow">
+ <class>RailOSTTBAppWindow</class>
+ <widget class="QMainWindow" name="RailOSTTBAppWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ROS Timetable Editor</string>
+   <string>RailOS Timetable Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="groupBox_2">
@@ -1591,7 +1591,7 @@
      <string>Edit</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButtonROSLoc">
+   <widget class="QPushButton" name="pushButtonRailOSLoc">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -1606,10 +1606,10 @@
      </font>
     </property>
     <property name="text">
-     <string>Set ROS Location</string>
+     <string>Set RailOS Location</string>
     </property>
    </widget>
-   <widget class="QLabel" name="ROSStatus">
+   <widget class="QLabel" name="RailOSStatus">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -1713,7 +1713,7 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout_ROSTTBGen"/>
+    <addaction name="actionAbout_RailOSTTBGen"/>
     <addaction name="actionDocumentation"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -1747,9 +1747,9 @@
     <string>Save</string>
    </property>
   </action>
-  <action name="actionAbout_ROSTTBGen">
+  <action name="actionAbout_RailOSTTBGen">
    <property name="text">
-    <string>About ROSTTBGen</string>
+    <string>About RailOSTTBGen</string>
    </property>
   </action>
   <action name="actionDocumentation">
@@ -1774,7 +1774,7 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>pushButtonROSLoc</tabstop>
+  <tabstop>pushButtonRailOSLoc</tabstop>
   <tabstop>pushButtonRoute</tabstop>
   <tabstop>pushButtonAddLocation</tabstop>
   <tabstop>timeEditTTBStart</tabstop>

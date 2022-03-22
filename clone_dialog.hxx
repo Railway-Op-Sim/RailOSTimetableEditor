@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//         ROS Timetable Editor Clone Service Application Window           //
+//         RailOS Timetable Editor Clone Service Application Window           //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -41,7 +41,7 @@ namespace Ui {
 class CloneDialog;
 }
 
-/*! @brief      ROS Timetable Editor Service Clone Window
+/*! @brief      RailOS Timetable Editor Service Clone Window
     @details    Pop-up window for cloning an existing service
     @version    0.2.2-alpha
     @author     Kristian Zarebski
@@ -62,7 +62,7 @@ public:
     @param ttb_table Pointer to the service list table
     @return void
     */
-    void fwdCurrentService(ROSTimetable* ttb, ROSService* service, QTableWidget* ttb_table){_current_ttb = ttb; _ttb_table = ttb_table; _current_srv = service;}
+    void fwdCurrentService(RailOSTimetable* ttb, RailOSService* service, QTableWidget* ttb_table){_current_ttb = ttb; _ttb_table = ttb_table; _current_srv = service;}
 
     /*! @brief Forward the list of available service identifiers from the main application
     @param services List of strings of service IDs
@@ -71,9 +71,9 @@ public:
     void fwdServicesList(QStringList& services){_current_service_list = services;}
 
     /*! @brief Fetch pointer to the newly created service
-    @return Pointer to newly created ROSService instane
+    @return Pointer to newly created RailOSService instane
     */
-    ROSService* getNewService() const {return _cloned_srv;}
+    RailOSService* getNewService() const {return _cloned_srv;}
 
     /*! @brief Reset dialogue to initial values
     @return void
@@ -92,16 +92,16 @@ private:
     Ui::CloneDialog *ui = nullptr;
 
     //! Pointer to current active timetable for edit
-    ROSTimetable* _current_ttb = nullptr;
+    RailOSTimetable* _current_ttb = nullptr;
 
     //! Pointer to table displaying service list
     QTableWidget* _ttb_table = nullptr;
 
     //! Pointer to current service open for edit
-    ROSService* _current_srv = nullptr;
+    RailOSService* _current_srv = nullptr;
 
     //! Pointer to the newly created clone service
-    ROSService* _cloned_srv = nullptr;
+    RailOSService* _cloned_srv = nullptr;
 
     //! List of services in current timetable
     QStringList _current_service_list = {};

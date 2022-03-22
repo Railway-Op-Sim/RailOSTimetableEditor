@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//              ROS Timetable Editor Main Application Window               //
+//              RailOS Timetable Editor Main Application Window               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -27,14 +27,15 @@
 //                                                                         //
 //-------------------------------------------------------------------------//
 
-#ifndef ROSTTBAPPWINDOW_HXX
-#define ROSTTBAPPWINDOW_HXX
+#ifndef RailOSTTBAPPWINDOW_HXX
+#define RailOSTTBAPPWINDOW_HXX
 
 #include <QMainWindow>
 #include <QWindow>
 #include <QFileDialog>
 #include <QDebug>
 #include <QMessageBox>
+#include <QProcessEnvironment>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <cmath>
@@ -51,31 +52,31 @@
 #include "utilities.hxx"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class ROSTTBAppWindow; }
+namespace Ui { class RailOSTTBAppWindow; }
 QT_END_NAMESPACE
 
-const QString main_window_title = "ROS Timetable Editor";
+const QString main_window_title = "RailOS Timetable Editor";
 
 
-/*! @brief      ROS Timetable Editor Main Application Window
-    @details    Main window for viewing, creating and editting services within a ROS timetable
+/*! @brief      RailOS Timetable Editor Main Application Window
+    @details    Main window for viewing, creating and editting services within a RailOS timetable
     @version    0.2.2-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-02-24
     @copyright  GNU Public License v3
 */
-class ROSTTBAppWindow : public QMainWindow
+class RailOSTTBAppWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    /*! @brief Main ROS Timetable Editor Application window
+    /*! @brief Main RailOS Timetable Editor Application window
     */
-    ROSTTBAppWindow();
+    RailOSTTBAppWindow();
 
     /*! @brief Destructor for main application window
     */
-    ~ROSTTBAppWindow();
+    ~RailOSTTBAppWindow();
 
     /*! @brief Open File Browser for user file selection
     @return void
@@ -100,17 +101,17 @@ public:
     /*! @brief Update the displayed output
     @return void
     */
-    void update_output(ROSService* current_serv = nullptr);
+    void update_output(RailOSService* current_serv = nullptr);
 
     /*! @brief Fetch pointer to current timetable parser instance
-    @return Pointer to ROSTTBGen instance
+    @return Pointer to RailOSTTBGen instance
     */
-    ROSTTBGen* getParser(){return _parser;}
+    RailOSTTBGen* getParser(){return _parser;}
 
     /*! @brief Get cache directory
-    @return directory of ROSTTB cache
+    @return directory of RailOSTTB cache
     */
-    QDir* getCacheDir(){return _cache_dir;}
+    QString getCacheDir() const{return QFileInfo(_cache_file).absolutePath();}
 
 private slots:
     //! New File Menu Action
@@ -122,8 +123,8 @@ private slots:
     //! Save File Menu Action
     void on_actionSave_triggered();
 
-    //! ROS Application Locate Button Press Action
-    void on_pushButtonROSLoc_clicked();
+    //! RailOS Application Locate Button Press Action
+    void on_pushButtonRailOSLoc_clicked();
 
     //! Insert New Service Button Press Action
     void on_pushButtonInsert_clicked();
@@ -225,7 +226,7 @@ private slots:
     void on_pushButtonCreateTemplate_clicked();
 
     //! Toggle About Menu Action
-    void on_actionAbout_ROSTTBGen_triggered();
+    void on_actionAbout_RailOSTTBGen_triggered();
 
     void on_checkBoxAtStation_toggled(bool checked);
 
@@ -243,9 +244,7 @@ private slots:
     void on_actionGit_Repository_triggered();
 
 private:
-    const QString _qt_path_sep = "/";
-
-    QString _ros_location = "";
+    QString _railos_location = "";
 
     //! Sets whether current train property change is induced by template selection
     bool _is_template_change = false;
@@ -262,17 +261,20 @@ private:
     //! Clone Service Dialogue Class member instance
     CloneDialog* _clone_srv = new CloneDialog(this);
 
-    //! Cache directory
-    QDir* _cache_dir = nullptr;
+    //! Cache file
+    const QString _cache_file = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).filePath("railos_location.cfg");
 
-    //! Location of ROS Timetables
-    QDir* _ros_timetables = nullptr;
+    //! Templates file
+    const QString _templates_file = QDir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation)).filePath("trainset_templates_cache.dat");
 
-    //! Location of ROS Railways
-    QDir* _ros_railways = nullptr;
+    //! Location of RailOS Timetables
+    QDir* _railos_timetables = nullptr;
+
+    //! Location of RailOS Railways
+    QDir* _railos_railways = nullptr;
 
     //! User Interface Class member instance
-    Ui::ROSTTBAppWindow *ui = nullptr;
+    Ui::RailOSTTBAppWindow *ui = nullptr;
 
     //! Selection model for timetable table widget
     QItemSelectionModel* _tt_model_select = nullptr;
@@ -293,10 +295,10 @@ private:
     QString _current_route = "";
 
     //! Timetable Parser Class member instance
-    ROSTTBGen* _parser = new ROSTTBGen(this);
+    RailOSTTBGen* _parser = new RailOSTTBGen(this);
 
     //! Current active/open timetable
-    ROSTimetable* _current_timetable = new ROSTimetable;
+    RailOSTimetable* _current_timetable = new RailOSTimetable;
 
     //! Array containing Timetable table column widths
     QList<int> _ttb_column_widths = {50, 50, 300, 200, 75, 200, 50};
@@ -305,7 +307,7 @@ private:
     QList<int> _srv_column_widths = {50, 50, 150, 50};
 
     //! Current active service under modification
-    ROSService* _current_service_selection = nullptr;
+    RailOSService* _current_service_selection = nullptr;
 
     //! About Dialogue
     About* _about_window = new About;
@@ -337,7 +339,7 @@ private:
     /*! @brief Check that the Railway Operation Simulator executable has been located
     @return True if application located has been set
     */
-    bool _checkROS();
+    bool _checkRailOS();
 
     /*! @brief Clear the service editor form
     @return void
@@ -389,12 +391,12 @@ private:
     */
     QStringList _create_custom_template_strings();
 
-    /*! @brief Construct paths relative to ROS binary
+    /*! @brief Construct paths relative to RailOS binary
     @return void
     */
-    void _make_paths(QString ros_path);
+    void _make_paths(QString railos_path);
 
     void _populate_coordinates(QString location);
 
 };
-#endif // ROSTTBAPPWINDOW_HXX
+#endif // RailOSTTBAPPWINDOW_HXX

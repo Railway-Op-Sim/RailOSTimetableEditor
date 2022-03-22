@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//         ROS Timetable Editor File Parser Class Definition               //
+//         RailOS Timetable Editor File Parser Class Definition               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -29,7 +29,7 @@
 
 #include "rosttbgen.hxx"
 
-QString ROSTTBGen::parse_file(const QString input_file)
+QString RailOSTTBGen::parse_file(const QString input_file)
 {
     _cached_text = "";
 
@@ -95,7 +95,7 @@ QString ROSTTBGen::parse_file(const QString input_file)
     return _file_name;
 }
 
-QString ROSTTBGen::parse_rly(const QString route_file)
+QString RailOSTTBGen::parse_rly(const QString route_file)
 {
     QFile open_file(route_file);
     if (!open_file.open(QIODevice::ReadOnly | QFile::Text))
@@ -110,7 +110,7 @@ QString ROSTTBGen::parse_rly(const QString route_file)
     return route_file;
 }
 
-QSet<QString> ROSTTBGen::_parse_rly_stations(QString route_file)
+QSet<QString> RailOSTTBGen::_parse_rly_stations(QString route_file)
 {
 
     QStringList _stations = {};
@@ -141,7 +141,7 @@ QSet<QString> ROSTTBGen::_parse_rly_stations(QString route_file)
     return _stations_list;
 }
 
-QMap<QString, QList<QList<int>>> ROSTTBGen::getCoordinates()
+QMap<QString, QList<QList<int>>> RailOSTTBGen::getCoordinates()
 {
     if(_coordinates.empty())
     {
@@ -151,7 +151,7 @@ QMap<QString, QList<QList<int>>> ROSTTBGen::getCoordinates()
     return _coordinates;
 }
 
-QMap<QString, QList<QList<int>>> ROSTTBGen::_parse_rly_coordinates(const QString route_file)
+QMap<QString, QList<QList<int>>> RailOSTTBGen::_parse_rly_coordinates(const QString route_file)
 {
     const QString _route_to_parse = (route_file.isEmpty() && !_current_route.isEmpty()) ? _current_route : route_file;
 
@@ -204,20 +204,20 @@ QMap<QString, QList<QList<int>>> ROSTTBGen::_parse_rly_coordinates(const QString
     return _coordinates;
 }
 
-bool ROSTTBGen::_isTime(QString string)
+bool RailOSTTBGen::_isTime(QString string)
 {
     if(string.size() != 5) return false;
     return string[0].isNumber() && string[1].isNumber() && string[2] == ":" && string[3].isNumber() && string[4].isNumber();
 }
 
-bool ROSTTBGen::_isID(QString string)
+bool RailOSTTBGen::_isID(QString string)
 {
     if(string.size() != 4 || _isTime("0"+string)) return false;
 
     return true;
 }
 
-bool ROSTTBGen::_isInteger(QString string)
+bool RailOSTTBGen::_isInteger(QString string)
 {
     for(auto n : string)
     {
@@ -227,14 +227,14 @@ bool ROSTTBGen::_isInteger(QString string)
     return true;
 }
 
-bool ROSTTBGen::_isPass(QStringList str_list)
+bool RailOSTTBGen::_isPass(QStringList str_list)
 {
     if(str_list.contains("pas")) return true;
 
     return false;
 }
 
-bool ROSTTBGen::_isStart(QStringList str_list)
+bool RailOSTTBGen::_isStart(QStringList str_list)
 {
     QStringList _types = _start_types.values();
     for(auto& type : _types)
@@ -245,22 +245,22 @@ bool ROSTTBGen::_isStart(QStringList str_list)
     return false;
 }
 
-ROSService::ServiceType ROSTTBGen::_parseType(QStringList str_list)
+RailOSService::ServiceType RailOSTTBGen::_parseType(QStringList str_list)
 {
     QStringList _str_types = _start_types.values();
-    QList<ROSService::ServiceType> _types = _start_types.keys();
+    QList<RailOSService::ServiceType> _types = _start_types.keys();
     for(int i{0}; i < _start_types.size(); ++i)
     {
         if(str_list.contains(_str_types[i])) return _types[i];
     }
 
-    return ROSService::ServiceType::Service;
+    return RailOSService::ServiceType::Service;
 }
 
-ROSService::FinishState ROSTTBGen::_parseExit(QStringList str_list)
+RailOSService::FinishState RailOSTTBGen::_parseExit(QStringList str_list)
 {
     QStringList _str_types = _exit_types.values();
-    QList<ROSService::FinishState> _types = _exit_types.keys();
+    QList<RailOSService::FinishState> _types = _exit_types.keys();
     for(int i{0}; i < _exit_types.size(); ++i)
     {
         if(str_list.contains(_str_types[i]))
@@ -268,10 +268,10 @@ ROSService::FinishState ROSTTBGen::_parseExit(QStringList str_list)
             return _types[i];
         }
     }
-    return ROSService::FinishState::FinishExit;
+    return RailOSService::FinishState::FinishExit;
 }
 
-bool ROSTTBGen::_isEnd(QStringList str_list)
+bool RailOSTTBGen::_isEnd(QStringList str_list)
 {
     QStringList _types = _exit_types.values();
     for(auto& type : _types)
@@ -282,7 +282,7 @@ bool ROSTTBGen::_isEnd(QStringList str_list)
     return false;
 }
 
-bool ROSTTBGen::_isCoordinate(QString string)
+bool RailOSTTBGen::_isCoordinate(QString string)
 {
     int n_chars = 0, n_nums = 0;
 
@@ -295,54 +295,54 @@ bool ROSTTBGen::_isCoordinate(QString string)
     return string.contains("-") && string[string.indexOf("-")-1].isNumber() && n_chars < 2 && n_nums > 1;
 }
 
-bool ROSTTBGen::_isRepeat(QStringList str_list)
+bool RailOSTTBGen::_isRepeat(QStringList str_list)
 {
     if(str_list.size() != 4) return false;
 
     return str_list[0] == "R" && _isInteger(str_list[1]) && _isInteger(str_list[2]) && _isInteger(str_list[3]);
 }
 
-bool ROSTTBGen::_isCallingPoint(QStringList str_list)
+bool RailOSTTBGen::_isCallingPoint(QStringList str_list)
 {
     if(str_list.size() != 3) return false;
     return _isTime(str_list[0]) && _isTime(str_list[1]) && str_list[2][0].isLetter();
 }
 
-bool ROSTTBGen::_isStartStopPoint(QStringList str_list)
+bool RailOSTTBGen::_isStartStopPoint(QStringList str_list)
 {
     if(str_list.size() != 2) return false;
     return !_isID(str_list[0]) && _isTime(str_list[0]) && str_list[1][0].isLetter() && !_isDirChange(str_list) && !_isPass(str_list);
 }
 
-bool ROSTTBGen::_isServiceDefinition(QStringList str_list)
+bool RailOSTTBGen::_isServiceDefinition(QStringList str_list)
 {
     if(str_list.size() != 7) return false;
     return _isID(str_list[0]) && _isInteger(str_list[2]) && _isInteger(str_list[3]) && _isInteger(str_list[4]) && _isInteger(str_list[5]) && _isInteger(str_list[6]);
 }
 
-bool ROSTTBGen::_isContinuedServiceDefinition(QStringList str_list)
+bool RailOSTTBGen::_isContinuedServiceDefinition(QStringList str_list)
 {
     if(str_list.size() != 2) return false;
 
     return _isID(str_list[0]);
 }
 
-bool ROSTTBGen::_isDirChange(QStringList str_list)
+bool RailOSTTBGen::_isDirChange(QStringList str_list)
 {
     return str_list.size() == 2 && str_list[1] == "cdt";
 }
 
-bool ROSTTBGen::_isSplit(QStringList str_list)
+bool RailOSTTBGen::_isSplit(QStringList str_list)
 {
     return _isTime(str_list[0]) && (str_list[1] == "fsp" || str_list[1] == "rsp");
 }
 
-bool ROSTTBGen::_isJoin(QStringList str_list)
+bool RailOSTTBGen::_isJoin(QStringList str_list)
 {
     return _isTime(str_list[0]) && str_list[1] == "jbo";
 }
 
-bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
+bool RailOSTTBGen::_process_service_candidate(int int_id, QStringList service)
 {
     QString _id = "NULL", _description = "NULL";
     QStringList _components;
@@ -372,7 +372,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         return false;
     }
 
-    ROSService* _service = new ROSService(int_id, _start_time, _id, _description);
+    RailOSService* _service = new RailOSService(int_id, _start_time, _id, _description);
 
     if(_isServiceDefinition(service[0].split(";")))
     {
@@ -388,31 +388,31 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     {
          _components = service[1].split(";");
 
-        ROSService::ServiceType _type = _parseType(_components[1].split(";"));
+        RailOSService::ServiceType _type = _parseType(_components[1].split(";"));
         _service->setType(_type);
         QStringList _element_ids;
         switch(_type)
         {
-            case ROSService::ServiceType::Service:
+            case RailOSService::ServiceType::Service:
                 _element_ids = _components[2].split(" ");
                 _service->setEntryPoint(_element_ids);
                 break;
-            case ROSService::ServiceType::ShuttleFromStop:
+            case RailOSService::ServiceType::ShuttleFromStop:
                 _element_ids = _components[2].split(" ");
                 _service->setEntryPoint(_element_ids);
                 _service->setParent(_components[3]);
                 break;
-            case ROSService::ServiceType::ShuttleFromFeeder:
+            case RailOSService::ServiceType::ShuttleFromFeeder:
                 _service->setParent(_components[2]);
                 _service->setDaughter(_components[3]);
                 break;
-            case ROSService::ServiceType::ServiceFromService:
+            case RailOSService::ServiceType::ServiceFromService:
                 _service->setParent(_components[2]);
                 break;
-            case ROSService::ServiceType::ShuttleFinishService:
+            case RailOSService::ServiceType::ShuttleFinishService:
                 _service->setParent(_components[2]);
                 break;
-            case ROSService::ServiceType::ServiceFromSplit:
+            case RailOSService::ServiceType::ServiceFromSplit:
                 _service->setParent(_components[2]);
                 break;
             default:
@@ -433,7 +433,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     }
 
     _components = service[service.size()-_final_index].split(";");
-    ROSService::FinishState _fin_state = _parseExit(_components);
+    RailOSService::FinishState _fin_state = _parseExit(_components);
     _service->setFinishState(_fin_state);
 
     // If the number of components does not match the expected number for the given
@@ -443,7 +443,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
     switch(_fin_state)
     {
-        case ROSService::FinishState::FinishRemainHere:
+        case RailOSService::FinishState::FinishRemainHere:
             if(_components.size() != 1)
             {
                 const QString _err_msg = _glob_msg + "Expected \"Frh\" for type \"Finish Remain Here\"";
@@ -451,7 +451,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
                 break;
             }
             break;
-        case ROSService::FinishState::FinishExit:
+        case RailOSService::FinishState::FinishExit:
             if(_components.size() != 3)
             {
                 const QString _err_msg = _glob_msg + "Expected \"HH:MM;Fer;Exit ID\" for type \"Finish Exit Railway\"";
@@ -461,7 +461,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
 
             _service->setExitPoints(_components[2].split(" "));
             break;
-        case ROSService::FinishState::FinishFormNew:
+        case RailOSService::FinishState::FinishFormNew:
             if(_components.size() != 3)
             {
                 const QString _err_msg = _glob_msg + "Expected \"HH:MM;Fns;Service ref\" for type \"Finish Form New\"";
@@ -470,7 +470,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             }
             _service->setDaughter(_components[2]);
             break;
-        case ROSService::FinishState::FinishJoinOther:
+        case RailOSService::FinishState::FinishJoinOther:
             if(_components.size() != 3)
             {
                 const QString _err_msg = _glob_msg + "Expected \"HH:MM;Fjo;Service ref\" for type \"Finish Join Other\"";
@@ -479,7 +479,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             }
             _service->setDaughter(_components[2]);
             break;
-        case ROSService::FinishState::FinishShuttleFormNew:
+        case RailOSService::FinishState::FinishShuttleFormNew:
             if(_components.size() != 4)
             {
                 const QString _err_msg = _glob_msg + "Expected \"HH:MM;Fns-sh;Shuttle ref;Finish ref\" for type \"Finish Shuttle Form New\"";
@@ -489,7 +489,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             _service->setParent(_components[2]);
             _service->setDaughter(_components[3]);
             break;
-        case ROSService::FinishState::FinishShuttleRemainHere:
+        case RailOSService::FinishState::FinishShuttleRemainHere:
             if(_components.size() != 3)
             {
                 const QString _err_msg = _glob_msg + "Expected \"HH:MM;Frh-sh;Shuttle ref\" for type \"Finish Shuttle Remain Here\"";
@@ -498,7 +498,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             }
             _service->setParent(_components[2]);
             break;
-        case ROSService::FinishState::FinishSingleShuttleFeeder:
+        case RailOSService::FinishState::FinishSingleShuttleFeeder:
             if(_components.size() != 3)
             {
                 const QString _err_msg = _glob_msg + "Expected \"HH:MM;F-nshs;Shuttle ref\" for type \"Finish Single Shuttle Feeder\"";
@@ -511,7 +511,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
             break;
     }
 
-    if(_fin_state != ROSService::FinishState::FinishRemainHere)
+    if(_fin_state != RailOSService::FinishState::FinishRemainHere)
     {
         QTime _time = QTime::fromString(_components[0], "HH:mm");
         _service->setExitTime(_time);
@@ -538,7 +538,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
         else if(_isCallingPoint(service[i].split(";")))
         {
             QStringList _components = service[i].split(";");
-            _service->addStation({QTime::fromString(_components[0].replace("W", ""), "HH:mm"),  // 'W' refers to legacy feature in older ROS
+            _service->addStation({QTime::fromString(_components[0].replace("W", ""), "HH:mm"),  // 'W' refers to legacy feature in older RailOS
                                  QTime::fromString(_components[0].replace("W", ""), "HH:mm")},  // and referred to warning events, this is now deprecated
                                  _components[2]);                                               // with intro of action window. Added removal here for legacy timetable support.
         }
@@ -598,7 +598,7 @@ bool ROSTTBGen::_process_service_candidate(int int_id, QStringList service)
     return true;
 }
 
-void ROSTTBGen::_process_data()
+void RailOSTTBGen::_process_data()
 {
     if(_input_data.size() < 1)
     {
@@ -689,13 +689,13 @@ void ROSTTBGen::_process_data()
     }
 }
 
-QString ROSTTBGen::_make_service_definition(ROSService* service)
+QString RailOSTTBGen::_make_service_definition(RailOSService* service)
 {
     const QString _id = service->getID(), _desc = service->getDescription();
 
     QString _output;
 
-    if(service->getType() == ROSService::ServiceType::Service || service->getType() == ROSService::ServiceType::ShuttleFromStop)
+    if(service->getType() == RailOSService::ServiceType::Service || service->getType() == RailOSService::ServiceType::ShuttleFromStop)
     {
         const QString _start_speed = QString::number(service->getStartSpeed()),
                       _max_speed = QString::number(service->getMaxSpeed()),
@@ -714,7 +714,7 @@ QString ROSTTBGen::_make_service_definition(ROSService* service)
     return _output;
 }
 
-QString ROSTTBGen::_make_type_line(ROSService* service)
+QString RailOSTTBGen::_make_type_line(RailOSService* service)
 {
     const QString _start_time = service->getStartTime().toString("HH:mm"),
                   _start_type = _start_types[service->getType()];
@@ -725,21 +725,21 @@ QString ROSTTBGen::_make_type_line(ROSService* service)
 
     switch(service->getType())
     {
-        case ROSService::ServiceType::Service:
+        case RailOSService::ServiceType::Service:
             return join(";", _start_time, _start_type, _start_point[0]+" "+_start_point[1]);
-        case ROSService::ServiceType::ShuttleFromStop:
+        case RailOSService::ServiceType::ShuttleFromStop:
             if(_daughter_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Daughter Retrieval Failure", "Failed to retrieve daughter service for "+service->getID());
             }
             return join(";", _start_time, _start_type, _start_point[0]+" "+_start_point[1], _daughter_id);
-        case ROSService::ServiceType::ServiceFromSplit:
+        case RailOSService::ServiceType::ServiceFromSplit:
             if(_parent_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
             }
             return join(";",_start_time, _start_type, _parent_id);
-        case ROSService::ServiceType::ShuttleFromFeeder:
+        case RailOSService::ServiceType::ShuttleFromFeeder:
             if(_parent_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
@@ -749,13 +749,13 @@ QString ROSTTBGen::_make_type_line(ROSService* service)
                 QMessageBox::critical(_parent, "Daughter Retrieval Failure", "Failed to retrieve daughter service for "+service->getID());
             }
             return join(";", _start_time, _start_type, _daughter_id, _parent_id);
-        case ROSService::ServiceType::ServiceFromService:
+        case RailOSService::ServiceType::ServiceFromService:
             if(_parent_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
             }
             return join(";", _start_time, _start_type, service->getParent());
-        case ROSService::ServiceType::ShuttleFinishService:
+        case RailOSService::ServiceType::ShuttleFinishService:
             if(_parent_id.isEmpty())
             {
                 QMessageBox::critical(_parent, "Parent Retrieval Failure", "Failed to retrieve parent service for "+service->getID());
@@ -766,12 +766,12 @@ QString ROSTTBGen::_make_type_line(ROSService* service)
     }
 }
 
-QStringList ROSTTBGen::_add_stations(ROSService* service)
+QStringList RailOSTTBGen::_add_stations(RailOSService* service)
 {
     QStringList _temp = {};
 
     const int int_start = (service->labelledLocationStart()) ? 1 : 0;
-    const int int_final = (service->getFinState() == ROSService::FinishState::FinishExit) ? service->getStations().size() : service->getStations().size()-1;
+    const int int_final = (service->getFinState() == RailOSService::FinishState::FinishExit) ? service->getStations().size() : service->getStations().size()-1;
 
     const QList<QList<QTime>> _times =  service->getTimes();
     const QStringList _stations = service->getStations();
@@ -782,7 +782,7 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
 
     // Check if service is service starts from a location or if it is started from another service as this will mean
     // the first station timetable entry should only contain a single time
-    if(service->labelledLocationStart() || service->getType() == ROSService::ServiceType::ShuttleFromFeeder || service->getType() == ROSService::ServiceType::ServiceFromService)
+    if(service->labelledLocationStart() || service->getType() == RailOSService::ServiceType::ShuttleFromFeeder || service->getType() == RailOSService::ServiceType::ServiceFromService)
     {
         if(service->getTimes().size() == 0)
         {
@@ -832,7 +832,7 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
 
     }
 
-    if(service->getFinState() != ROSService::FinishState::FinishExit)
+    if(service->getFinState() != RailOSService::FinishState::FinishExit)
     {     
         const QTime _arrive = _times[int_final][0];
         _temp.append(join(";", _arrive.toString("HH:mm"), _stations[int_final]));
@@ -858,7 +858,7 @@ QStringList ROSTTBGen::_add_stations(ROSService* service)
     return _temp;
 }
 
-QString ROSTTBGen::_get_partner(const QString &id)
+QString RailOSTTBGen::_get_partner(const QString &id)
 {
     for(auto s : _current_timetable->getServices())
     {
@@ -872,9 +872,9 @@ QString ROSTTBGen::_get_partner(const QString &id)
     return "NULL";
 }
 
-QString ROSTTBGen::_make_service_termination(ROSService* service)
+QString RailOSTTBGen::_make_service_termination(RailOSService* service)
 {
-    if(service->getFinState() == ROSService::FinishState::FinishRemainHere) return "Frh";
+    if(service->getFinState() == RailOSService::FinishState::FinishRemainHere) return "Frh";
 
     if(service->getExitTime() == QTime())
     {
@@ -892,11 +892,11 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
 
     switch(service->getFinState())
     {
-        case ROSService::FinishState::FinishExit:
+        case RailOSService::FinishState::FinishExit:
             _exit_ids = service->getExitIDs();
             return join(";", _exit_time.toString("HH:mm"), _exit_type, join(" ", _exit_ids));
             break;
-        case ROSService::FinishState::FinishFormNew:
+        case RailOSService::FinishState::FinishFormNew:
              _new_serv = service->getDaughter();
              if(_new_serv.isEmpty())
              {
@@ -905,10 +905,10 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
              }
             return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
             break;
-        case ROSService::FinishState::FinishJoinOther:
+        case RailOSService::FinishState::FinishJoinOther:
             return join(";", _exit_time.toString("HH:mm"), _exit_type, _other);
             break;
-        case ROSService::FinishState::FinishShuttleFormNew:
+        case RailOSService::FinishState::FinishShuttleFormNew:
             _prev_serv = service->getParent();
 
             _new_serv = service->getDaughter();
@@ -926,7 +926,7 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             }
             return join(";", _exit_time.toString("HH:mm"), _prev_serv, _new_serv);
             break;
-        case ROSService::FinishState::FinishShuttleRemainHere:
+        case RailOSService::FinishState::FinishShuttleRemainHere:
             _prev_serv = service->getParent();
             if(_prev_serv.isEmpty())
             {
@@ -935,7 +935,7 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
             }
             return join(";", _exit_time.toString("HH:mm"), _exit_type, _new_serv);
             break;
-        case ROSService::FinishState::FinishSingleShuttleFeeder:
+        case RailOSService::FinishState::FinishSingleShuttleFeeder:
             _prev_serv = service->getParent();
             if(_prev_serv.isEmpty())
             {
@@ -950,12 +950,12 @@ QString ROSTTBGen::_make_service_termination(ROSService* service)
      }
 }
 
-QString ROSTTBGen::_make_repeat_line(ROSService *service)
+QString RailOSTTBGen::_make_repeat_line(RailOSService *service)
 {
     return join(";", "R", QString::number(service->getRepeatInterval()), QString::number(service->getIDIncrement()), QString::number(service->getNRepeats()));
 }
 
-QStringList ROSTTBGen::createTimetableStrings(ROSTimetable* timetable)
+QStringList RailOSTTBGen::createTimetableStrings(RailOSTimetable* timetable)
 {
     QStringList _elements = {timetable->getStartTime().toString("HH:mm")};
 

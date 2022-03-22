@@ -26,7 +26,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="rosgenresources.qrc">:/images/img/rosttbgen_abouticon.png</pixmap>
+    <pixmap resource="railosgenresources.qrc">:/images/img/railosttbgen_abouticon.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -44,7 +44,7 @@
     </font>
    </property>
    <property name="text">
-    <string>ROS Timetable Editor</string>
+    <string>RailOS Timetable Editor</string>
    </property>
   </widget>
   <widget class="QLabel" name="labelCopyright">
@@ -139,7 +139,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="rosgenresources.qrc"/>
+  <include location="railosgenresources.qrc"/>
  </resources>
  <connections/>
 </ui>

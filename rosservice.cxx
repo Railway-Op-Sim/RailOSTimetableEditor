@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//         ROS Timetable Editor Service Class Definition                   //
+//         RailOS Timetable Editor Service Class Definition                   //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -29,7 +29,7 @@
 
 #include "rosservice.hxx"
 
-void ROSService::shiftStationTimes(const int n_secs, QString &station)
+void RailOSService::shiftStationTimes(const int n_secs, QString &station)
 {
     const int index = _stations.indexOf(station);
     if(index < 0)
@@ -41,7 +41,7 @@ void ROSService::shiftStationTimes(const int n_secs, QString &station)
     _times[index][1] = _times[index][1].addSecs(n_secs);
 }
 
-void ROSService::shiftServiceTimes(const int n_secs)
+void RailOSService::shiftServiceTimes(const int n_secs)
 {
     //if(_parent_service != "") return;
     setEntryTime(_enter_map_time.addSecs(n_secs));
@@ -50,7 +50,7 @@ void ROSService::shiftServiceTimes(const int n_secs)
     for(int i{0}; i < _cdt_times.size(); ++i) if(_cdt_times[i] != QTime()) _cdt_times[i] = _cdt_times[i].addSecs(n_secs);
 }
 
-void ROSService::deleteEntry(const int &index)
+void RailOSService::deleteEntry(const int &index)
 {
     if(index < 0 || index > _stations.size()-1) return;
     _stations.removeAt(index);
@@ -62,34 +62,34 @@ void ROSService::deleteEntry(const int &index)
 
 }
 
-void ROSService::deleteEntry(const QString& station)
+void RailOSService::deleteEntry(const QString& station)
 {
     const int index = _stations.indexOf(station);
     if(index < 0) return;
     deleteEntry(index);
 }
 
-QString ROSService::_start_new()
+QString RailOSService::_start_new()
 {
     QString out_string = join(";", _service_id,_description, QString(_start_speed), QString(_max_speed),
                         QString(_mass), QString(_max_brake), QString(_power));
 
     switch (_service_type)
     {
-        case ROSService::ServiceType::ServiceFromSplit:
+        case RailOSService::ServiceType::ServiceFromSplit:
             out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Sfs", _parent_service));
             break;
-        case ROSService::ServiceType::ServiceFromService:
+        case RailOSService::ServiceType::ServiceFromService:
             out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Sns", _parent_service));
             break;
-        case ROSService::ServiceType::ShuttleFinishService:
+        case RailOSService::ServiceType::ShuttleFinishService:
             out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Sns-fsh", _parent_service));
             break;
-        case ROSService::ServiceType::ShuttleFromStop:
+        case RailOSService::ServiceType::ShuttleFromStop:
             out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Snt-sh", _enter_ids[0]));
             out_string = join(" ", out_string, join(";", _enter_ids[1], _parent_service));
             break;
-        case ROSService::ServiceType::ShuttleFromFeeder:
+        case RailOSService::ServiceType::ShuttleFromFeeder:
             out_string = join(",", out_string, join(";", _enter_map_time.toString("HH:mm"), "Sns-sh", _parent_service));
             break;
         default:
@@ -99,7 +99,7 @@ QString ROSService::_start_new()
     return out_string;
 }
 
-QString ROSService::_add_sTrainSet()
+QString RailOSService::_add_sTrainSet()
 {
 
     if(_stations.size() < 2) return "";
@@ -126,24 +126,24 @@ QString ROSService::_add_sTrainSet()
     return out_string;
 }
 
-QStringList ROSService::summarise()
+QStringList RailOSService::summarise()
 {
     return QStringList({_enter_map_time.toString("HH:mm"), _service_id, _description})+getStations();
 }
 
-QString ROSService::_finalize()
+QString RailOSService::_finalize()
 {
     QString out_string = "";
 
     switch(_finish_as)
     {
-        case ROSService::FinishState::FinishExit:
+        case RailOSService::FinishState::FinishExit:
             out_string = join(";", _times[_times.size()-1][0].toString(), "Fer", join(" ", _exit_ids));
             break;
-        case ROSService::FinishState::FinishFormNew:
+        case RailOSService::FinishState::FinishFormNew:
             out_string = join(";", _times[_times.size()-1][0].toString(), "Fns", _daughter_id);
             break;
-        case ROSService::FinishState::FinishJoinOther:
+        case RailOSService::FinishState::FinishJoinOther:
             out_string = join(";", _times[_times.size()-1][0].toString(), "Fjo", _daughter_id);
             break;
         default:
@@ -153,14 +153,14 @@ QString ROSService::_finalize()
     return out_string;
 }
 
-bool ROSService::checkService()
+bool RailOSService::checkService()
 {
     bool _checker = _max_brake > 0 && _max_speed > 0 && _mass > 0 && _power > 0;
     _checker = _checker && _stations.size() > 2;
     return _checker;
 }
 
-QString ROSService::as_string()
+QString RailOSService::as_string()
 {
     QString _out = _start_new();
     _out = join(",", _out, _add_sTrainSet());
@@ -169,7 +169,7 @@ QString ROSService::as_string()
     return _out;
 }
 
-void ROSService::setFinishState(const ROSService::FinishState& fin_state)
+void RailOSService::setFinishState(const RailOSService::FinishState& fin_state)
 {
     _finish_as = fin_state;
 }

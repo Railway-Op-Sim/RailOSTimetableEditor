@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------//
-//         ROS Timetable Editor File Parser Class Definition               //
+//         RailOS Timetable Editor File Parser Class Definition               //
 //                                                                         //
 // This file provides part of the source code towards the standalone       //
 // timetable editor constructed using the Qt v5.15 framework.              //
@@ -27,8 +27,8 @@
 //                                                                         //
 //-------------------------------------------------------------------------//
 
-#ifndef ROSTTBGEN_HXX
-#define ROSTTBGEN_HXX
+#ifndef RailOSTTBGEN_HXX
+#define RailOSTTBGEN_HXX
 
 #include <QString>
 #include <QDebug>
@@ -45,14 +45,14 @@
 #include "rosservice.hxx"
 #include "utilities.hxx"
 
-/*! @brief      ROS Timetable Editor Parse Class
+/*! @brief      RailOS Timetable Editor Parse Class
     @details    A class to parse existing timetables and generate new ones using current data
     @version    0.2.2-alpha
     @author     Kristian Zarebski
     @date 	    last modified 2021-07-21
     @copyright  GNU Public License v3
 */
-class ROSTTBGen
+class RailOSTTBGen
 {
     private:
         //! Stored text
@@ -68,7 +68,7 @@ class ROSTTBGen
         QString _current_route = "";
 
         //! Current timetable to be modified
-        ROSTimetable* _current_timetable = new ROSTimetable;
+        RailOSTimetable* _current_timetable = new RailOSTimetable;
 
         //! Container for holding parsed timetable data
         QStringList _input_data = {};
@@ -89,7 +89,7 @@ class ROSTTBGen
         */
         bool _isTime(QString string);
 
-        /*! @brief Check string is an ROS ID
+        /*! @brief Check string is an RailOS ID
         @return True if string is valid ID
         */
         bool _isID(QString string);
@@ -170,46 +170,46 @@ class ROSTTBGen
         bool _process_service_candidate(int int_id, QStringList service);
 
         /*! @brief Fetch service join partner
-        @return ROS service ID for partner service
+        @return RailOS service ID for partner service
         */
         QString _get_partner(const QString& id);
 
-        /*! @brief Convert string service type to ROSService::ServiceType
-        @return Enum service type ROSService::ServiceType
+        /*! @brief Convert string service type to RailOSService::ServiceType
+        @return Enum service type RailOSService::ServiceType
         */
-        ROSService::ServiceType _parseType(QStringList str_list);
+        RailOSService::ServiceType _parseType(QStringList str_list);
 
-        /*! @brief Convert string service finish state to ROSService::FinishState
-        @return Enum service finish state ROSService::FinishState
+        /*! @brief Convert string service finish state to RailOSService::FinishState
+        @return Enum service finish state RailOSService::FinishState
         */
-        ROSService::FinishState _parseExit(QStringList str_list);
+        RailOSService::FinishState _parseExit(QStringList str_list);
 
         /*! @brief Construct the service definition string
-        @return String for ROS to initialise service
+        @return String for RailOS to initialise service
         */
-        QString _make_service_definition(ROSService* service);
+        QString _make_service_definition(RailOSService* service);
 
         /*! @brief Construct service type statement
-        @return String for ROS to set service type
+        @return String for RailOS to set service type
         */
-        QString _make_type_line(ROSService* service);
+        QString _make_type_line(RailOSService* service);
 
         /*! @brief Construct station list strings
         @return String list of all calling points
         */
-        QStringList _add_stations(ROSService* service);
+        QStringList _add_stations(RailOSService* service);
 
         /*! @brief Construct service termination statement
-        @return String for ROS to set service termination
+        @return String for RailOS to set service termination
         */
-        QString _make_service_termination(ROSService* service);
+        QString _make_service_termination(RailOSService* service);
 
         /*! @brief Construct service repetition statement
-        @return String for ROS describing repeat options
+        @return String for RailOS describing repeat options
         */
-        QString _make_repeat_line(ROSService* service);
+        QString _make_repeat_line(RailOSService* service);
 
-        /*! @brief Parse the station list from an input ROS .rly file
+        /*! @brief Parse the station list from an input RailOS .rly file
         @return name of the current route
         */
         QSet<QString> _parse_rly_stations(QString route_file);
@@ -219,27 +219,27 @@ class ROSTTBGen
         */
         QMap<QString, QList<QList<int>>> _parse_rly_coordinates(const QString route_file = "");
 
-        //! Map object to map ROSService::FinishState onto the ROS syntax
-        QMap<ROSService::FinishState, QString> _exit_types = {{ROSService::FinishState::FinishExit, "Fer"},
-                                                              {ROSService::FinishState::FinishFormNew, "Fns"},
-                                                              {ROSService::FinishState::FinishJoinOther, "Fjo"},
-                                                              {ROSService::FinishState::FinishRemainHere, "Frh"},
-                                                              {ROSService::FinishState::FinishShuttleRemainHere, "Frh-sh"},
-                                                              {ROSService::FinishState::FinishShuttleFormNew, "Fns-sh"},
-                                                              {ROSService::FinishState::FinishSingleShuttleFeeder, "F-nshs"}};
+        //! Map object to map RailOSService::FinishState onto the RailOS syntax
+        QMap<RailOSService::FinishState, QString> _exit_types = {{RailOSService::FinishState::FinishExit, "Fer"},
+                                                              {RailOSService::FinishState::FinishFormNew, "Fns"},
+                                                              {RailOSService::FinishState::FinishJoinOther, "Fjo"},
+                                                              {RailOSService::FinishState::FinishRemainHere, "Frh"},
+                                                              {RailOSService::FinishState::FinishShuttleRemainHere, "Frh-sh"},
+                                                              {RailOSService::FinishState::FinishShuttleFormNew, "Fns-sh"},
+                                                              {RailOSService::FinishState::FinishSingleShuttleFeeder, "F-nshs"}};
 
-        //! Map object to map ROSService::ServiceType onto the ROS syntax
-        QMap<ROSService::ServiceType, QString> _start_types = {{ROSService::ServiceType::Service, "Snt"},
-                                                               {ROSService::ServiceType::ShuttleFromStop, "Snt-sh"},
-                                                               {ROSService::ServiceType::ShuttleFromFeeder, "Sns-sh"},
-                                                               {ROSService::ServiceType::ServiceFromSplit, "Sfs"},
-                                                               {ROSService::ServiceType::ShuttleFinishService, "Sns-fsh"},
-                                                               {ROSService::ServiceType::ServiceFromService, "Sns"}};
+        //! Map object to map RailOSService::ServiceType onto the RailOS syntax
+        QMap<RailOSService::ServiceType, QString> _start_types = {{RailOSService::ServiceType::Service, "Snt"},
+                                                               {RailOSService::ServiceType::ShuttleFromStop, "Snt-sh"},
+                                                               {RailOSService::ServiceType::ShuttleFromFeeder, "Sns-sh"},
+                                                               {RailOSService::ServiceType::ServiceFromSplit, "Sfs"},
+                                                               {RailOSService::ServiceType::ShuttleFinishService, "Sns-fsh"},
+                                                               {RailOSService::ServiceType::ServiceFromService, "Sns"}};
     public:
         /*! @brief Construct a parser instance
         @param parent Pointer to parent application window
         */
-        ROSTTBGen(QWidget* parent, const QString railway_file = "", const QString timetable_file = "") : _parent(parent) {
+        RailOSTTBGen(QWidget* parent, const QString railway_file = "", const QString timetable_file = "") : _parent(parent) {
 
             if(!railway_file.isEmpty())
             {
@@ -267,7 +267,7 @@ class ROSTTBGen
         */
         QMap<QString, QList<QList<int>>> getCoordinates();
 
-        /*! @brief Parse the data from an input ROS .ttb file
+        /*! @brief Parse the data from an input RailOS .ttb file
         @return file contents
         */
         QString parse_file(const QString in_file);
@@ -277,22 +277,22 @@ class ROSTTBGen
         /*! @brief Fetch the constructed timetable
         @return Pointer to newly created timetable
         */
-        ROSTimetable* getParsedTimetable() { return _current_timetable; }
+        RailOSTimetable* getParsedTimetable() { return _current_timetable; }
 
-        /*! @brief Retrieve ROS syntax for given finish state
+        /*! @brief Retrieve RailOS syntax for given finish state
         @return String to represent the finish state
         */
-        QString getFinishID(ROSService::FinishState state) {return _exit_types[state];}
+        QString getFinishID(RailOSService::FinishState state) {return _exit_types[state];}
 
-        /*! @brief Retrieve ROS syntax for given service type
+        /*! @brief Retrieve RailOS syntax for given service type
         @return String to represent the service type
         */
-        QString getStartID(ROSService::ServiceType state) {return _start_types[state];}
+        QString getStartID(RailOSService::ServiceType state) {return _start_types[state];}
 
         /*! @brief Construct string representation
         @return List of strings representing lines for output .ttb file
         */
-        QStringList createTimetableStrings(ROSTimetable* timetable);
+        QStringList createTimetableStrings(RailOSTimetable* timetable);
 
         /*! @brief Set the Station List (used to maintain station listing when parser is reset/remade
         @return void
@@ -300,4 +300,4 @@ class ROSTTBGen
         void setStations(QSet<QString> stations) {_stations_list = stations;}
 };
 
-#endif // ROSTTBGEN_HXX
+#endif // RailOSTTBGEN_HXX
