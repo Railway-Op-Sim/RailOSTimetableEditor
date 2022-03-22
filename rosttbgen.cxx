@@ -520,8 +520,6 @@ bool RailOSTTBGen::_process_service_candidate(int int_id, QStringList service)
     // Parse Locations
     for(int i{2}; i < service.size()-_final_index; ++i)
     {
-        bool _pass_point = false;
-
         _service->setLabelledLocationStart(i == 2 && service[i].split(";").size() == 2);
 
         if(_service->getStations().size() > i-1 && _isDirChange(service[i].split(";")))
@@ -556,7 +554,7 @@ bool RailOSTTBGen::_process_service_candidate(int int_id, QStringList service)
             QStringList _components = service[i].split(";");
             _service->addStation({QTime::fromString(_components[0].replace("W", ""), "HH:mm"), QTime()},
                                  _components[2]);
-            _service->setStopAsPassPoint(_service->getStations().size()-1, _pass_point);
+            _service->setStopAsPassPoint(_service->getStations().size()-1, true);
 
         }
 

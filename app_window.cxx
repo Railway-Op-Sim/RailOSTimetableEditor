@@ -563,12 +563,12 @@ void RailOSTTBAppWindow::update_output(RailOSService* current_serv)
             _ns_string += " ⤸ "+_current_service_selection->getCDTTimes()[i].toString("HH:mm");
         }
 
+        qDebug() << _current_service_selection->getCDTPass(_current_element_stations[i]) << Qt::endl;
+
         if(_current_service_selection->getDaughter() != "" && i == _current_element_stations.size()-1)
         {
             _ns_string += " → "+_current_service_selection->getDaughter();
         }
-
-
         else if(_current_service_selection->getCDTPass(_current_element_stations[i])[1])
         {
             _ns_string = "Pass";
