@@ -52,11 +52,12 @@ def _build_setup_buttons() -> typing.List[typing.List[psg.Element]]:
 def _build_service_display_table(service_entries:  typing.List[typing.List[typing.Any]]) -> psg.Table:
     return psg.Table(
         values=service_entries,
-        headings=None,
+        headings=["Arrive", "Depart", "Location"],
         justification="left",
         key="SERVICE_DISPLAY",
         auto_size_columns=False,
-        enable_events=True
+        enable_events=True,
+        col_widths=[10,10,30]
     )
 
 

@@ -22,7 +22,14 @@ def railosttb_editor() -> None:
             _session.choose_route(_window)
         elif _event == "Timetable":
             _window.close()
-            _window = railos_gui.build_interface(timetable_entries=_session.choose_timetable())
+            _window = railos_gui.build_interface(
+                timetable_entries=_session.choose_timetable()
+            )
+        elif _event == "TIMETABLE_DISPLAY":
+            _window = railos_gui.build_interface(
+                timetable_entries=_session._populate_services(),
+                service_entries=_session.choose_service(_values[_event]),
+            )
 
 
 if __name__ in "__main__":

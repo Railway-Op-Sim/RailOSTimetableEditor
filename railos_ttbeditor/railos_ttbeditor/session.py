@@ -3,6 +3,8 @@ import os.path
 import dataclasses
 import railostools.rly as railos_rly
 import railostools.ttb.parsing as railos_ttb
+from railostools.ttb.components import TimetabledService
+from railostools.ttb.components.actions import Location
 import railostools.exceptions as railos_exc
 import PySimpleGUI as psg
 import pandas
@@ -36,6 +38,22 @@ class RailOSTTBSession:
             for identifier, service in services.items()
         ]
         return _table
+
+    def choose_service(self, TIMETABLE_DISPLAY: typing.List[typing.List[typing.Any]]) -> typing.List[typing.List[str]]:
+        if not (
+            _data_selected := [
+                list(self._timetable_parser._data.services.values())[row]
+                for row in TIMETABLE_DISPLAY
+            ]
+        ):
+            return [["", "", ""]]
+        _service: TimetabledService = _data_selected[0]
+        _table_data: typing.List[typing.List[str]] = [
+            [action.time, action.end_time or "", action.name]
+            for action in _service.actions.values()
+            if isinstance(action, Location)
+        ]
+        return _table_data
 
     def find_railos(self) -> str:
         _exe = psg.popup_get_file(
