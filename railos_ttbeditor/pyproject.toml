@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "railos-ttbeditor"
+version = "0.1.0"
+description = ""
+authors = [" Kristian Zarębski <krizar312@gmail.com>"]
+readme = "README.md"
+packages = [{include = "railos_ttbeditor"}]
+
+[tool.poetry.dependencies]
+python = "^3.11,<3.12"
+pysimplegui = "^4.60.4"
+railostools = {git = "https://github.com/Railway-Op-Sim/railostools.git", subdirectory="python"}
+pandas = "^1.5.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
