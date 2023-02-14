@@ -3,6 +3,7 @@ import typing
 import datetime
 import pandas
 import railostools.ttb.components as railos_ttb_comp
+from railos_ttbeditor.addresses import GUIKey
 
 
 def _times_of_day() -> typing.Iterator[str]:
@@ -34,17 +35,17 @@ def _build_setup_buttons() -> typing.List[typing.List[psg.Element]]:
             psg.Button(
                 button_text="Set RailOS Location",
                 tooltip="Locate Railway Operation Simulator installation",
-                key="RAILOS_LOC_BROWSER",
+                key=GUIKey.RAILOS_LOC_BROWSER.name,
             ),
             psg.Text(
                 "Railway Operation Simulator Location Unset",
                 text_color="red",
-                key="RAILOS_LOC",
+                key=GUIKey.RAILOS_LOC.name,
             ),
             psg.Button(
-                button_text="Route", tooltip="Select route file", key="ROUTE_BROWSER"
+                button_text="Route", tooltip="Select route file", key=GUIKey.ROUTE_BROWSER.name
             ),
-            psg.Text("Route Map Not Specified", text_color="red", key="ROUTE_CHOICE"),
+            psg.Text("Route Map Not Specified", text_color="red", key=GUIKey.ROUTE_CHOICE.name),
         ]
     ]
 
@@ -52,9 +53,9 @@ def _build_setup_buttons() -> typing.List[typing.List[psg.Element]]:
 def _build_service_display_table(service_entries:  typing.List[typing.List[typing.Any]]) -> psg.Table:
     return psg.Table(
         values=service_entries,
-        headings=["Arrive", "Depart", "Location"],
+        headings=["Arrive", "Depart", "Location", "Action"],
         justification="left",
-        key="SERVICE_DISPLAY",
+        key=GUIKey.SERVICE_DISPLAY.name,
         auto_size_columns=False,
         enable_events=True,
         col_widths=[10,10,30]
@@ -66,7 +67,7 @@ def _build_timetable_display_table(timetable_entries:  typing.List[typing.List[t
         values=timetable_entries,
         headings=["Headcode", "Time", "Description"],
         justification="left",
-        key="TIMETABLE_DISPLAY",
+        key=GUIKey.TIMETABLE_DISPLAY.name,
         enable_events=True,
         auto_size_columns=False,
         col_widths=[10,10,30]
@@ -79,7 +80,7 @@ def _build_start_time_spinbox() -> typing.Tuple[psg.Text, psg.Spin]:
         psg.Spin(
             values=list(_times_of_day()),
             tooltip="Service start time",
-            key="SRV_START_TIME",
+            key=GUIKey.SRV_START_TIME.name,
             size=(10, 1),
         ),
     )
@@ -88,8 +89,8 @@ def _build_start_time_spinbox() -> typing.Tuple[psg.Text, psg.Spin]:
 def _build_unit_select() -> psg.Radio:
     return psg.Column(
         [
-            [psg.Radio("kph", "UNIT_SELECT", default=True)],
-            [psg.Radio("mph", "UNIT_SELECT")],
+            [psg.Radio("kph", GUIKey.UNIT_SELECT.name, default=True)],
+            [psg.Radio("mph", GUIKey.UNIT_SELECT.name)],
         ]
     )
 
@@ -137,7 +138,7 @@ def _build_train_consist_panel() -> psg.Column:
                 psg.Column(
                     [
                         [psg.Text("From Train Template")],
-                        [psg.DropDown([], key="CONSIST_TEMPLATES", size=(25, 1))],
+                        [psg.DropDown([], key=GUIKey.CONSIST_TEMPLATES.name, size=(25, 1))],
                     ],
                     vertical_alignment="top",
                 ),
@@ -162,9 +163,9 @@ def _build_ref_desc_boxes() -> psg.Column:
     return psg.Column(
         [
             [psg.Text("Service Reference")],
-            [psg.Input("", key="SERVICE_REF", size=(20, 1))],
+            [psg.Input("", key=GUIKey.SERVICE_REF.name, size=(20, 1))],
             [psg.Text("Description")],
-            [psg.Input("", key="SERVICE_DESC", size=(40, 1))],
+            [psg.Input("", key=GUIKey.SERVICE_DESC.name, size=(40, 1))],
         ],
         vertical_alignment="top",
     )
@@ -173,17 +174,17 @@ def _build_ref_desc_boxes() -> psg.Column:
 def _build_service_type_select() -> psg.Column:
     return psg.Column(
         [
-            [psg.Radio("Standard", "RADIO_SRV_SELECT", default=True)],
-            [psg.Radio("Shuttle from Stop", "RADIO_SRV_SELECT")],
+            [psg.Radio("Standard", GUIKey.RADIO_SRV_SELECT.name, default=True)],
+            [psg.Radio("Shuttle from Stop", GUIKey.RADIO_SRV_SELECT.name)],
             [
                 psg.Radio(
-                    "Shuttle from Feeder Service", "RADIO_SRV_SELECT", disabled=True
+                    "Shuttle from Feeder Service", GUIKey.RADIO_SRV_SELECT.name, disabled=True
                 )
             ],
-            [psg.Radio("Shuttle Finish Service", "RADIO_SRV_SELECT", disabled=True)],
+            [psg.Radio("Shuttle Finish Service", GUIKey.RADIO_SRV_SELECT.name, disabled=True)],
             [
                 psg.Radio(
-                    "Shuttle from Other Service", "RADIO_SRV_SELECT", disabled=True
+                    "Shuttle from Other Service", GUIKey.RADIO_SRV_SELECT.name, disabled=True
                 )
             ],
         ],
@@ -194,18 +195,18 @@ def _build_service_type_select() -> psg.Column:
 def _build_finish_type_select() -> psg.Column:
     return psg.Column(
         [
-            [psg.Radio("Finish and Form New Service", "RADIO_SRV_FINISH_SELECT")],
+            [psg.Radio("Finish and Form New Service", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
             [
                 psg.Radio(
                     "Finish and Remain at Location",
-                    "RADIO_SRV_FINISH_SELECT",
+                    GUIKey.RADIO_SRV_FINISH_SELECT.name,
                     default=True,
                 )
             ],
-            [psg.Radio("Finish and Exit at Location", "RADIO_SRV_FINISH_SELECT")],
-            [psg.Radio("Finish and Join Other", "RADIO_SRV_FINISH_SELECT")],
-            [psg.Radio("Finish and Shuttle Feeder", "RADIO_SRV_FINISH_SELECT")],
-            [psg.Radio("Finish Shuttle, Form New", "RADIO_SRV_FINISH_SELECT")],
+            [psg.Radio("Finish and Exit at Location", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
+            [psg.Radio("Finish and Join Other", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
+            [psg.Radio("Finish and Shuttle Feeder", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
+            [psg.Radio("Finish Shuttle, Form New", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
         ],
         vertical_alignment="top",
     )
@@ -216,25 +217,25 @@ def _build_location_select() -> psg.Column:
         [
             [
                 psg.Checkbox(
-                    "Station/Siding Start", key="CHOOSE_BY_LOCATION", default=True
+                    "Station/Siding Start", key=GUIKey.CHOOSE_BY_LOCATION.name, default=True
                 )
             ],
             [
                 psg.Column(
                     [
                         [psg.Text("Location")],
-                        [psg.DropDown([], key="LOCATION_SELECT", size=(25, 1))],
+                        [psg.DropDown([], key=GUIKey.LOCATION_SELECT.name, size=(25, 1))],
                         [psg.Text("Track IDs")],
-                        [psg.DropDown([], key="TRACK_IDS", size=(25, 1))],
+                        [psg.DropDown([], key=GUIKey.TRACK_IDS.name, size=(25, 1))],
                     ],
                     vertical_alignment="top",
                 ),
                 psg.Column(
                     [
                         [psg.Text("Track ID Rear")],
-                        [psg.Input("", key="TRACK_ID_REAR", size=(25, 1))],
+                        [psg.Input("", key=GUIKey.TRACK_ID_REAR.name, size=(25, 1))],
                         [psg.Text("Track ID Front")],
-                        [psg.DropDown("", key="TRACK_ID_FRONT", size=(25, 1))],
+                        [psg.DropDown("", key=GUIKey.TRACK_ID_FRONT.name, size=(25, 1))],
                     ],
                     visible=False,
                     vertical_alignment="top",
@@ -248,15 +249,15 @@ def _build_finish_service_ref() -> psg.Column:
     return psg.Column(
         [
             [psg.Text("Exit Location IDs\n(comma separated)")],
-            [psg.Input("", key="EXIT_LOCATION_IDS", size=(25, 1))],
+            [psg.Input("", key=GUIKey.EXIT_LOCATION_IDS.name, size=(25, 1))],
             [psg.Text("New Service Reference")],
-            [psg.Input("", key="FINISH_SRV_REF", size=(25, 1))],
+            [psg.Input("", key=GUIKey.FINISH_SRV_REF.name, size=(25, 1))],
             [psg.Text("Manual Termination Time")],
             [
-                psg.Checkbox("", default=False, key="MANUAL_TERMINATION"),
+                psg.Checkbox("", default=False, key=GUIKey.MANUAL_TERMINATION.name),
                 psg.Spin(
                     values=list(_times_of_day()),
-                    key="MANUAL_TERMINATION_TIME",
+                    key=GUIKey.MANUAL_TERMINATION_TIME.name,
                     size=(10, 1),
                 ),
             ],
@@ -269,18 +270,18 @@ def _build_others_ref_panel() -> typing.List[psg.Element]:
         psg.Column(
             [
                 [psg.Text("Parent Service Reference")],
-                [psg.DropDown([], key="PARENT_SRV_REF", size=(25, 1))],
+                [psg.DropDown([], key=GUIKey.PARENT_SRV_REF.name, size=(25, 1))],
             ],
             vertical_alignment="top",
         ),
         psg.Column(
             [
                 [psg.Text("Shuttle Reference")],
-                [psg.Input("", key="SHUTTLE_REF", size=(25, 1))],
+                [psg.Input("", key=GUIKey.SHUTTLE_REF.name, size=(25, 1))],
                 [psg.Text("Shuttle Return Service Reference")],
-                [psg.Input("", key="SHUTTLE_RETURN_REF", size=(25, 1))],
+                [psg.Input("", key=GUIKey.SHUTTLE_RETURN_REF.name, size=(25, 1))],
                 [psg.Text("Feeder Reference")],
-                [psg.DropDown([], key="FEEDER_SRV_REF", size=(25, 1))],
+                [psg.DropDown([], key=GUIKey.FEEDER_SRV_REF.name, size=(25, 1))],
             ],
             vertical_alignment="top",
         ),
@@ -298,9 +299,9 @@ def _build_repeats_panel() -> typing.List[psg.Column]:
         ),
         psg.Column(
             [
-                [psg.Spin(values=list(range(99)), initial_value=0, key="REPEATS_N")],
-                [psg.Spin(values=list(range(99)), initial_value=0, key="REPEATS_MINS")],
-                [psg.Spin(values=list(range(99)), initial_value=0, key="REPEATS_INC")],
+                [psg.Spin(values=list(range(99)), initial_value=0, key=GUIKey.REPEATS_N.name)],
+                [psg.Spin(values=list(range(99)), initial_value=0, key=GUIKey.REPEATS_MINS.name)],
+                [psg.Spin(values=list(range(99)), initial_value=0, key=GUIKey.REPEATS_INC.name)],
             ]
         ),
     ]
@@ -310,10 +311,10 @@ def _build_action_buttons() -> psg.Column:
     return psg.Column(
         [
             [
-                psg.Button("Insert/Edit", key="INSERT_EDIT"),
-                psg.Button("Delete", key="DELETE"),
-                psg.Button("Clear", key="CLEAR"),
-                psg.Button("Clone", key="CLONE"),
+                psg.Button("Insert/Edit", key=GUIKey.INSERT_EDIT.name),
+                psg.Button("Delete", key=GUIKey.DELETE.name),
+                psg.Button("Clear", key=GUIKey.CLEAR.name),
+                psg.Button("Clone", key=GUIKey.CLONE.name),
             ]
         ],
         justification="r",
@@ -356,14 +357,14 @@ def _build_control_panel_3() -> psg.Column:
     )
 
 
-def build_interface(timetable_entries: typing.List[typing.List[typing.Any]]=None, service_entries: typing.List[typing.List[typing.Any]]=None) -> psg.Window:
+def build_interface(timetable_entries: typing.List[typing.List[typing.Any]]=None, service_entries: typing.List[typing.List[typing.Any]]=None, *args, **kwargs) -> psg.Window:
     psg.theme("Default1")
 
     if not timetable_entries:
         timetable_entries = [["", "", ""]]
 
     if not service_entries:
-        service_entries = [["", "", ""]]
+        service_entries = [["", "", "", ""]]
 
     _menu: psg.MenuBar = _build_menu_bar()
     _setup_buttons: typing.List[typing.List[psg.Element]] = _build_setup_buttons()
@@ -389,7 +390,7 @@ def build_interface(timetable_entries: typing.List[typing.List[typing.Any]]=None
         [_build_action_buttons()],
     ]
 
-    return psg.Window("RailOS Timetable Editor", _layout, size=(1200, 768))
+    return psg.Window("RailOS Timetable Editor", _layout, size=(1200, 768), *args, **kwargs)
 
 
 if __name__ in "__main__":
