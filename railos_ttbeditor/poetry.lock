@@ -195,6 +195,7 @@ url = "https://github.com/Railway-Op-Sim/railostools.git"
 reference = "HEAD"
 resolved_reference = "eb4ca546cd28645faa3355f3fee4aba494c11167"
 subdirectory = "python"
+
 [[package]]
 name = "requests"
 version = "2.28.2"
@@ -334,7 +335,7 @@ requests = ">=2.0.0,<3.0.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.11,<3.12"
-content-hash = "d98dbdf0fd1cc3ff9ab8c57bebedfa38d45a0051336a385d316647387235bf42"
+content-hash = "c5de1c0fad9486aabc31c73c4f1dc7e4e0d69674b54b533e5e3173fb6e603b38"
 
 [metadata.files]
 beautifulsoup4 = [

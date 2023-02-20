@@ -21,11 +21,95 @@ class RailOSTTBSession:
         self.service_entry: typing.List[str] = [["", "", "", ""]]
         self._railway_parser = railos_rly.RlyParser()
         self._timetable_parser = railos_ttb.TTBParser()
-        self.current_service: TimetabledService = None
+        self._current_service: TimetabledService = None
+        self._display_in_kph: bool = True
+        self._display_in_kw: bool = True
         self.window = railos_gui.build_interface(
             timetable_entries=self.service_list,
             service_entries=self.service_entry
         )
+
+    @property
+    def parent_service(self) -> typing.Optional[TimetabledService]:
+        if isinstance(self.current_service.start_type, (Sfs, Sns, Sns_fsh)):
+            return self._timetable_parser._data.services[str(self.current_service.start_type.parent_service)]
+        elif isinstance(self.current_service.start_type, Sns_sh):
+            return self._timetable_parser._data.services[str(self.current_service.start_type.feeder_ref)]
+        return None
+
+
+    def _assemble_service_list(self) -> typing.List[str]:
+        _service_list = []
+
+        for action in self._current_service.actions.values():
+            if isinstance(action, Location):
+                _service_list.append(
+                    [action.time, action.end_time or "", action.name, ""]
+                )
+            elif isinstance(action, cdt):
+                _service_list.append([action.time, "", "", "↩"])
+            elif isinstance(action, jbo):
+                _service_list.append(
+                    [action.time, "", "", f"← {action.joining_service_ref}"]
+                )
+            elif isinstance(action, fsp):
+                _service_list.append(
+                    [
+                        action.time,
+                        "",
+                        "",
+                        f"{self._current_service.header.reference} ↔ {action.new_service_ref}",
+                    ]
+                )
+            elif isinstance(action, rsp):
+                _service_list.append(
+                    [
+                        action.time,
+                        "",
+                        "",
+                        f"{action.new_service_ref} ↔ {self._current_service.header.reference}",
+                    ]
+                )
+            elif isinstance(action, pas):
+                _service_list.append([action.time, "", f"{action.location}", "↓"])
+        return _service_list
+
+    @property
+    def current_service(self) -> TimetabledService:
+        return self._current_service
+
+    @current_service.setter
+    def current_service(self, service: TimetabledService) -> None:
+        self._current_service = service
+        self.service_list = self._assemble_service_list()
+        self.window[GUIKey.SRV_MAX_SPEED.name].update(disabled=self.parent_service is not None)
+        self.window[GUIKey.SRV_START_SPEED.name].update(disabled=self.parent_service is not None)
+        self.window[GUIKey.SRV_MASS.name].update(
+            getattr(self.parent_service or self._current_service, "header").mass or 0,
+            disabled=self.parent_service is not None,
+        )
+        if self._current_service.header.power or self.parent_service:
+            self.window[GUIKey.SRV_MAX_POWER.name].update(
+                getattr(self.parent_service or self._current_service, "header").power or 0
+                * (1 if self._display_in_kw else 1.34),
+                disabled=self.parent_service is not None,
+            )
+        self.window[GUIKey.SRV_MAX_BRAKE_FORCE.name].update(
+            getattr(self.parent_service or self._current_service, "header").brake_force or 0,
+            disabled=self.parent_service is not None
+        )
+        self.window[GUIKey.SERVICE_DISPLAY.name].update(values=self.service_list)
+        self.window[GUIKey.SRV_START_TIME.name].update(service.start_type.time)
+        if self._current_service.header.start_speed or self.parent_service:
+            self.window[GUIKey.SRV_START_SPEED.name].update(
+                getattr(self.parent_service or self._current_service, "header").start_speed or 0
+                * (1 if self._display_in_kph else 0.62137)
+            )
+        if self._current_service.header.max_speed or self.parent_service:
+            self.window[GUIKey.SRV_MAX_SPEED.name].update(
+                getattr(self.parent_service or self._current_service, "header").max_speed or 0
+                * (1 if self._display_in_kph else 0.62137)
+            )
 
     def manual_termination_checkbox(self, MANUAL_TERMINATION: bool) -> None:
         self.window[GUIKey.MANUAL_TERMINATION_TIME.name].update(disabled=MANUAL_TERMINATION)
@@ -53,42 +137,49 @@ class RailOSTTBSession:
             ]
         ):
             return [["", "", "", ""]]
-        _service: TimetabledService = _data_selected[0]
-        self.service_list = []
+        self.current_service = _data_selected[0]
 
-        for action in _service.actions.values():
-            if isinstance(action, Location):
-                self.service_list.append(
-                    [action.time, action.end_time or "", action.name, ""]
-                )
-            elif isinstance(action, cdt):
-                self.service_list.append([action.time, "", "", "↩"])
-            elif isinstance(action, jbo):
-                self.service_list.append(
-                    [action.time, "", "", f"← {action.joining_service_ref}"]
-                )
-            elif isinstance(action, fsp):
-                self.service_list.append(
-                    [
-                        action.time,
-                        "",
-                        "",
-                        f"{_service.header.reference} ↔ {action.new_service_ref}",
-                    ]
-                )
-            elif isinstance(action, rsp):
-                self.service_list.append(
-                    [
-                        action.time,
-                        "",
-                        "",
-                        f"{action.new_service_ref} ↔ {_service.header.reference}",
-                    ]
-                )
-            elif isinstance(action, pas):
-                self.service_list.append([action.time, "", f"{action.location}", "↓"])
-        self.window[GUIKey.SERVICE_DISPLAY.name].update(values=self.service_list)
-        self.current_service = _service
+    def set_to_mph(self) -> None:
+        try:
+            _current_max_speed: float = self.current_service.header.max_speed
+            _current_start_speed: float = self.current_service.header.start_speed
+            self.window[GUIKey.SRV_MAX_SPEED.name].update(int(_current_max_speed * 0.62137))
+            self.window[GUIKey.SRV_START_SPEED.name].update(int(_current_start_speed * 0.62137))
+            self.window[GUIKey.SRV_START_SPEED_LABEL.name].update("Start Speed (mph)")
+            self.window[GUIKey.SRV_MAX_SPEED_LABEL.name].update("Max Speed (mph)")
+            self._display_in_kph = False
+        except (AttributeError, TypeError):
+            return
+
+    def set_to_kph(self) -> None:
+        try:
+            _current_max_speed: float = self.current_service.header.max_speed
+            _current_start_speed: float = self.current_service.header.start_speed
+            self.window[GUIKey.SRV_MAX_SPEED.name].update(int(_current_max_speed / 0.62137))
+            self.window[GUIKey.SRV_START_SPEED.name].update(int(_current_start_speed / 0.62137))
+            self.window[GUIKey.SRV_START_SPEED_LABEL.name].update("Start Speed (kph)")
+            self.window[GUIKey.SRV_MAX_SPEED_LABEL.name].update("Max Speed (kph)")
+            self._display_in_kph = True
+        except (AttributeError, TypeError) as e:
+            return
+
+    def set_to_kw(self) -> None:
+        try:
+            _current_power: float = self.current_service.header.power
+            self.window[GUIKey.SRV_MAX_POWER.name].update(int(_current_power / 1.34))
+            self.window[GUIKey.SRV_MAX_POWER_LABEL.name].update("Max Power (kW)")
+            self._display_in_kw = True
+        except (AttributeError, TypeError):
+            return
+
+    def set_to_hp(self) -> None:
+        try:
+            _current_power: float = self.current_service.header.power
+            self.window[GUIKey.SRV_MAX_POWER.name].update(int(_current_power * 1.34))
+            self.window[GUIKey.SRV_MAX_POWER_LABEL.name].update("Max Power (hp)")
+            self._display_in_kw = False
+        except (AttributeError, TypeError) as e:
+            return
 
     def find_railos(self) -> str:
         _exe = psg.popup_get_file(

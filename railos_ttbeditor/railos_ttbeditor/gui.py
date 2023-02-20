@@ -1,7 +1,6 @@
 import PySimpleGUI as psg
 import typing
 import datetime
-import pandas
 import railostools.ttb.components as railos_ttb_comp
 from railos_ttbeditor.addresses import GUIKey
 
@@ -89,8 +88,11 @@ def _build_start_time_spinbox() -> typing.Tuple[psg.Text, psg.Spin]:
 def _build_unit_select() -> psg.Radio:
     return psg.Column(
         [
-            [psg.Radio("kph", GUIKey.UNIT_SELECT.name, default=True)],
-            [psg.Radio("mph", GUIKey.UNIT_SELECT.name)],
+            [psg.Radio("kph", GUIKey.UNIT_SELECT_SPEED.name, key=GUIKey.UNIT_SELECT_KPH.name, enable_events=True, default=True)],
+            [psg.Radio("mph", GUIKey.UNIT_SELECT_SPEED.name, key=GUIKey.UNIT_SELECT_MPH.name, enable_events=True)],
+            [],
+            [psg.Radio("kW", GUIKey.UNIT_SELECT_MASS.name, key=GUIKey.UNIT_SELECT_KW.name, enable_events=True, default=True)],
+            [psg.Radio("hp", GUIKey.UNIT_SELECT_MASS.name, key=GUIKey.UNIT_SELECT_HP.name, enable_events=True)],
         ]
     )
 
@@ -99,7 +101,7 @@ def _build_spinbox_spec(
     specification: str, unit: str
 ) -> typing.Tuple[psg.Text, psg.Spin]:
     return (
-        psg.Text(f"{specification.title()} ({unit})"),
+        psg.Text(f"{specification.title()} ({unit})", key=f"SRV_{specification.replace(' ', '_').upper()}_LABEL"),
         psg.Spin(
             values=list(range(999)),
             disabled=True,

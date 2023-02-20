@@ -10,7 +10,6 @@ packages = [{include = "railos_ttbeditor"}]
 python = "^3.11,<3.12"
 pysimplegui = "^4.60.4"
 railostools = {git = "https://github.com/Railway-Op-Sim/railostools.git", subdirectory="python"}
-pandas = "^1.5.3"
 
 
 [build-system]
