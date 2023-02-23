@@ -1,10 +1,11 @@
 import typing
-import os.path
+import os
+import datetime
 from railos_ttbeditor.addresses import GUIKey
 import railostools.rly as railos_rly
 import railos_ttbeditor.gui as railos_gui
 import railostools.ttb.parsing as railos_ttb
-from railostools.ttb.components import TimetabledService
+from railostools.ttb.components import TimetabledService, StartType
 from railostools.ttb.components.actions import Location, cdt, jbo, fsp, rsp, pas
 from railostools.ttb.components.start import Sfs, Snt, Sns, Sns_fsh, Snt_sh, Sns_sh
 import railostools.exceptions as railos_exc
@@ -110,6 +111,8 @@ class RailOSTTBSession:
                 getattr(self.parent_service or self._current_service, "header").max_speed or 0
                 * (1 if self._display_in_kph else 0.62137)
             )
+        self.set_start_type(self._current_service.start_type)
+        self.set_end_type(self._current_service.finish_type)
 
     def manual_termination_checkbox(self, MANUAL_TERMINATION: bool) -> None:
         self.window[GUIKey.MANUAL_TERMINATION_TIME.name].update(disabled=MANUAL_TERMINATION)
@@ -223,13 +226,22 @@ class RailOSTTBSession:
 
         try:
             self._timetable_parser.parse(_ttb_file)
-        except Exception:
+        except Exception as e:
+            _log_file: str = os.path.join(os.getcwd(), datetime.datetime.now().strftime("parse_err_%H_%M_%S_%Y_%m_%d.log"))
             psg.popup(
                 f"Error: Failed to parse file '{_ttb_file}'. "
-                "Note legacy timetables are not supported.",
+                f"Note legacy timetables are not supported, see log file '{_log_file}'",
                 title="Parsing Error",
             )
+            with open(_log_file, "w") as out_f:
+                out_f.write(e.args[0])
             self._current_ttb = None
             return
         self.service_list = self._populate_services()
         self.window[GUIKey.TIMETABLE_DISPLAY.name].update(values=self.service_list)
+
+    def set_start_type(self, start_type: StartType) -> None:
+        self.window[f"RADIO_SRV_{start_type.name.upper().replace('-', '_')}"].update(value=True)
+
+    def set_end_type(self, end_type: StartType) -> None:
+        self.window[f"RADIO_SRV_{end_type.name.upper().replace('-', '_')}"].update(value=True)

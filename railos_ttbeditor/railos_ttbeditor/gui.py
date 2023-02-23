@@ -176,17 +176,17 @@ def _build_ref_desc_boxes() -> psg.Column:
 def _build_service_type_select() -> psg.Column:
     return psg.Column(
         [
-            [psg.Radio("Standard", GUIKey.RADIO_SRV_SELECT.name, default=True)],
-            [psg.Radio("Shuttle from Stop", GUIKey.RADIO_SRV_SELECT.name)],
+            [psg.Radio("Standard", GUIKey.RADIO_SRV_SELECT.name, key=GUIKey.RADIO_SRV_SNT.name, default=True)],
+            [psg.Radio("Shuttle from Stop", GUIKey.RADIO_SRV_SELECT.name, key=GUIKey.RADIO_SRV_SNT_SH.name)],
             [
                 psg.Radio(
-                    "Shuttle from Feeder Service", GUIKey.RADIO_SRV_SELECT.name, disabled=True
+                    "Shuttle from Feeder Service", GUIKey.RADIO_SRV_SELECT.name, key=GUIKey.RADIO_SRV_SNS_SH.name, disabled=True
                 )
             ],
-            [psg.Radio("Shuttle Finish Service", GUIKey.RADIO_SRV_SELECT.name, disabled=True)],
+            [psg.Radio("Shuttle Finish Service", GUIKey.RADIO_SRV_SELECT.name, key=GUIKey.RADIO_SRV_SNS_FSH.name, disabled=True)],
             [
                 psg.Radio(
-                    "Shuttle from Other Service", GUIKey.RADIO_SRV_SELECT.name, disabled=True
+                    "Service from Other Service", GUIKey.RADIO_SRV_SELECT.name, key=GUIKey.RADIO_SRV_SNS.name, disabled=True
                 )
             ],
         ],
@@ -197,18 +197,20 @@ def _build_service_type_select() -> psg.Column:
 def _build_finish_type_select() -> psg.Column:
     return psg.Column(
         [
-            [psg.Radio("Finish and Form New Service", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
+            [psg.Radio("Finish and Form New Service", GUIKey.RADIO_SRV_FINISH_SELECT.name, key=GUIKey.RADIO_SRV_FNS.name)],
             [
                 psg.Radio(
                     "Finish and Remain at Location",
                     GUIKey.RADIO_SRV_FINISH_SELECT.name,
+                    key=GUIKey.RADIO_SRV_FRH.name,
                     default=True,
                 )
             ],
-            [psg.Radio("Finish and Exit at Location", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
-            [psg.Radio("Finish and Join Other", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
-            [psg.Radio("Finish and Shuttle Feeder", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
-            [psg.Radio("Finish Shuttle, Form New", GUIKey.RADIO_SRV_FINISH_SELECT.name)],
+            [psg.Radio("Finish Shuttle, Remain Here", GUIKey.RADIO_SRV_FINISH_SELECT.name, key=GUIKey.RADIO_SRV_FRH_SH.name)],
+            [psg.Radio("Finish and Exit at Location", GUIKey.RADIO_SRV_FINISH_SELECT.name, key=GUIKey.RADIO_SRV_FER.name)],
+            [psg.Radio("Finish and Join Other", GUIKey.RADIO_SRV_FINISH_SELECT.name, key=GUIKey.RADIO_SRV_FJO.name)],
+            [psg.Radio("Finish Shuttle Feeder", GUIKey.RADIO_SRV_FINISH_SELECT.name, key=GUIKey.RADIO_SRV_F_NSHS.name)],
+            [psg.Radio("Finish Shuttle, Form New", GUIKey.RADIO_SRV_FINISH_SELECT.name, key=GUIKey.RADIO_SRV_FNS_SH.name)],
         ],
         vertical_alignment="top",
     )
