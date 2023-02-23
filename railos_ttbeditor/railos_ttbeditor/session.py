@@ -1,7 +1,10 @@
 import typing
 import os
 import datetime
+import pathlib
+import toml
 from railos_ttbeditor.addresses import GUIKey
+import railos_ttbeditor.exceptions as railosttb_exc
 import railostools.rly as railos_rly
 import railos_ttbeditor.gui as railos_gui
 import railostools.ttb.parsing as railos_ttb
@@ -10,12 +13,27 @@ from railostools.ttb.components.actions import Location, cdt, jbo, fsp, rsp, pas
 from railostools.ttb.components.start import Sfs, Snt, Sns, Sns_fsh, Snt_sh, Sns_sh
 import railostools.exceptions as railos_exc
 import PySimpleGUI as psg
-import pandas
+
+def ensure_railos_set(function) -> None:
+    def _func_wrapper(*args, **kwargs):
+        args[0].load_cache()
+        if not args[0]._cache_data.get("railos_location"):
+            raise railosttb_exc.RailOSLocationUnset
+        function(*args, **kwargs)
+    return _func_wrapper
+
+def ensure_timetable_loaded(function) -> None:
+    def _func_wrapper(*args, **kwargs):
+        if not args[0]._cache_data.get("railos_location"):
+            raise railosttb_exc.RailOSLocationUnset
+        elif not args[0]._current_ttb:
+            raise railosttb_exc.NoTimetableLoaded
+        function(*args, **kwargs)
+    return _func_wrapper
 
 
 class RailOSTTBSession:
     def __init__(self) -> None:
-        self._railos_location: typing.Optional[str] = None
         self._current_rly: typing.Optional[str] = None
         self._current_ttb: typing.Optional[str] = None
         self.service_list: typing.List[str] = [["", "", "", ""]]
@@ -25,6 +43,7 @@ class RailOSTTBSession:
         self._current_service: TimetabledService = None
         self._display_in_kph: bool = True
         self._display_in_kw: bool = True
+        self._cache_data: typing.Dict[str, typing.Any] = {}
         self.window = railos_gui.build_interface(
             timetable_entries=self.service_list,
             service_entries=self.service_entry
@@ -38,6 +57,15 @@ class RailOSTTBSession:
             return self._timetable_parser._data.services[str(self.current_service.start_type.feeder_ref)]
         return None
 
+    def load_cache(self) -> None:
+        if not os.path.exists(railos_gui.RAILOSTTB_EDITOR_CACHE_FILE):
+            return
+        with open(railos_gui.RAILOSTTB_EDITOR_CACHE_FILE) as in_f:
+            self._cache_data = dict(toml.load(in_f))
+        if _railos_loc := self._cache_data.get("railos_location"):
+            self.window[GUIKey.RAILOS_LOC.name].update(
+                _railos_loc, text_color="green" if os.path.exists(_railos_loc) else "red"
+            )
 
     def _assemble_service_list(self) -> typing.List[str]:
         _service_list = []
@@ -114,6 +142,7 @@ class RailOSTTBSession:
         self.set_start_type(self._current_service.start_type)
         self.set_end_type(self._current_service.finish_type)
 
+    @ensure_timetable_loaded
     def manual_termination_checkbox(self, MANUAL_TERMINATION: bool) -> None:
         self.window[GUIKey.MANUAL_TERMINATION_TIME.name].update(disabled=MANUAL_TERMINATION)
 
@@ -130,6 +159,7 @@ class RailOSTTBSession:
         ]
         return _table
 
+    @ensure_timetable_loaded
     def choose_service(
         self, TIMETABLE_DISPLAY: typing.List[typing.List[typing.Any]]
     ) -> typing.Dict:
@@ -193,11 +223,14 @@ class RailOSTTBSession:
         )
         if not _exe:
             return
-        self._railos_location = _exe
+        self._cache_data["railos_location"] = _exe
         self.window[GUIKey.RAILOS_LOC.name].update(
             _exe, text_color="green" if os.path.exists(_exe) else "red"
         )
+        with open(railos_gui.RAILOSTTB_EDITOR_CACHE_FILE, "w") as out_f:
+            toml.dump(self._cache_data, out_f)
 
+    @ensure_railos_set
     def choose_route(self) -> None:
         _rly_file = psg.popup_get_file(
             "",
@@ -213,6 +246,7 @@ class RailOSTTBSession:
             _rly_file, text_color="green" if os.path.exists(_rly_file) else "red"
         )
 
+    @ensure_railos_set
     def choose_timetable(self) -> typing.List[typing.List[typing.Any]]:
         _ttb_file = psg.popup_get_file(
             "",

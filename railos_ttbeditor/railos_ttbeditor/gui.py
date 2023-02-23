@@ -1,9 +1,13 @@
 import PySimpleGUI as psg
 import typing
+import os.path
+import pathlib
+import toml
 import datetime
 import railostools.ttb.components as railos_ttb_comp
 from railos_ttbeditor.addresses import GUIKey
 
+RAILOSTTB_EDITOR_CACHE_FILE: str = os.path.join(pathlib.Path(__file__).parent, "railosttbedit_cache.toml")
 
 def _times_of_day() -> typing.Iterator[str]:
     for time in range(0, 431964, 60):
@@ -29,6 +33,9 @@ def _build_menu_bar() -> psg.MenuBar:
 
 
 def _build_setup_buttons() -> typing.List[typing.List[psg.Element]]:
+    _preset_location: typing.Optional[str] = None
+    if os.path.exists(RAILOSTTB_EDITOR_CACHE_FILE):
+        _preset_location = toml.load(RAILOSTTB_EDITOR_CACHE_FILE).get("railos_location")
     return [
         [
             psg.Button(
@@ -37,14 +44,21 @@ def _build_setup_buttons() -> typing.List[typing.List[psg.Element]]:
                 key=GUIKey.RAILOS_LOC_BROWSER.name,
             ),
             psg.Text(
-                "Railway Operation Simulator Location Unset",
-                text_color="red",
+                _preset_location
+                or "Railway Operation Simulator Location Unset",
+                text_color="green" if _preset_location else "red",
                 key=GUIKey.RAILOS_LOC.name,
             ),
             psg.Button(
-                button_text="Route", tooltip="Select route file", key=GUIKey.ROUTE_BROWSER.name
+                button_text="Route",
+                tooltip="Select route file",
+                key=GUIKey.ROUTE_BROWSER.name,
             ),
-            psg.Text("Route Map Not Specified", text_color="red", key=GUIKey.ROUTE_CHOICE.name),
+            psg.Text(
+                "Route Map Not Specified",
+                text_color="red",
+                key=GUIKey.ROUTE_CHOICE.name,
+            ),
         ]
     ]
 
