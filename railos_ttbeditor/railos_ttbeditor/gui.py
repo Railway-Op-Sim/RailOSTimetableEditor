@@ -71,7 +71,8 @@ def _build_service_display_table(service_entries:  typing.List[typing.List[typin
         key=GUIKey.SERVICE_DISPLAY.name,
         auto_size_columns=False,
         enable_events=True,
-        col_widths=[10,10,30]
+        col_widths=[10,10,30],
+        alternating_row_color="light grey"
     )
 
 
@@ -83,7 +84,8 @@ def _build_timetable_display_table(timetable_entries:  typing.List[typing.List[t
         key=GUIKey.TIMETABLE_DISPLAY.name,
         enable_events=True,
         auto_size_columns=False,
-        col_widths=[10,10,30]
+        col_widths=[10,10,30],
+        alternating_row_color="light grey"
     )
 
 
@@ -230,33 +232,35 @@ def _build_finish_type_select() -> psg.Column:
     )
 
 
-def _build_location_select() -> psg.Column:
+def _build_location_select(locations: typing.List[str], track_ids: typing.List[str]) -> psg.Column:
     return psg.Column(
         [
             [
                 psg.Checkbox(
-                    "Station/Siding Start", key=GUIKey.CHOOSE_BY_LOCATION.name, default=True
+                    "Station/Siding Start", key=GUIKey.CHOOSE_BY_LOCATION.name, default=True, enable_events=True
                 )
             ],
             [
                 psg.Column(
                     [
-                        [psg.Text("Location")],
-                        [psg.DropDown([], key=GUIKey.LOCATION_SELECT.name, size=(25, 1))],
+                        [psg.Text("Locations"), psg.Text("", key=GUIKey.SPAWN_DIRECTION.name)],
+                        [psg.DropDown(locations, key=GUIKey.LOCATION_SELECT.name, size=(25, 1), enable_events=True, readonly=True)],
                         [psg.Text("Track IDs")],
-                        [psg.DropDown([], key=GUIKey.TRACK_IDS.name, size=(25, 1))],
+                        [psg.DropDown(track_ids, key=GUIKey.TRACK_IDS.name, size=(25, 1), enable_events=True, readonly=True)],
                     ],
                     vertical_alignment="top",
+                    key=GUIKey.LOCATIONS_COLUMN.name
                 ),
                 psg.Column(
                     [
                         [psg.Text("Track ID Rear")],
                         [psg.Input("", key=GUIKey.TRACK_ID_REAR.name, size=(25, 1))],
                         [psg.Text("Track ID Front")],
-                        [psg.DropDown("", key=GUIKey.TRACK_ID_FRONT.name, size=(25, 1))],
+                        [psg.Input("", key=GUIKey.TRACK_ID_FRONT.name, size=(25, 1))],
                     ],
                     visible=False,
                     vertical_alignment="top",
+                    key=GUIKey.TRACK_IDS_COLUMN.name
                 ),
             ],
         ]
@@ -352,10 +356,10 @@ def _build_control_panel_1() -> psg.Column:
     )
 
 
-def _build_control_panel_2() -> psg.Column:
+def _build_control_panel_2(locations: typing.List[str], track_ids: typing.List[str]) -> psg.Column:
     return psg.Column(
         [
-            [_build_service_type_select(), _build_location_select()],
+            [_build_service_type_select(), _build_location_select(locations, track_ids)],
             _build_others_ref_panel(),
         ],
         vertical_alignment="top",
@@ -375,14 +379,19 @@ def _build_control_panel_3() -> psg.Column:
     )
 
 
-def build_interface(timetable_entries: typing.List[typing.List[typing.Any]]=None, service_entries: typing.List[typing.List[typing.Any]]=None, *args, **kwargs) -> psg.Window:
+def build_interface(
+    timetable_entries: typing.List[typing.List[typing.Any]],
+    service_entries: typing.List[typing.List[typing.Any]],
+    location_entries: typing.List[str],
+    track_ids: typing.List[str],
+    *args, **kwargs) -> psg.Window:
     psg.theme("Default1")
 
     if not timetable_entries:
-        timetable_entries = [["", "", ""]]
+        timetable_entries = []
 
     if not service_entries:
-        service_entries = [["", "", "", ""]]
+        service_entries = []
 
     _menu: psg.MenuBar = _build_menu_bar()
     _setup_buttons: typing.List[typing.List[psg.Element]] = _build_setup_buttons()
@@ -404,7 +413,7 @@ def build_interface(timetable_entries: typing.List[typing.List[typing.Any]]=None
                 justification="c",
             )
         ],
-        [_build_control_panel_1(), _build_control_panel_2(), _build_control_panel_3()],
+        [_build_control_panel_1(), _build_control_panel_2(location_entries, track_ids), _build_control_panel_3()],
         [_build_action_buttons()],
     ]
 

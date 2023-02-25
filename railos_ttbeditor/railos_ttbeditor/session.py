@@ -1,17 +1,21 @@
 import typing
 import os
 import datetime
-import pathlib
+import itertools
 import toml
 from railos_ttbeditor.addresses import GUIKey
 import railos_ttbeditor.exceptions as railosttb_exc
-import railostools.rly as railos_rly
+import railostools.rly.parsing as railos_rly
+import railostools.rly.relations as railos_rly_rel
 import railos_ttbeditor.gui as railos_gui
+import railostools.common.enumeration as railos_enums
 import railostools.ttb.parsing as railos_ttb
 from railostools.ttb.components import TimetabledService, StartType
-from railostools.ttb.components.actions import Location, cdt, jbo, fsp, rsp, pas
+from railostools.ttb.components.actions import cdt, jbo, fsp, rsp, pas
 from railostools.ttb.components.start import Sfs, Snt, Sns, Sns_fsh, Snt_sh, Sns_sh
+from railostools.ttb.components.finish import Fns, F_nshs, Fjo, Fns_sh, Fer, Frh, Frh_sh
 import railostools.exceptions as railos_exc
+import railostools.ttb.components.actions as ttb_act
 import PySimpleGUI as psg
 
 def ensure_railos_set(function) -> None:
@@ -38,15 +42,20 @@ class RailOSTTBSession:
         self._current_ttb: typing.Optional[str] = None
         self.service_list: typing.List[str] = [["", "", "", ""]]
         self.service_entry: typing.List[str] = [["", "", "", ""]]
+        self.locations_list: typing.List[str] = []
+        self.track_ids: typing.List[str] = []
         self._railway_parser = railos_rly.RlyParser()
         self._timetable_parser = railos_ttb.TTBParser()
         self._current_service: TimetabledService = None
+        self._current_location_track_coords: typing.List[typing.Tuple[typing.Tuple[int, int], typing.Tuple[int, int]]] = []
         self._display_in_kph: bool = True
         self._display_in_kw: bool = True
         self._cache_data: typing.Dict[str, typing.Any] = {}
         self.window = railos_gui.build_interface(
             timetable_entries=self.service_list,
-            service_entries=self.service_entry
+            service_entries=self.service_entry,
+            location_entries=self.locations_list,
+            track_ids=self.track_ids
         )
 
     @property
@@ -56,6 +65,17 @@ class RailOSTTBSession:
         elif isinstance(self.current_service.start_type, Sns_sh):
             return self._timetable_parser._data.services[str(self.current_service.start_type.feeder_ref)]
         return None
+
+    @property
+    def succeeding_service(self) -> typing.Optional[TimetabledService]:
+        if isinstance(self.current_service.finish_type, (F_nshs, Fns_sh)):
+            return self._timetable_parser._data.services[str(self.current_service.finish_type.linked_shuttle_ref)]
+        elif isinstance(self.current_service.finish_type, Fns):
+            return self._timetable_parser._data.services[str(self.current_service.finish_type.new_service_ref)]
+        elif isinstance(self.current_service.finish_type, Fjo):
+            return self._timetable_parser._data.services[str(self.current_service.finish_type.joining_service_ref)]
+        else:
+            return None
 
     def load_cache(self) -> None:
         if not os.path.exists(railos_gui.RAILOSTTB_EDITOR_CACHE_FILE):
@@ -67,40 +87,55 @@ class RailOSTTBSession:
                 _railos_loc, text_color="green" if os.path.exists(_railos_loc) else "red"
             )
 
+    def _service_finish_line(self, latest_location: str) -> typing.List[str]:
+        if isinstance(self.current_service.finish_type, Frh):
+            return ["-", "-", latest_location, "✓"]
+        elif isinstance(self.current_service.finish_type, (Fns, Fns_sh)):
+            return [self.current_service.finish_type.time, "-", latest_location, f"→ {self.succeeding_service.header.reference}"]
+        elif isinstance(self.current_service.finish_type, Fjo):
+            return [self.current_service.finish_type.time, "-", latest_location, f"↬ {self.succeeding_service.header.reference}"]
+        else:
+            return []
+
     def _assemble_service_list(self) -> typing.List[str]:
         _service_list = []
+        _latest_location: str = "-"
 
         for action in self._current_service.actions.values():
-            if isinstance(action, Location):
+            if isinstance(action, ttb_act.Location):
+                _latest_location = action.name
                 _service_list.append(
-                    [action.time, action.end_time or "", action.name, ""]
+                    [action.time, action.end_time or "-", action.name, ""]
                 )
             elif isinstance(action, cdt):
-                _service_list.append([action.time, "", "", "↩"])
+                _service_list.append([action.time, "-", _latest_location, "⤸"])
             elif isinstance(action, jbo):
                 _service_list.append(
-                    [action.time, "", "", f"← {action.joining_service_ref}"]
+                    [action.time, "-", _latest_location, f"↫ {action.joining_service_ref}"]
                 )
             elif isinstance(action, fsp):
                 _service_list.append(
                     [
                         action.time,
-                        "",
-                        "",
-                        f"{self._current_service.header.reference} ↔ {action.new_service_ref}",
+                        "-",
+                        _latest_location,
+                        f"{self._current_service.header.reference} ↦ {action.new_service_ref}",
                     ]
                 )
             elif isinstance(action, rsp):
                 _service_list.append(
                     [
                         action.time,
-                        "",
-                        "",
-                        f"{action.new_service_ref} ↔ {self._current_service.header.reference}",
+                        "-",
+                        _latest_location,
+                        f"{action.new_service_ref} ↦ {self._current_service.header.reference}",
                     ]
                 )
             elif isinstance(action, pas):
-                _service_list.append([action.time, "", f"{action.location}", "↓"])
+                _latest_location = action.location
+                _service_list.append([action.time, "-", f"{action.location}", "↓"])
+        if _finish_line := self._service_finish_line(_latest_location):
+            _service_list.append(_finish_line)
         return _service_list
 
     @property
@@ -230,6 +265,31 @@ class RailOSTTBSession:
         with open(railos_gui.RAILOSTTB_EDITOR_CACHE_FILE, "w") as out_f:
             toml.dump(self._cache_data, out_f)
 
+    def _populate_locations(self) -> None:
+        self.locations_list = list(sorted(self._railway_parser.timetable_locations.keys()))
+        self.window[GUIKey.LOCATION_SELECT.name].update(values=self.locations_list)
+
+    def populate_track_ids(self, location: str) -> None:
+        _location: railos_rly.TimetableLocation = self._railway_parser.timetable_locations[location]
+        self._current_location_track_coords = [(c.start_coordinate, c.end_coordinate) for c in _location.start_positions]
+        self._current_location_track_coords += [(c.end_coordinate, c.start_coordinate) for c in _location.start_positions]
+        self.track_ids = [f"{c[0]} {c[1]}" for c in self._current_location_track_coords]
+        self.window[GUIKey.TRACK_IDS.name].update(values=self.track_ids)
+
+    def select_track_spawn(self, choice_str: str) -> None:
+        _current_id_str_idx = self.track_ids.index(choice_str)
+        _current_ids = self._current_location_track_coords[_current_id_str_idx]
+        _symbol: str = ""
+        if _current_ids[0][0] > _current_ids[1][0]:
+            _symbol = "←"
+        elif _current_ids[0][0] < _current_ids[1][0]:
+            _symbol = "→"
+        elif _current_ids[0][1] > _current_ids[1][1]:
+            _symbol = "↓"
+        else:
+            _symbol = "↑"
+        self.window[GUIKey.SPAWN_DIRECTION.name].update(_symbol)
+
     @ensure_railos_set
     def choose_route(self) -> None:
         _rly_file = psg.popup_get_file(
@@ -245,6 +305,7 @@ class RailOSTTBSession:
         self.window[GUIKey.ROUTE_CHOICE.name].update(
             _rly_file, text_color="green" if os.path.exists(_rly_file) else "red"
         )
+        self._populate_locations()
 
     @ensure_railos_set
     def choose_timetable(self) -> typing.List[typing.List[typing.Any]]:

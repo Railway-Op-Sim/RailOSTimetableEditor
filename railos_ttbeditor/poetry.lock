@@ -193,9 +193,8 @@ wikidspark = {git = "https://github.com/artemis-beta/wikidspark.git"}
 type = "git"
 url = "https://github.com/Railway-Op-Sim/railostools.git"
 reference = "HEAD"
-resolved_reference = "ea87ff16ddd303086bcb54abc3ca13bd2967fc9a"
+resolved_reference = "903ae6b5cfaa63f2670364986293d9329129cf9c"
 subdirectory = "python"
-
 [[package]]
 name = "requests"
 version = "2.28.2"

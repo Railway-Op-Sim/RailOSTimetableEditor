@@ -18,6 +18,13 @@ def railosttb_editor() -> None:
         try:
             if _event == GUIKey.RAILOS_LOC_BROWSER.name:
                 _session.find_railos()
+            elif _event == GUIKey.CHOOSE_BY_LOCATION.name:
+                _session.window[GUIKey.LOCATIONS_COLUMN.name].update(visible=_values[GUIKey.CHOOSE_BY_LOCATION.name])
+                _session.window[GUIKey.TRACK_IDS_COLUMN.name].update(visible=not _values[GUIKey.CHOOSE_BY_LOCATION.name])
+            elif _event == GUIKey.LOCATION_SELECT.name:
+                _session.populate_track_ids(_values[GUIKey.LOCATION_SELECT.name])
+            elif _event == GUIKey.TRACK_IDS.name:
+                _session.select_track_spawn(_values[GUIKey.TRACK_IDS.name])
             elif _event == GUIKey.MANUAL_TERMINATION.name:
                 _session.manual_termination_checkbox(**_values)
             elif _event == GUIKey.ROUTE_BROWSER.name:

@@ -62,3 +62,6 @@ class GUIKey(enum.Enum):
     RADIO_SRV_FRH = enum.auto()
     RADIO_SRV_FER = enum.auto()
     RADIO_SRV_F_NSHS = enum.auto()
+    LOCATIONS_COLUMN = enum.auto()
+    TRACK_IDS_COLUMN = enum.auto()
+    SPAWN_DIRECTION =enum.auto()
