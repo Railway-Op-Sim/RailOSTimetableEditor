@@ -8,7 +8,7 @@ packages = [{include = "railos_ttbeditor"}]
 
 [tool.poetry.dependencies]
 python = "^3.11,<3.12"
-railostools = {git = "https://github.com/Railway-Op-Sim/railostools.git", subdirectory="python"}
+railostools = {git = "https://github.com/Railway-Op-Sim/railostools.git", subdirectory="python", tag = "v0.5.4"}
 pysimplegui = "^4.60.4"
 toml = "^0.10.2"
 

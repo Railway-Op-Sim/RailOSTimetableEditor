@@ -172,7 +172,7 @@ python-versions = "*"
 
 [[package]]
 name = "railostools"
-version = "1.1.1"
+version = "1.1.2"
 description = "API and CLI for interaction with Railway Operation Simulator"
 category = "main"
 optional = false
@@ -192,8 +192,8 @@ wikidspark = {git = "https://github.com/artemis-beta/wikidspark.git"}
 [package.source]
 type = "git"
 url = "https://github.com/Railway-Op-Sim/railostools.git"
-reference = "HEAD"
-resolved_reference = "903ae6b5cfaa63f2670364986293d9329129cf9c"
+reference = "v0.5.4"
+resolved_reference = "48a0a4c613307e74590952a83438530a1e3d103f"
 subdirectory = "python"
 [[package]]
 name = "requests"
@@ -334,7 +334,7 @@ requests = ">=2.0.0,<3.0.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.11,<3.12"
-content-hash = "4e16a42180af0db5a719fe1daf4befcf644a7f1bc3e23baa203b0d490954a6bc"
+content-hash = "f086a2fdbf1991149da4172bedeb3f32fefe6cfaa83cc16fe0ffd8a733499be1"
 
 [metadata.files]
 beautifulsoup4 = [

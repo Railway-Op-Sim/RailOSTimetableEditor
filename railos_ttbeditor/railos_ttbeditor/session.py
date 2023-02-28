@@ -91,9 +91,15 @@ class RailOSTTBSession:
         if isinstance(self.current_service.finish_type, Frh):
             return ["-", "-", latest_location, "✓"]
         elif isinstance(self.current_service.finish_type, (Fns, Fns_sh)):
-            return [self.current_service.finish_type.time, "-", latest_location, f"→ {self.succeeding_service.header.reference}"]
+            _time_str = self.current_service.finish_type.time
+            if (_days := self.current_service.finish_type.time_days):
+                _time_str += f"+{_days}"
+            return [_time_str, "-", latest_location, f"→ {self.succeeding_service.header.reference}"]
         elif isinstance(self.current_service.finish_type, Fjo):
-            return [self.current_service.finish_type.time, "-", latest_location, f"↬ {self.succeeding_service.header.reference}"]
+            _time_str = self.current_service.finish_type.time
+            if (_days := self.current_service.finish_type.time_days):
+                _time_str += f"+{_days}"
+            return [_time_str, "-", latest_location, f"↬ {self.succeeding_service.header.reference}"]
         else:
             return []
 
@@ -102,21 +108,28 @@ class RailOSTTBSession:
         _latest_location: str = "-"
 
         for action in self._current_service.actions.values():
+            _time_str = action.time
+            if (_days := action.time_days):
+                _time_str += f"+{_days}"
+
             if isinstance(action, ttb_act.Location):
                 _latest_location = action.name
+                _end_time_str = action.end_time
+                if (_days := action.end_time_days):
+                    _end_time_str += f"+{_days}"
                 _service_list.append(
-                    [action.time, action.end_time or "-", action.name, ""]
+                    [_time_str, _end_time_str or "-", action.name, ""]
                 )
             elif isinstance(action, cdt):
-                _service_list.append([action.time, "-", _latest_location, "⤸"])
+                _service_list.append([_time_str, "-", _latest_location, "⤸"])
             elif isinstance(action, jbo):
                 _service_list.append(
-                    [action.time, "-", _latest_location, f"↫ {action.joining_service_ref}"]
+                    [_time_str, "-", _latest_location, f"↫ {action.joining_service_ref}"]
                 )
             elif isinstance(action, fsp):
                 _service_list.append(
                     [
-                        action.time,
+                        _time_str,
                         "-",
                         _latest_location,
                         f"{self._current_service.header.reference} ↦ {action.new_service_ref}",
@@ -125,7 +138,7 @@ class RailOSTTBSession:
             elif isinstance(action, rsp):
                 _service_list.append(
                     [
-                        action.time,
+                        _time_str,
                         "-",
                         _latest_location,
                         f"{action.new_service_ref} ↦ {self._current_service.header.reference}",
@@ -133,7 +146,7 @@ class RailOSTTBSession:
                 )
             elif isinstance(action, pas):
                 _latest_location = action.location
-                _service_list.append([action.time, "-", f"{action.location}", "↓"])
+                _service_list.append([_time_str, "-", f"{action.location}", "↓"])
         if _finish_line := self._service_finish_line(_latest_location):
             _service_list.append(_finish_line)
         return _service_list
@@ -188,10 +201,13 @@ class RailOSTTBSession:
         if not (services := self._timetable_parser._data.services):
             return
 
-        _table: typing.List[typing.List[str]] = [
-            [identifier, service.start_type.time, service.header.description]
-            for identifier, service in services.items()
-        ]
+        _table: typing.List[typing.List[str]] = []
+
+        for identifier, service in services.items():
+            _time_str =  service.start_type.time
+            if (_days := service.start_type.time_days):
+                _time_str += f"+{_days}"
+            _table.append([identifier, _time_str, service.header.description])
         return _table
 
     @ensure_timetable_loaded
